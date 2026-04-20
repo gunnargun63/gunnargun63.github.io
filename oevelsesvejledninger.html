@@ -396,8 +396,8 @@
     container.innerHTML = files.map((f, i) => {
       const ext = f.name.split('.').pop().toUpperCase();
       const delay = (i * 0.04 + 0.04).toFixed(2);
-      const rawUrl = `https://raw.githubusercontent.com/gunnargun63/gunnargun63.github.io/main/%C3%98velsesvejledninger/${encodeURIComponent(currentLevel)}/${encodeURIComponent(f.name)}`;
-      return `<a class="card" href="${rawUrl}" target="_blank" rel="noopener" style="animation-delay:${delay}s">
+      const pagesUrl = `https://gunnargun63.github.io/%C3%98velsesvejledninger/${encodeURIComponent(currentLevel)}/${encodeURIComponent(f.name)}`;
+      return `<a class="card" href="${pagesUrl}" target="_blank" rel="noopener" style="animation-delay:${delay}s">
         <div class="card-icon">≡</div>
         <div class="card-title">${f.name}</div>
         <div class="card-meta">${ext} · ${formatSize(f.size)}</div>
