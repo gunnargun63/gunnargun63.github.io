@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Øvelsesvejledninger – Gunnar Gun</title>
+  <style>
+    :root {
+      --bg: #f7f6f2;
+      --surface: #ffffff;
+      --border: #e2e0d8;
+      --text: #1a1a18;
+      --muted: #6b6a65;
+      --accent: #1a4f8a;
+      --accent-light: #e8f0f9;
+      --danger: #a32d2d;
+      --radius: 10px;
+      --font: 'Literata', Georgia, serif;
+      --font-ui: 'DM Sans', system-ui, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font-ui);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 2rem 1rem;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    .page {
+      max-width: 720px;
+      margin: 0 auto;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 2.5rem;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .topbar a {
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: color 0.15s;
+    }
+
+    .topbar a:hover { color: var(--text); }
+
+    .topbar svg { width: 14px; height: 14px; }
+
+    .sep { color: var(--border); }
+
+    header { margin-bottom: 2rem; }
+
+    .eyebrow {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+    }
+
+    h1 {
+      font-family: var(--font);
+      font-size: 32px;
+      font-weight: 400;
+      color: var(--text);
+      line-height: 1.2;
+      margin-bottom: 0.5rem;
+    }
+
+    .description {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 1.5rem 0;
+    }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .count {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .search-wrap {
+      position: relative;
+      flex: 1;
+      max-width: 260px;
+    }
+
+    .search-wrap svg {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 14px;
+      height: 14px;
+      color: var(--muted);
+      pointer-events: none;
+    }
+
+    #search {
+      width: 100%;
+      padding: 7px 10px 7px 32px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      font-size: 13px;
+      color: var(--text);
+      font-family: var(--font-ui);
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    #search:focus { border-color: var(--accent); }
+
+    #file-list { display: flex; flex-direction: column; gap: 6px; }
+
+    .file-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      cursor: pointer;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+
+    .file-card:hover {
+      border-color: var(--accent);
+      box-shadow: 0 2px 8px rgba(26,79,138,0.08);
+    }
+
+    .file-badge {
+      width: 36px;
+      height: 36px;
+      border-radius: 7px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      flex-shrink: 0;
+    }
+
+    .badge-pdf { background: #fce8e8; color: #a32d2d; }
+    .badge-doc { background: #e8f0f9; color: #1a4f8a; }
+    .badge-ppt { background: #fef0e6; color: #a05020; }
+    .badge-img { background: #eaf4ea; color: #2d6e2d; }
+    .badge-xls { background: #eaf4ea; color: #2d6e2d; }
+    .badge-gen { background: #f0eff9; color: #5340a0; }
+
+    .file-info { flex: 1; min-width: 0; }
+
+    .file-name {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .file-meta {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .download-btn {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--accent);
+      background: var(--accent-light);
+      border: none;
+      border-radius: 6px;
+      padding: 6px 10px;
+      cursor: pointer;
+      font-family: var(--font-ui);
+      transition: background 0.15s;
+      flex-shrink: 0;
+    }
+
+    .download-btn svg { width: 13px; height: 13px; }
+    .download-btn:hover { background: #d0e2f5; }
+
+    .state-box {
+      text-align: center;
+      padding: 3rem 1.5rem;
+      background: var(--surface);
+      border: 1px dashed var(--border);
+      border-radius: var(--radius);
+      color: var(--muted);
+    }
+
+    .state-box .icon {
+      font-size: 28px;
+      margin-bottom: 0.75rem;
+    }
+
+    .state-box strong {
+      display: block;
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--text);
+      margin-bottom: 0.4rem;
+    }
+
+    .state-box p {
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .state-box code {
+      background: var(--bg);
+      padding: 1px 5px;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+
+    .error-box {
+      padding: 1rem 1.25rem;
+      background: #fce8e8;
+      border-radius: var(--radius);
+      color: var(--danger);
+      font-size: 13px;
+    }
+
+    footer {
+      margin-top: 3rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+      font-size: 12px;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    footer a { color: var(--accent); }
+
+    .refresh-btn {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-size: 12px;
+      color: var(--muted);
+      cursor: pointer;
+      font-family: var(--font-ui);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: border-color 0.15s;
+    }
+
+    .refresh-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .refresh-btn svg { width: 12px; height: 12px; }
+
+    @media (max-width: 480px) {
+      h1 { font-size: 26px; }
+      .download-btn span { display: none; }
+      .search-wrap { max-width: 100%; }
+    }
+  </style>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Literata:wght@400;500&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="page">
+
+  <nav class="topbar">
+    <a href="https://gunnargun63.github.io">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      Forside
+    </a>
+    <span class="sep">/</span>
+    <span>Øvelsesvejledninger</span>
+  </nav>
+
+  <header>
+    <p class="eyebrow">Fysik B</p>
+    <h1>Øvelsesvejledninger</h1>
+    <p class="description">Filerne hentes automatisk fra GitHub. Upload nye filer til mappen <code style="font-size:13px;background:#ebebeb;padding:1px 5px;border-radius:4px;">Øvelsesvejledninger/</code> i dit repository — de vises her med det samme.</p>
+  </header>
+
+  <hr class="divider">
+
+  <div class="toolbar">
+    <span class="count" id="count">Henter filer...</span>
+    <div class="search-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" id="search" placeholder="Søg i filer..." oninput="filterFiles()">
+    </div>
+  </div>
+
+  <div id="file-list"></div>
+
+  <footer>
+    <span>Gunnar Gun &mdash; <a href="https://gunnargun63.github.io">gunnargun63.github.io</a></span>
+    <button class="refresh-btn" onclick="loadFiles()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
+      Opdater
+    </button>
+  </footer>
+
+</div>
+
+<script>
+  const REPO = "gunnargun63/gunnargun63.github.io";
+  const FOLDER = "%C3%98velsesvejledninger";
+  const API_URL = `https://api.github.com/repos/${REPO}/contents/${FOLDER}`;
+
+  let allFiles = [];
+
+  function formatSize(bytes) {
+    if (bytes < 1024) return bytes + " B";
+    if (bytes < 1024 * 1024) return Math.round(bytes / 1024) + " KB";
+    return (bytes / (1024 * 1024)).toFixed(1) + " MB";
+  }
+
+  function getBadge(name) {
+    const ext = name.split('.').pop().toLowerCase();
+    if (ext === 'pdf') return ['PDF', 'badge-pdf'];
+    if (['doc','docx'].includes(ext)) return ['DOC', 'badge-doc'];
+    if (['ppt','pptx'].includes(ext)) return ['PPT', 'badge-ppt'];
+    if (['xls','xlsx'].includes(ext)) return ['XLS', 'badge-xls'];
+    if (['png','jpg','jpeg','gif','svg'].includes(ext)) return ['IMG', 'badge-img'];
+    return [ext.toUpperCase().slice(0,3) || 'FIL', 'badge-gen'];
+  }
+
+  function renderFiles(files) {
+    const container = document.getElementById('file-list');
+    const countEl = document.getElementById('count');
+
+    if (files.length === 0 && allFiles.length > 0) {
+      container.innerHTML = `<div class="state-box"><div class="icon">🔍</div><strong>Ingen resultater</strong><p>Ingen filer matcher din søgning.</p></div>`;
+      countEl.textContent = '0 filer';
+      return;
+    }
+
+    if (files.length === 0) {
+      container.innerHTML = `<div class="state-box"><div class="icon">📂</div><strong>Mappen er endnu tom</strong><p>Upload filer til <code>Øvelsesvejledninger/</code> i dit GitHub-repository, så vises de automatisk her.</p></div>`;
+      countEl.textContent = '0 filer';
+      return;
+    }
+
+    countEl.textContent = files.length + (files.length === 1 ? ' fil' : ' filer');
+    container.innerHTML = files.map(f => {
+      const [label, cls] = getBadge(f.name);
+      return `<a class="file-card" href="${f.download_url}" target="_blank" rel="noopener">
+        <div class="file-badge ${cls}">${label}</div>
+        <div class="file-info">
+          <div class="file-name">${f.name}</div>
+          <div class="file-meta">${formatSize(f.size)}</div>
+        </div>
+        <button class="download-btn" onclick="event.preventDefault();window.open('${f.download_url}','_blank')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          <span>Åbn</span>
+        </button>
+      </a>`;
+    }).join('');
+  }
+
+  function filterFiles() {
+    const q = document.getElementById('search').value.toLowerCase();
+    renderFiles(q ? allFiles.filter(f => f.name.toLowerCase().includes(q)) : allFiles);
+  }
+
+  async function loadFiles() {
+    const container = document.getElementById('file-list');
+    const countEl = document.getElementById('count');
+    container.innerHTML = `<div class="state-box" style="border-style:solid"><p>Henter filer fra GitHub...</p></div>`;
+    countEl.textContent = 'Henter...';
+
+    try {
+      const res = await fetch(API_URL);
+      if (res.status === 404) {
+        allFiles = [];
+        renderFiles([]);
+        return;
+      }
+      if (!res.ok) throw new Error("GitHub API svarede med " + res.status);
+      const data = await res.json();
+      allFiles = data.filter(f => f.type === 'file').sort((a,b) => a.name.localeCompare(b.name, 'da'));
+      filterFiles();
+    } catch(e) {
+      container.innerHTML = `<div class="error-box">Kunne ikke hente filer: ${e.message}</div>`;
+      countEl.textContent = '';
+    }
+  }
+
+  loadFiles();
+</script>
+</body>
+</html>
