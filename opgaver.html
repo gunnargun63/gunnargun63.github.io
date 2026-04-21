@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Opgaver</title>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Exo+2:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:        #0a0e17;
+      --card-bg:   #111927;
+      --border:    #1a2e45;
+      --accent:    #00d4e8;
+      --text:      #c8dce8;
+      --text-dim:  #5a7a90;
+      --text-head: #e8f4f8;
+      --glow:      0 0 16px rgba(0,212,232,0.25);
+    }
+    body.light {
+      --bg:        #f0f4f8;
+      --card-bg:   #ffffff;
+      --border:    #b0c8dc;
+      --accent:    #007890;
+      --text:      #1a3040;
+      --text-dim:  #6a8a9a;
+      --text-head: #0a1820;
+      --glow:      0 0 16px rgba(0,120,144,0.15);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Exo 2', sans-serif;
+      font-weight: 300;
+      min-height: 100vh;
+      transition: background 0.3s, color 0.3s;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 40px 40px;
+      opacity: 0.25;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .container {
+      position: relative;
+      z-index: 1;
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 48px 24px 80px;
+    }
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 40px;
+    }
+    .back-link {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.78rem;
+      letter-spacing: 0.08em;
+      color: var(--text-dim);
+      text-decoration: none;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+    .back-link:hover { color: var(--accent); }
+    .toggle-btn {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.78rem;
+      letter-spacing: 0.08em;
+      padding: 6px 14px;
+      cursor: pointer;
+      border-radius: 3px;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .toggle-btn:hover { border-color: var(--accent); color: var(--accent); }
+    header { margin-bottom: 48px; }
+    .label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.2em;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+    .label::before { content: '{ '; }
+    .label::after  { content: ' }'; }
+    h1 {
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      font-weight: 700;
+      color: var(--text-head);
+      line-height: 1.15;
+      letter-spacing: -0.01em;
+      margin-bottom: 20px;
+    }
+    h1 span { color: var(--accent); }
+    .divider {
+      height: 1px;
+      background: linear-gradient(90deg, var(--accent) 0%, transparent 60%);
+      margin-bottom: 20px;
+      opacity: 0.5;
+    }
+    .subtitle {
+      font-size: 1rem;
+      color: var(--text);
+      line-height: 1.7;
+      max-width: 580px;
+      opacity: 0.85;
+    }
+    .section-title {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin: 40px 0 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .section-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* Kort */
+    .card {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent);
+      padding: 13px 18px;
+      margin-bottom: 8px;
+      text-decoration: none;
+      border-radius: 2px;
+      cursor: pointer;
+      transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
+      animation: fadeUp 0.4s ease both;
+      width: 100%;
+      background: var(--card-bg);
+      color: inherit;
+      font-family: inherit;
+      font-weight: 300;
+      text-align: left;
+    }
+    .card:hover {
+      border-color: var(--accent);
+      box-shadow: var(--glow);
+      transform: translateX(4px);
+    }
+    .card-icon {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.95rem;
+      color: var(--accent);
+      opacity: 0.55;
+      flex-shrink: 0;
+    }
+    .card-title {
+      flex: 1;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text-head);
+    }
+    .card-meta {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.68rem;
+      color: var(--text-dim);
+      letter-spacing: 0.06em;
+      flex-shrink: 0;
+    }
+    .card-arrow {
+      font-family: 'Share Tech Mono', monospace;
+      color: var(--accent);
+      opacity: 0;
+      transition: opacity 0.2s, transform 0.2s;
+      transform: translateX(4px);
+      flex-shrink: 0;
+      margin-left: 8px;
+    }
+    .card:hover .card-arrow { opacity: 1; transform: translateX(0); }
+
+    /* Søgefelt */
+    .search-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+    #search {
+      flex: 1;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      padding: 7px 12px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.78rem;
+      color: var(--text);
+      letter-spacing: 0.04em;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    #search:focus { border-color: var(--accent); }
+    #search::placeholder { color: var(--text-dim); }
+    .count-label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.68rem;
+      color: var(--text-dim);
+      letter-spacing: 0.06em;
+      white-space: nowrap;
+    }
+
+    .state-box {
+      background: var(--card-bg);
+      border: 1px dashed var(--border);
+      border-radius: 2px;
+      padding: 3rem 1.5rem;
+      text-align: center;
+      color: var(--text-dim);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.78rem;
+      letter-spacing: 0.06em;
+    }
+
+    .hidden { display: none; }
+
+    footer {
+      margin-top: 64px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      letter-spacing: 0.08em;
+      border-top: 1px solid var(--border);
+      padding-top: 20px;
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <div class="top-bar">
+    <span class="back-link" id="back-link" onclick="goBack()">← Forside</span>
+    <button class="toggle-btn" onclick="document.body.classList.toggle('light');this.textContent=document.body.classList.contains('light')?'◐ MØrk':'◑ LYS'">◑ LYS</button>
+  </div>
+
+  <header>
+    <p class="label" id="header-label">Opgaver</p>
+    <h1 id="header-title">Opgaver<br><span>Diverse</span></h1>
+    <div class="divider"></div>
+    <p class="subtitle" id="header-subtitle">Vælg en opgavetype for at se opgaverne.</p>
+  </header>
+
+  <!-- Niveau-visning -->
+  <div id="view-levels">
+    <p class="section-title">Niveau</p>
+    <button class="card" onclick="openLevel('Arbejdsopgaver')" style="animation-delay:0.04s">
+      <div class="card-icon">✎</div>
+      <div class="card-title">Arbejdsopgaver</div>
+      <div class="card-meta" id="meta-Arbejdsopgaver">...</div>
+      <div class="card-arrow">→</div>
+    </button>
+    <button class="card" onclick="openLevel('Temaopgaver')" style="animation-delay:0.08s">
+      <div class="card-icon">✎</div>
+      <div class="card-title">Temaopgaver</div>
+      <div class="card-meta" id="meta-Temaopgaver">...</div>
+      <div class="card-arrow">→</div>
+    </button>
+    <button class="card" onclick="openLevel('Simuleringsopgaver')" style="animation-delay:0.12s">
+      <div class="card-icon">✎</div>
+      <div class="card-title">Simuleringsopgaver</div>
+      <div class="card-meta" id="meta-Simuleringsopgaver">...</div>
+      <div class="card-arrow">→</div>
+    </button>
+  </div>
+
+  <!-- Fil-visning -->
+  <div id="view-files" class="hidden">
+    <p class="section-title" id="files-section-title">Filer</p>
+    <div class="search-row">
+      <input type="text" id="search" placeholder="SØG I FILER..." oninput="filterFiles()">
+      <span class="count-label" id="count-label"></span>
+    </div>
+    <div id="file-list"></div>
+  </div>
+
+  <footer>Gunnar Gunnarsson</footer>
+
+</div>
+
+<script>
+  const REPO = "gunnargun63/gunnargun63.github.io";
+  const BASE = "Opgaver";
+  const LEVELS = ["Arbejdsopgaver", "Temaopgaver", "Simuleringsopgaver"];
+
+  let allFiles = [];
+  let currentLevel = null;
+
+  function formatSize(bytes) {
+    if (bytes < 1024) return bytes + " B";
+    if (bytes < 1024 * 1024) return Math.round(bytes / 1024) + " KB";
+    return (bytes / (1024 * 1024)).toFixed(1) + " MB";
+  }
+
+  function metaId(level) {
+    return 'meta-' + level.replace(' ', '');
+  }
+
+  async function fetchCount(level) {
+    const url = `https://api.github.com/repos/${REPO}/contents/${BASE}/${encodeURIComponent(level)}`;
+    try {
+      const res = await fetch(url);
+      if (!res.ok) return null;
+      const data = await res.json();
+      return Array.isArray(data) ? data.filter(f => f.type === 'file').length : 0;
+    } catch { return null; }
+  }
+
+  async function showLevels() {
+    currentLevel = null;
+    document.getElementById('view-levels').classList.remove('hidden');
+    document.getElementById('view-files').classList.add('hidden');
+    document.getElementById('back-link').textContent = '← Forside';
+    document.getElementById('header-label').textContent = 'Opgaver';
+    document.getElementById('header-title').innerHTML = 'Opgaver<br><span style="color:var(--accent)">Diverse</span>';
+    document.getElementById('header-subtitle').textContent = 'Vælg en opgavetype for at se opgaverne.';
+
+    LEVELS.forEach(async l => {
+      const el = document.getElementById(metaId(l));
+      if (el) el.textContent = '...';
+      const n = await fetchCount(l);
+      if (el) el.textContent = n === null ? 'TOM' : n + (n === 1 ? ' FIL' : ' FILER');
+    });
+  }
+
+  async function openLevel(level) {
+    currentLevel = level;
+    document.getElementById('view-levels').classList.add('hidden');
+    document.getElementById('view-files').classList.remove('hidden');
+    document.getElementById('back-link').textContent = '← Opgaver';
+    document.getElementById('header-label').textContent = level;
+    document.getElementById('header-title').innerHTML = 'Opgaver<br><span style="color:var(--accent)">Diverse</span>';
+    document.getElementById('header-subtitle').textContent = 'Upload filer til ' + level + '-mappen på GitHub — de vises automatisk her.';
+    document.getElementById('files-section-title').textContent = level;
+    document.getElementById('search').value = '';
+    document.getElementById('count-label').textContent = '';
+    document.getElementById('file-list').innerHTML = `<div class="state-box">HENTER FILER...</div>`;
+
+    const url = `https://api.github.com/repos/${REPO}/contents/${BASE}/${encodeURIComponent(level)}`;
+    try {
+      const res = await fetch(url);
+      if (res.status === 404) { allFiles = []; renderFiles([]); return; }
+      if (!res.ok) throw new Error("API fejl " + res.status);
+      const data = await res.json();
+      allFiles = data.filter(f => f.type === 'file').sort((a,b) => a.name.localeCompare(b.name, 'da'));
+      filterFiles();
+    } catch(e) {
+      document.getElementById('file-list').innerHTML = `<div class="state-box">FEJL: ${e.message}</div>`;
+    }
+  }
+
+  function goBack() {
+    if (currentLevel) showLevels();
+    else window.location.href = 'https://gunnargun63.github.io';
+  }
+
+  function renderFiles(files) {
+    const container = document.getElementById('file-list');
+    const countEl = document.getElementById('count-label');
+
+    if (files.length === 0 && allFiles.length > 0) {
+      container.innerHTML = `<div class="state-box">INGEN RESULTATER</div>`;
+      countEl.textContent = '0 FILER'; return;
+    }
+    if (files.length === 0) {
+      container.innerHTML = `<div class="state-box">MAPPEN ER TOM</div>`;
+      countEl.textContent = '0 FILER'; return;
+    }
+
+    countEl.textContent = files.length + (files.length === 1 ? ' FIL' : ' FILER');
+    container.innerHTML = files.map((f, i) => {
+      const ext = f.name.split('.').pop().toUpperCase();
+      const delay = (i * 0.04 + 0.04).toFixed(2);
+      const pagesUrl = `https://gunnargun63.github.io/Opgaver/${encodeURIComponent(currentLevel)}/${encodeURIComponent(f.name)}`;
+      return `<a class="card" href="${pagesUrl}" target="_blank" rel="noopener" style="animation-delay:${delay}s">
+        <div class="card-icon">≡</div>
+        <div class="card-title">${f.name}</div>
+        <div class="card-meta">${ext} · ${formatSize(f.size)}</div>
+        <div class="card-arrow">→</div>
+      </a>`;
+    }).join('');
+  }
+
+  function filterFiles() {
+    const q = document.getElementById('search').value.toLowerCase();
+    renderFiles(q ? allFiles.filter(f => f.name.toLowerCase().includes(q)) : allFiles);
+  }
+
+  showLevels();
+</script>
+</body>
+</html>
