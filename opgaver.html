@@ -141,7 +141,12 @@
     document.getElementById('back-link').textContent = '← Opgaver';
     document.getElementById('header-label').textContent = level;
     document.getElementById('header-title').innerHTML = 'Opgaver<br><span style="color:var(--accent)">Diverse</span>';
-    document.getElementById('header-subtitle').textContent = 'Længere opgaver over forskellige temaer.';
+    const beskrivelser = {
+      'Arbejdsopgaver': 'Opgaver der passer til ca. 1 time.',
+      'Temaopgaver': 'Længere opgaver over forskellige temaer.',
+      'Simuleringsopgaver': 'Opgavebeskrivelse til forskellige simuleringer.'
+    };
+    document.getElementById('header-subtitle').textContent = beskrivelser[level] || '';
     document.getElementById('files-section-title').textContent = level;
     document.getElementById('search').value = '';
     document.getElementById('count-label').textContent = '';
