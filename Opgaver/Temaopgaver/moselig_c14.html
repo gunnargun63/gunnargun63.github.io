@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hvor gammel er Lyngmosemanden?</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<style>
+:root{
+  --bg:#000000;
+  --fg:#EEEEEE;
+  --dim:#CFCFCF;
+  --border:#6A6A6A;
+  --blue:#58C4DD;
+  --yellow:#F4D345;
+  --green:#83C167;
+  --red:#FC6255;
+  --teal:#5CD0B3;
+  --serif:"KaTeX_Main","Latin Modern Roman","CMU Serif",Georgia,"Times New Roman",serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--serif)}
+body{padding:18px 16px 60px}
+.wrap{max-width:1100px;margin:0 auto}
+h1{font-weight:normal;font-size:2.1rem;margin:0 0 6px;letter-spacing:.01em}
+.sub{color:var(--dim);font-size:1.12rem;margin:0 0 16px;line-height:1.5}
+h2{font-weight:normal;font-size:1.5rem;color:var(--blue);margin:22px 0 10px}
+h3{font-weight:normal;font-size:1.28rem;margin:0 0 8px}
+p{font-size:1.12rem;line-height:1.55;margin:0 0 12px}
+i.sym{font-family:"KaTeX_Math","KaTeX_Main",Georgia,serif;font-style:italic}
+canvas{display:block;width:100%;background:var(--bg)}
+.sep{height:1px;background:#2a2a2a;margin:26px 0 4px}
+.note{color:var(--dim);font-size:1rem;line-height:1.5;margin:8px 0 0}
+
+button{
+  font-family:var(--serif);font-size:1.06rem;font-weight:bold;color:var(--fg);
+  background:transparent;border:1.5px solid var(--border);border-radius:6px;
+  padding:6px 16px;cursor:pointer;transition:border-color .15s,background .15s
+}
+button:hover:not(:disabled){border-color:var(--fg)}
+button:disabled{opacity:.38;cursor:default}
+button.primary{border-color:var(--green)}
+.row{display:flex;flex-wrap:wrap;gap:10px 20px;align-items:center;margin:12px 0}
+
+/* ---------- fundkort ---------- */
+.fund{display:flex;gap:26px;align-items:flex-start;flex-wrap:wrap;
+  border:1.5px solid var(--border);border-radius:10px;background:#0b0b0b;padding:20px 22px}
+.fund figure{margin:0;flex:0 0 300px;max-width:300px}
+.fund figure img{width:100%;display:block;border-radius:6px;border:1px solid #333}
+.fund figcaption{color:var(--dim);font-size:.95rem;line-height:1.45;margin-top:8px}
+.fund .txt{flex:1 1 340px;min-width:280px}
+dl.data{display:grid;grid-template-columns:auto 1fr;gap:7px 16px;margin:14px 0 0;font-size:1.12rem}
+dl.data dt{color:var(--dim)}
+dl.data dd{margin:0}
+dl.data dd b{color:var(--yellow);font-weight:normal}
+.nrline{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 4px}
+.nrline label{color:var(--dim);font-size:1.08rem}
+input.nr{font-family:var(--serif);font-size:1.15rem;width:5.4em;color:var(--yellow);
+  background:#141414;border:1.5px solid var(--border);border-radius:6px;padding:4px 8px;text-align:center}
+input.nr:focus{outline:none;border-color:var(--yellow)}
+
+/* ---------- resultatlinje ---------- */
+.resultat{display:flex;flex-wrap:wrap;gap:8px 28px;align-items:baseline;
+  border:1.5px solid #333;border-radius:10px;padding:12px 20px;margin:12px 0 0;font-size:1.15rem}
+.resultat b{color:var(--yellow);font-weight:normal}
+.resultat .dim{color:var(--dim);font-size:1rem}
+
+/* ---------- konstanter ---------- */
+.konst{border:1.5px solid #333;border-radius:10px;padding:12px 20px;margin:14px 0 0}
+.konst ul{margin:6px 0 0;padding-left:22px}
+.konst li{font-size:1.06rem;line-height:1.6}
+
+/* ---------- opgaver ---------- */
+.opg{border-left:3px solid #333;padding:2px 0 2px 18px;margin:0 0 26px}
+.opg.ok{border-left-color:var(--green)}
+.opg.nej{border-left-color:var(--red)}
+.opg h3 span.nr{color:var(--blue)}
+.felt{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;margin:10px 0 0}
+.felt .navn{font-size:1.15rem;min-width:2.6em}
+.felt input{font-family:var(--serif);font-size:1.12rem;width:11em;color:var(--fg);
+  background:#141414;border:1.5px solid var(--border);border-radius:6px;padding:6px 10px}
+.felt input:focus{outline:none;border-color:var(--blue)}
+.felt input.ok{border-color:var(--green)}
+.felt input.nej{border-color:var(--red)}
+.felt .enhed{color:var(--dim);font-size:1.06rem;min-width:7.2em}
+.fb{font-size:1.06rem;line-height:1.5;margin:8px 0 0;min-height:1.3em}
+.fb.ok{color:var(--green)}
+.fb.nej{color:var(--red)}
+.fb .tip{color:var(--dim);display:block;margin-top:3px}
+.loesRow{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;margin:10px 0 0}
+.loesRow button{font-size:.98rem;padding:4px 12px}
+.laas{color:var(--dim);font-size:1rem}
+
+/* ---------- status ---------- */
+.status{border:1.5px solid var(--border);border-radius:10px;background:#0b0b0b;padding:16px 22px;margin:22px 0 0}
+.status .tal{font-size:1.35rem}
+.prikker{display:inline-flex;gap:7px;margin-left:4px;vertical-align:-2px}
+.prik{width:13px;height:13px;border-radius:50%;border:1.6px solid var(--border)}
+.prik.ok{background:var(--green);border-color:var(--green)}
+.prik.nej{background:var(--red);border-color:var(--red)}
+
+/* ---------- modal ---------- */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.8);display:none;align-items:flex-start;
+  justify-content:center;padding:40px 16px;overflow:auto;z-index:10}
+.modal.open{display:flex}
+.panel{position:relative;background:#0b0b0b;border:1.5px solid var(--border);border-radius:10px;
+  max-width:820px;width:100%;padding:26px 30px 22px}
+.panel h2{font-weight:normal;font-size:1.7rem;color:var(--fg);margin:0 0 14px;padding-right:150px}
+.panel h3{font-weight:normal;font-size:1.32rem;color:var(--blue);margin:24px 0 10px}
+.panel p{font-size:1.12rem;line-height:1.6;margin:0 0 14px}
+.panel .katex-display{overflow-x:auto;overflow-y:hidden;padding:2px 0}
+.panel .top{position:absolute;top:16px;right:16px;display:flex;gap:8px}
+.panel .top button{font-size:.95rem;padding:4px 10px}
+
+@media (max-width:620px){
+  body{padding:16px 16px 48px}
+  h1{font-size:1.72rem}
+  .fund{padding:16px;gap:18px}
+  .fund figure{flex:1 1 100%;max-width:none}
+  .fund figure img{max-height:210px;object-fit:cover;object-position:center 42%}
+  .felt .enhed{min-width:0}
+  .panel{padding:22px 18px 18px}
+  .panel h2{padding-right:0;margin-top:34px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>Hvor gammel er Lyngmosemanden?</h1>
+  <p class="sub">I danske moser er der fundet over 500 lig fra jernalderen, bevaret fordi mosevandet er surt og iltfattigt. Her skal du datere et nyt fund med kulstof&#8209;14&#8209;metoden.</p>
+
+  <div class="fund">
+    <figure id="fotoFig">
+      <img id="foto" alt="Hovedet af Tollundmanden, et dansk moselig fra jernalderen"
+           src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Tollundmannen.jpg/960px-Tollundmannen.jpg">
+      <figcaption>Tollundmanden. Hovedet er så velbevaret, at finderne troede, de havde fundet en nyligt dræbt mand og ringede til politiet. Foto: Sven Rosborn, Wikimedia Commons (public domain).</figcaption>
+    </figure>
+
+    <div class="txt">
+      <div class="nrline">
+        <label for="nrInput">Dit opgavenummer</label>
+        <input class="nr" id="nrInput" type="text" inputmode="numeric" maxlength="4" value="4719">
+        <button id="nytNr">↺ Nyt nummer</button>
+      </div>
+      <p class="note">Hvert nummer giver sit eget datasæt. Skriv dit ned &ndash; samme nummer giver samme tal igen.</p>
+
+      <h3 style="margin-top:16px">Fundet</h3>
+      <p><b style="font-weight:normal;color:var(--blue)">Lyngmosemanden er et hypotetisk moselig</b> &ndash; opfundet til denne opgave, men med realistiske tal. Laboratoriet har renset kulstoffet ud af en vævsprøve fra fundet og målt på det i et døgn.</p>
+      <dl class="data">
+        <dt>Masse af kulstof i prøven</dt><dd><i class="sym">m</i> = <b id="dM">&ndash;</b></dd>
+        <dt>Måletid</dt><dd>1 døgn = 24 &middot; 3600 s = 86400 s</dd>
+        <dt>Tællinger på 1 døgn</dt><dd><b id="dT">&ndash;</b></dd>
+        <dt>GM-rørets udbytte</dt><dd><b id="dE">&ndash;</b> af henfaldene registreres</dd>
+        <dt>Prøvens aktivitet</dt><dd><i class="sym">A</i> = <b id="dA">&ndash;</b> døgn<sup>&minus;1</sup></dd>
+      </dl>
+    </div>
+  </div>
+
+  <div class="row">
+    <button id="koer" class="primary">▶ Kør målingen</button>
+    <button id="spring">⏭ Spring til slut</button>
+  </div>
+  <canvas id="maaling"></canvas>
+  <p class="note" id="maalNote">Prøven sender betapartikler ud i <b style="font-weight:normal;color:var(--fg)">alle retninger</b>, og GM-røret fanger kun dem, der rammer inden for de stiplede linjer. Laboratoriet kender denne brøkdel, <b style="font-weight:normal;color:var(--fg)">udbyttet</b>, og regner derfor om: aktivitet = tællinger / udbytte. Der er også korrigeret for baggrundsstråling. Tegningen er skematisk, og døgnet er skrumpet til 10 sekunder.</p>
+
+  <div class="resultat" id="resultat">
+    <span><i class="sym">m</i> = <b id="rM">&ndash;</b></span>
+    <span><i class="sym">A</i> = <b id="rA">&ndash;</b> døgn<sup>&minus;1</sup></span>
+    <span class="dim" id="rNote">Kør målingen, eller regn videre med tallene ovenfor.</span>
+  </div>
+
+  <div class="konst">
+    <h3>Det skal du bruge</h3>
+    <ul>
+      <li>Naturligt kulstof har en gennemsnitlig atommasse meget tæt på 12 u, og 1 u = 1,66054 &middot; 10<sup>&minus;24</sup> g</li>
+      <li>I levende væv er brøkdelen 1,2 &middot; 10<sup>&minus;12</sup> af alle kulstofatomer C&#8209;14</li>
+      <li>C&#8209;14 henfalder ved betaminus&#8209;henfald med halveringstiden <i class="sym">T</i><sub>1/2</sub> = 5730 år</li>
+      <li>1 år regnes som 365 &middot; 24 &middot; 3600 s</li>
+    </ul>
+  </div>
+
+  <h2>Opgaver</h2>
+  <p class="sub" style="margin-bottom:18px">Svar med mindst 3 betydende cifre. Tierpotenser skrives fx <span style="color:var(--fg)">3,84e&minus;12</span> eller <span style="color:var(--fg)">3,84&middot;10^&minus;12</span>.</p>
+
+  <section class="opg" id="opg1">
+    <h3><span class="nr">1</span> &middot; Hvor mange C&#8209;14&#8209;kerner var der, da han døde?</h3>
+    <p>Så længe Lyngmosemanden levede, indgik han i kulstofkredsløbet, og brøkdelen af C&#8209;14 i hans væv var den samme som i luften. Beregn antallet af C&#8209;14&#8209;kerner <i class="sym">N</i><sub>0</sub> i prøven på det tidspunkt, hvor han døde.</p>
+    <div class="felt">
+      <span class="navn"><i class="sym">N</i><sub>0</sub> =</span>
+      <input id="f1" type="text" autocomplete="off" spellcheck="false">
+      <span class="enhed">kerner</span>
+      <button class="tjek" data-f="1">Tjek</button>
+    </div>
+    <div class="fb" id="fb1"></div>
+    <div class="loesRow">
+      <button class="visOpg" data-o="1" disabled>Vis løsning til opgave 1</button>
+      <span class="laas" id="laas1"></span>
+    </div>
+  </section>
+
+  <section class="opg" id="opg2">
+    <h3><span class="nr">2</span> &middot; Henfaldskonstanten</h3>
+    <p>Beregn henfaldskonstanten <i class="sym">k</i> for C&#8209;14 i enheden s<sup>&minus;1</sup>.</p>
+    <div class="felt">
+      <span class="navn"><i class="sym">k</i> =</span>
+      <input id="f2" type="text" autocomplete="off" spellcheck="false">
+      <span class="enhed">s<sup>&minus;1</sup></span>
+      <button class="tjek" data-f="2">Tjek</button>
+    </div>
+    <div class="fb" id="fb2"></div>
+    <div class="loesRow">
+      <button class="visOpg" data-o="2" disabled>Vis løsning til opgave 2</button>
+      <span class="laas" id="laas2"></span>
+    </div>
+  </section>
+
+  <section class="opg" id="opg3">
+    <h3><span class="nr">3</span> &middot; Prøvens aktivitet dengang</h3>
+    <p>Beregn aktiviteten <i class="sym">A</i><sub>0</sub> af prøven på dødstidspunktet, først i enheden Bq og derefter i enheden døgn<sup>&minus;1</sup>. Det er den samme fysiske størrelse begge gange &ndash; kun tidsenheden er en anden.</p>
+    <div class="felt">
+      <span class="navn"><i class="sym">A</i><sub>0</sub> =</span>
+      <input id="f3" type="text" autocomplete="off" spellcheck="false">
+      <span class="enhed">Bq = s<sup>&minus;1</sup></span>
+      <button class="tjek" data-f="3">Tjek</button>
+    </div>
+    <div class="fb" id="fb3"></div>
+    <div class="felt">
+      <span class="navn"><i class="sym">A</i><sub>0</sub> =</span>
+      <input id="f4" type="text" autocomplete="off" spellcheck="false">
+      <span class="enhed">døgn<sup>&minus;1</sup></span>
+      <button class="tjek" data-f="4">Tjek</button>
+    </div>
+    <div class="fb" id="fb4"></div>
+    <div class="loesRow">
+      <button class="visOpg" data-o="3" disabled>Vis løsning til opgave 3</button>
+      <span class="laas" id="laas3"></span>
+    </div>
+  </section>
+
+  <section class="opg" id="opg4">
+    <h3><span class="nr">4</span> &middot; Hvor længe er der gået?</h3>
+    <p>I dag er prøvens aktivitet <i class="sym">A</i> = <b id="dA2" style="color:var(--yellow);font-weight:normal">&ndash;</b> døgn<sup>&minus;1</sup>. Beregn, hvor mange år der er gået, siden Lyngmosemanden døde.</p>
+    <div class="felt">
+      <span class="navn"><i class="sym">t</i> =</span>
+      <input id="f5" type="text" autocomplete="off" spellcheck="false">
+      <span class="enhed">år</span>
+      <button class="tjek" data-f="5">Tjek</button>
+    </div>
+    <div class="fb" id="fb5"></div>
+    <div class="loesRow">
+      <button class="visOpg" data-o="4" disabled>Vis løsning til opgave 4</button>
+      <span class="laas" id="laas4"></span>
+    </div>
+  </section>
+
+  <div class="status">
+    <div class="row" style="margin:0">
+      <span class="tal" id="statusTxt">Ingen svar tjekket endnu.</span>
+      <span class="prikker" id="prikker"></span>
+    </div>
+    <div class="row" style="margin:14px 0 0">
+      <button id="visLoes" disabled>Vis hele løsningen</button>
+      <button id="nulstil">↺ Nulstil svar</button>
+    </div>
+  </div>
+
+  <div id="grafBoks" style="display:none">
+    <div class="sep"></div>
+    <h2>Henfaldskurven for prøven</h2>
+    <p class="sub">Kurven viser prøvens aktivitet i enheden døgn<sup>&minus;1</sup> som funktion af tiden siden dødstidspunktet. Den vandrette streg er laboratoriets måling.</p>
+    <canvas id="graf"></canvas>
+  </div>
+
+</div>
+
+<div class="modal" id="modal">
+  <div class="panel">
+    <div class="top"><button id="kopier">Kopiér tekst</button><button id="luk">✕</button></div>
+    <h2 id="loesTitel">Løsning</h2>
+    <div id="loesBody"></div>
+  </div>
+</div>
+
+<script>
+"use strict";
+// ================= FYSIK-START =================
+// Kulstof-14-datering. Alle konstanter som i noten "Kernefysik og radioaktivitet".
+const U_G     = 1.66054e-24;        // masse af 1 u, i g
+const M_C     = 12;                 // gennemsnitlig atommasse for kulstof, i u
+const FRAC    = 1.2e-12;            // brøkdel af kulstofatomer der er C-14 i levende væv
+const T_HALV  = 5730;               // halveringstid for C-14, i år
+const S_PR_AAR   = 365 * 24 * 3600; // 3,1536e7 s
+const S_PR_DOEGN = 24 * 3600;       // 86400 s
+const AAR_NU  = 2026;
+// Hvor stor en brøkdel af henfaldene GM-røret registrerer. C-14 udsender meget
+// bløde betapartikler, så både geometrien og absorptionen holder udbyttet nede.
+const UDBYTTE = [0.05, 0.075, 0.10, 0.125];
+
+function mulberry32(a){
+  return function(){
+    a |= 0; a = (a + 0x6D2B79F5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+// Alle tal i et opgavesæt udledes af opgavenummeret, så det kan genskabes.
+function opgaveData(nr){
+  const r = mulberry32((nr * 2654435761) >>> 0);
+  r(); r();
+  const m     = Math.round((1.5 + 0.1 * Math.floor(r() * 26)) * 10) / 10;  // 1,5 - 4,0 g
+  const alder = 1900 + 10 * Math.floor(r() * 61);                          // 1900 - 2500 år
+  const nC    = m / (M_C * U_G);            // antal kulstofatomer i alt
+  const n0    = FRAC * nC;                  // antal C-14-kerner ved dødstidspunktet
+  const kAar  = Math.LN2 / T_HALV;          // år^-1
+  const kSek  = kAar / S_PR_AAR;            // s^-1
+  const a0    = kSek * n0;                  // Bq
+  const a0Doegn = a0 * S_PR_DOEGN;          // samme aktivitet, målt pr. døgn
+  // Strålingen går ud i alle retninger. GM-røret dækker kun en kendt brøkdel af
+  // kuglefladen om prøven, så tælletallet skal regnes om til prøvens aktivitet.
+  const eta = UDBYTTE[Math.floor(r() * UDBYTTE.length)];
+  const aNuEksakt = a0Doegn * Math.exp(-kAar * alder);      // døgn^-1
+  const taellinger = Math.round(aNuEksakt * eta);      // det tælleren viser, et helt tal
+  const aMaalt = Math.round(taellinger / eta);         // aktiviteten efter omregning
+  const tSvar = Math.log(a0Doegn / aMaalt) / kAar;          // facit, regnet af de viste tal
+  return { nr, m, alder, nC, n0, kAar, kSek, a0, a0Doegn, eta, taellinger, aMaalt, tSvar };
+}
+// ================= FYSIK-END =================
+
+// ---------- formatering ----------
+const COL = { fg:"#EEEEEE", dim:"#CFCFCF", blue:"#58C4DD", yellow:"#F4D345",
+              green:"#83C167", red:"#FC6255", teal:"#5CD0B3" };
+const SERIF = '"KaTeX_Main","Latin Modern Roman","CMU Serif",Georgia,serif';
+const MATH  = '"KaTeX_Math","KaTeX_Main",Georgia,serif';
+
+const komma = s => String(s).replace(".", ",");
+const fmt = (v, n) => komma(v.toFixed(n));
+
+// betydende cifre -> "3,84" og eksponent
+function sciDele(v, n){
+  if (v === 0) return { mant: "0", eks: 0 };
+  const eks = Math.floor(Math.log10(Math.abs(v)));
+  let mant = v / Math.pow(10, eks);
+  mant = Number(mant.toFixed(n - 1));
+  if (Math.abs(mant) >= 10){ mant /= 10; return { mant: komma(mant.toFixed(n - 1)), eks: eks + 1 }; }
+  return { mant: komma(mant.toFixed(n - 1)), eks };
+}
+function sciHtml(v, n){
+  const d = sciDele(v, n);
+  return `${d.mant} &middot; 10<sup>${komma(String(d.eks)).replace("-", "\u2212")}</sup>`;
+}
+// I TeX er komma et skilletegn med luft efter. Decimalkomma skal derfor skrives {,}
+const kommaTex = s => String(s).replace(/[.,]/, "{,}");
+function sciTex(v, n){
+  const d = sciDele(v, n);
+  return `${kommaTex(d.mant)}\\cdot 10^{${d.eks}}`;
+}
+// afrund til n betydende cifre (tal)
+function sig(v, n){
+  if (v === 0) return 0;
+  const p = Math.ceil(Math.log10(Math.abs(v)));
+  const f = Math.pow(10, n - p);
+  return Math.round(v * f) / f;
+}
+function doedsaar(t){
+  const y = AAR_NU - Math.round(t / 10) * 10;
+  return y > 0 ? `år ${y} e.Kr.` : `år ${1 - y} f.Kr.`;
+}
+
+// ---------- indlæsning af elevsvar ----------
+const SUP = { "\u2070":"0","\u00b9":"1","\u00b2":"2","\u00b3":"3","\u2074":"4",
+              "\u2075":"5","\u2076":"6","\u2077":"7","\u2078":"8","\u2079":"9",
+              "\u207a":"+","\u207b":"-" };
+function parseTal(raw){
+  if (raw == null) return NaN;
+  let s = String(raw).toLowerCase();
+  // hævede cifre -> ^tal
+  s = s.replace(/[\u2070\u00b9\u00b2\u00b3\u2074-\u2079\u207a\u207b]+/g,
+                m => "^" + [...m].map(c => SUP[c]).join(""));
+  s = s.replace(/[\s\u00a0\u202f\u2009]/g, "");
+  s = s.replace(/\u2212|\u2013/g, "-");         // minustegn og tankestreg
+  s = s.replace(/[\u00b7\u22c5\u00d7]/g, "*");  // gangetegn
+  s = s.replace(/\*\*/g, "^");
+  // enheder som eleven måske skriver med
+  s = s.replace(/(s\^?-1|1\/s|bq|becquerel|henfald(er)?|kerner|atomer|stk\.?|pr\.?|\/?d(ø|oe)gn|\u00e5r|aar)/g, "");
+  s = s.replace(/,/g, ".");
+  s = s.replace(/(\d)x(?=1?0)/g, "$1*");        // "3.84x10^-12"
+  let m;
+  if ((m = s.match(/^([+-]?(?:\d+\.?\d*|\.\d+))$/)))
+    return parseFloat(m[1]);
+  if ((m = s.match(/^([+-]?(?:\d+\.?\d*|\.\d+))e([+-]?\d+)$/)))
+    return parseFloat(m[1]) * Math.pow(10, parseInt(m[2], 10));
+  if ((m = s.match(/^(?:([+-]?(?:\d+\.?\d*|\.\d+))\*)?10\^?([+-]?\d+)$/)))
+    return (m[1] ? parseFloat(m[1]) : 1) * Math.pow(10, parseInt(m[2], 10));
+  return NaN;
+}
+const taet = (a, b, tol) => isFinite(a) && isFinite(b) && b !== 0 && Math.abs(a - b) <= tol * Math.abs(b);
+
+// ---------- opgavesættet ----------
+let D = null;                      // aktuelle data
+let svar = [null, null, null, null, null];   // true/false/null pr. felt
+let forsoeg = [0, 0, 0, 0, 0];              // antal tjek pr. felt
+let loesningSet = [false, false, false, false];   // pr. opgave
+// Regnskabet følger opgavenummeret, så man ikke kan skifte nummer frem og tilbage
+// for at slette sporet efter en åbnet løsning.
+const historik = new Map();
+const OPG_FELTER = [[0], [1], [2, 3], [4]];
+let visMaaling = 0;                // fremdrift 0-1 i måleanimationen
+let koerer = false;
+
+const felter = [1, 2, 3, 4, 5].map(i => document.getElementById("f" + i));
+const fbEl   = [1, 2, 3, 4, 5].map(i => document.getElementById("fb" + i));
+
+function facit(i){
+  return [D.n0, D.kSek, D.a0, D.a0Doegn, D.tSvar][i];
+}
+function tolerance(i){
+  // alderen er sammensat af flere afrundede mellemresultater, så den får lidt mere plads
+  return i === 4 ? 0.04 : 0.02;
+}
+
+// Typiske fejl, med et målrettet tip. Rækkefølgen er vigtig: mest specifikke først.
+function diagnose(i, v){
+  const t = [];
+  const push = (test, tekst) => { if (!t.length && test) t.push(tekst); };
+  if (i === 0){
+    push(taet(v, D.nC, 0.03), "Det er antallet af kulstofatomer i alt. Kun brøkdelen 1,2 &middot; 10\u207b\u00b9\u00b2 af dem er C-14.");
+    push(taet(v, D.n0 * 12, 0.04), "Du har divideret med massen af 1 u i stedet for med massen af \u00e9t kulstofatom. Et kulstofatom vejer 12 u, alts\u00e5 12 &middot; 1,66054 &middot; 10\u207b\u00b2\u2074 g = 1,99 &middot; 10\u207b\u00b2\u00b3 g.");
+    push(taet(v, D.m / U_G, 0.04), "Du har divideret med massen af 1 u i stedet for med 12 u, og du mangler at gange med br\u00f8kdelen 1,2 &middot; 10\u207b\u00b9\u00b2.");
+    push(taet(v, D.m * M_C * U_G * FRAC, 0.05) || taet(v, D.m * U_G * FRAC, 0.05), "Du har ganget med massen af \u00e9t atom i stedet for at dividere. Antallet af atomer er pr\u00f8vens masse divideret med massen af \u00e9t atom.");
+    push(taet(v, D.m * M_C * U_G, 0.05) || taet(v, D.m * U_G, 0.05), "Du har ganget med massen af \u00e9t atom i stedet for at dividere, og du mangler br\u00f8kdelen 1,2 &middot; 10\u207b\u00b9\u00b2.");
+    push(taet(v, D.n0 * 100, 0.03), "Du er en faktor 100 for højt oppe. Brøkdelen 1,2 &middot; 10\u207b\u00b9\u00b2 er ikke en procentdel.");
+    push(v > 0 && v < 1, "Svaret kan ikke v\u00e6re mindre end 1 \u2013 der er milliarder af C-14-kerner i pr\u00f8ven. N\u00e5r man dividerer med et meget lille tal, bliver resultatet stort. Tjek, om du har ganget, hvor du skulle dividere.");
+    push(v > 1e25, "Svaret er alt for stort. Selv hvis hele pr\u00f8ven var C-14, ville der kun v\u00e6re omkring 10\u00b2\u00b3 kerner. Tjek, om du har divideret med br\u00f8kdelen 1,2 &middot; 10\u207b\u00b9\u00b2 i stedet for at gange med den.");
+    push(taet(v, D.n0 / 100, 0.03), "Du er en faktor 100 for lavt nede. Brøkdelen 1,2 &middot; 10\u207b\u00b9\u00b2 er ikke en procentdel.");
+    push(taet(v, D.m * FRAC, 0.03), "Du mangler at dele med massen af ét kulstofatom, 12 u.");
+  }
+  if (i === 1){
+    push(taet(v, D.kAar, 0.03), "Det er <i class='sym'>k</i> i enheden år\u207b\u00b9. Del med antallet af sekunder på et år.");
+    push(taet(v, T_HALV / Math.LN2, 0.03), "Du har vendt brøken om. Der gælder <i class='sym'>k</i> = ln(2)/<i class='sym'>T</i><sub>1/2</sub>.");
+    push(taet(v, S_PR_AAR / Math.LN2 * T_HALV, 0.03), "Du har vendt brøken om.");
+    push(taet(v, Math.LN2 / (T_HALV * 365 * 24), 0.03), "Tjek omregningen: der er 3600 sekunder på en time.");
+  }
+  if (i === 2){
+    push(taet(v, D.kAar * D.n0, 0.03), "Du har brugt <i class='sym'>k</i> i år\u207b\u00b9. Aktivitet i Bq kræver <i class='sym'>k</i> i s\u207b\u00b9.");
+    push(taet(v, D.a0Doegn, 0.03), "Det er aktiviteten i enheden døgn\u207b\u00b9. Her spørges om den i Bq, altså pr. sekund.");
+    push(taet(v, D.n0 / T_HALV, 0.03), "Aktiviteten er <i class='sym'>A</i> = <i class='sym'>k</i> &middot; <i class='sym'>N</i>, ikke <i class='sym'>N</i> delt med halveringstiden.");
+  }
+  if (i === 3){
+    push(taet(v, D.a0, 0.03), "Det er aktiviteten i Bq, altså pr. sekund. Gang med de 86400 sekunder, døgnet varer.");
+    push(taet(v, D.a0 * 3600, 0.03), "Du har ganget med en time. Et døgn er 24 &middot; 3600 s = 86400 s.");
+    push(taet(v, D.a0 * 60, 0.03), "Du har ganget med et minut.");
+    push(taet(v, D.aMaalt, 0.03), "Det er prøvens aktivitet i dag. Spørgsmålet er aktiviteten på dødstidspunktet.");
+  }
+  if (i === 4){
+    push(v < 0 || taet(v, -D.tSvar, 0.06), "Du har byttet om på de to tal i logaritmen. Der skal stå ln(<i class='sym'>A</i><sub>0</sub>/<i class='sym'>A</i>), og <i class='sym'>A</i><sub>0</sub> er den største.");
+    push(taet(v, D.tSvar * S_PR_AAR, 0.06), "Det er alderen i sekunder. Brug <i class='sym'>k</i> i år\u207b\u00b9, så kommer <i class='sym'>t</i> direkte i år.");
+    push(taet(v, D.tSvar / S_PR_AAR, 0.06), "Enhederne passer ikke. Brug <i class='sym'>k</i> i år\u207b\u00b9, så kommer <i class='sym'>t</i> direkte i år.");
+    push(taet(v, T_HALV * Math.log(D.a0Doegn / D.aMaalt), 0.05), "Du mangler at dividere med ln(2) &ndash; eller at gange med ln(2) det rigtige sted.");
+    push(taet(v, D.a0Doegn / D.aMaalt, 0.05), "Forholdet mellem de to tal er ikke alderen. Isolér <i class='sym'>t</i> i <i class='sym'>A</i> = <i class='sym'>A</i><sub>0</sub> &middot; e<sup>&minus;<i class='sym'>kt</i></sup>.");
+    push(v > 50000, "Svaret er alt for stort. Et moselig fra jernalderen er nogle få tusind år gammelt.");
+  }
+  return t[0] || null;
+}
+
+function tjek(i){
+  const v = parseTal(felter[i].value);
+  const f = facit(i), tol = tolerance(i);
+  felter[i].classList.remove("ok", "nej");
+  fbEl[i].classList.remove("ok", "nej");
+  if (!isFinite(v)){
+    svar[i] = null;
+    fbEl[i].className = "fb nej";
+    fbEl[i].innerHTML = "Kunne ikke læse tallet. Skriv det fx som <b>3,84e&minus;12</b> eller <b>3,84&middot;10^&minus;12</b>.";
+    opdaterStatus();
+    return;
+  }
+  forsoeg[i]++;
+  const ok = taet(v, f, tol);
+  svar[i] = ok;
+  felter[i].classList.add(ok ? "ok" : "nej");
+  fbEl[i].className = "fb " + (ok ? "ok" : "nej");
+  if (ok){
+    let txt = "Rigtigt.";
+    if (i === 4) txt += ` Lyngmosemanden døde for ca. ${Math.round(D.tSvar / 10) * 10} år siden, alts\u00e5 omkring ${doedsaar(D.tSvar)}`;
+    fbEl[i].innerHTML = txt;
+  } else {
+    const tip = diagnose(i, v);
+    fbEl[i].innerHTML = "Ikke helt." + (tip ? `<span class="tip">${tip}</span>` : "");
+  }
+  const sek = document.getElementById(i === 4 ? "opg4" : i === 2 || i === 3 ? "opg3" : "opg" + (i + 1));
+  const rel = i === 2 || i === 3 ? [svar[2], svar[3]] : [svar[i]];
+  sek.classList.remove("ok", "nej");
+  if (rel.every(x => x === true)) sek.classList.add("ok");
+  else if (rel.some(x => x === false)) sek.classList.add("nej");
+  if (i === 4) visGraf();
+  gemHistorik();
+  opdaterStatus();
+}
+
+// En løsning åbnes, når de foregående opgaver er rigtige, og denne opgave
+// enten er rigtig eller er forsøgt mindst tre gange.
+const FORSOEG_KRAEVET = 3;
+function opgaveRigtig(n){ return OPG_FELTER[n].every(i => svar[i] === true); }
+function nokForsoeg(n){ return OPG_FELTER[n].every(i => svar[i] === true || forsoeg[i] >= FORSOEG_KRAEVET); }
+function foersteUloeste(n){
+  for (let m = 0; m < n; m++) if (!opgaveRigtig(m)) return m + 1;
+  return 0;
+}
+function laaseTekst(n){
+  if (loesningSet[n]) return "Løsningen er set.";
+  const mangler = foersteUloeste(n);
+  if (mangler) return `Åbner, når opgave ${mangler} er rigtig.`;
+  if (opgaveRigtig(n)) return "";
+  const brugt = Math.min(...OPG_FELTER[n].filter(i => svar[i] !== true).map(i => forsoeg[i]));
+  return `Åbner efter ${FORSOEG_KRAEVET} forsøg \u2013 du har brugt ${brugt}.`;
+}
+function gemHistorik(){
+  if (D) historik.set(D.nr, { forsoeg: forsoeg.slice(), loesningSet: loesningSet.slice() });
+}
+function listeOver(tal){
+  if (tal.length === 1) return String(tal[0]);
+  return tal.slice(0, -1).join(", ") + " og " + tal[tal.length - 1];
+}
+
+function opdaterStatus(){
+  const tjekket = svar.filter(x => x !== null).length;
+  const rigtige = svar.filter(x => x === true).length;
+  const sete = [1, 2, 3, 4].filter(n => loesningSet[n - 1]);
+  const st = document.getElementById("statusTxt");
+  let txt = tjekket === 0 && !sete.length
+    ? "Ingen svar tjekket endnu."
+    : `${rigtige} af 5 rigtige.`;
+  if (sete.length) txt += ` Løsning set til opgave ${listeOver(sete)}.`;
+  st.innerHTML = txt;
+  const p = document.getElementById("prikker");
+  p.innerHTML = svar.map(s => `<span class="prik ${s === true ? "ok" : s === false ? "nej" : ""}"></span>`).join("");
+  document.getElementById("visLoes").disabled = rigtige < 5;
+  for (let n = 0; n < 4; n++){
+    const b = document.querySelector(`button.visOpg[data-o="${n + 1}"]`);
+    b.disabled = !(foersteUloeste(n) === 0 && (opgaveRigtig(n) || nokForsoeg(n)));
+    document.getElementById("laas" + (n + 1)).textContent = b.disabled || loesningSet[n] ? laaseTekst(n) : "";
+  }
+}
+
+// Rydder svarene, men ikke forsøg og sete løsninger: regnskabet skal stå ved magt.
+function nulstilSvar(){
+  svar = [null, null, null, null, null];
+  felter.forEach(f => { f.value = ""; f.classList.remove("ok", "nej"); });
+  fbEl.forEach(f => { f.className = "fb"; f.innerHTML = ""; });
+  ["opg1","opg2","opg3","opg4"].forEach(id => document.getElementById(id).classList.remove("ok","nej"));
+  document.getElementById("grafBoks").style.display = "none";
+  opdaterStatus();
+}
+
+// ---------- opgavesæt ----------
+function saetOpgave(nr){
+  D = opgaveData(nr);
+  document.getElementById("nrInput").value = String(nr);
+  document.getElementById("dM").textContent = fmt(D.m, 1) + " g";
+  document.getElementById("dT").textContent = String(D.taellinger);
+  document.getElementById("dE").textContent = fmt(D.eta * 100, 2) + " %";
+  document.getElementById("dA").textContent = String(D.aMaalt);
+  document.getElementById("dA2").textContent = String(D.aMaalt);
+  document.getElementById("rM").textContent = fmt(D.m, 1) + " g";
+  document.getElementById("rA").textContent = String(D.aMaalt);
+  document.getElementById("rNote").textContent = "Kør målingen, eller regn videre med tallene ovenfor.";
+  if (location.hash.slice(1) !== String(nr)) history.replaceState(null, "", "#" + nr);
+  const h = historik.get(nr);
+  forsoeg = h ? h.forsoeg.slice() : [0, 0, 0, 0, 0];
+  loesningSet = h ? h.loesningSet.slice() : [false, false, false, false];
+  nulstilSvar();
+  visMaaling = 0; koerer = false;
+  document.getElementById("koer").textContent = "▶ Kør målingen";
+  partikler.length = 0;
+  byg();
+  tegnAlt();
+}
+function nytNummer(){
+  saetOpgave(1000 + Math.floor(Math.random() * 9000));
+}
+
+// ---------- måleanimation ----------
+const cvM = document.getElementById("maaling"), ctx = cvM.getContext("2d");
+const cvG = document.getElementById("graf"),    gtx = cvG.getContext("2d");
+let W = 900, Hm = 280, GW = 900, GH = 300;
+const partikler = [];
+
+function layout(){
+  const dpr = window.devicePixelRatio || 1;
+  W = cvM.clientWidth || 900;
+  Hm = Math.max(250, Math.min(340, W * 0.36));
+  cvM.style.height = Hm + "px";
+  cvM.width = Math.round(W * dpr); cvM.height = Math.round(Hm * dpr);
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+  GW = cvG.clientWidth || 900;
+  GH = Math.max(240, Math.min(340, GW * 0.36));
+  cvG.style.height = GH + "px";
+  cvG.width = Math.round(GW * dpr); cvG.height = Math.round(GH * dpr);
+  gtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  tegnAlt();
+}
+
+// tekst med symboler i kursiv: dele = [[tekst, erSymbol], ...]
+function rich(c, dele, x, y, align, size, farve){
+  const fontOf = p => (p[1] ? `italic ${size}px ${MATH}` : `${size}px ${SERIF}`);
+  let w = 0;
+  for (const p of dele){ c.font = fontOf(p); w += c.measureText(p[0]).width; }
+  let cx = align === "right" ? x - w : align === "center" ? x - w / 2 : x;
+  c.fillStyle = farve; c.textBaseline = "alphabetic"; c.textAlign = "left";
+  for (const p of dele){ c.font = fontOf(p); c.fillText(p[0], cx, y); cx += c.measureText(p[0]).width; }
+  return w;
+}
+function rundRekt(c, x, y, w, h, r){
+  c.beginPath();
+  c.moveTo(x + r, y); c.lineTo(x + w - r, y); c.quadraticCurveTo(x + w, y, x + w, y + r);
+  c.lineTo(x + w, y + h - r); c.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  c.lineTo(x + r, y + h); c.quadraticCurveTo(x, y + h, x, y + h - r);
+  c.lineTo(x, y + r); c.quadraticCurveTo(x, y, x + r, y);
+  c.closePath();
+}
+
+let geo = {};
+function byg(){
+  if (!D) return;
+  const px = 0.20 * W;                       // prøvens plads
+  const winX = 0.36 * W;                     // GM-rørets vindue
+  const afst = winX - px;
+  // Rørets acceptvinkel. Den holdes fast, så røret har samme naturlige størrelse i
+  // alle opgavesæt. Den dækker ca. 10 % af retningerne, altså samme størrelsesorden
+  // som udbyttet, men den er ikke sat lig med det: se forklaringen under animationen.
+  const acc = 18 * Math.PI / 180;
+  const halvVindue = afst * Math.tan(acc);
+  geo = {
+    px, py: Hm * 0.52,
+    winX, acc, halvVindue, afst,
+    roerL: Math.max(96, 0.16 * W),
+    tx: 0.995 * W
+  };
+}
+
+// En betapartikel sendes ud i en tilfældig retning. Kun de retninger, der
+// rammer rørets vindue, bliver registreret.
+function nyPartikel(){
+  const th = (Math.random() * 2 - 1) * Math.PI;
+  const traef = Math.abs(th) < geo.acc;
+  const laengde = traef ? geo.afst / Math.cos(th) : Math.max(W, Hm) * 1.2;
+  partikler.push({ th, laengde, r: 0, traef });
+}
+
+let glimt = -9;                              // tidspunkt for seneste registrering
+
+function tegnMaaling(){
+  const c = ctx;
+  c.clearRect(0, 0, W, Hm);
+  if (!D) return;
+  const skala = Math.max(0.72, Math.min(1, W / 900));
+
+  // ---- fremdriftsbjælke: døgnet ----
+  const bx = 8, bw = W - 16, by = 16, bh = 7;
+  c.strokeStyle = "#3a3a3a"; c.lineWidth = 1.4;
+  rundRekt(c, bx, by, bw, bh, bh / 2); c.stroke();
+  c.fillStyle = COL.teal;
+  rundRekt(c, bx, by, Math.max(bh, bw * visMaaling), bh, bh / 2); c.fill();
+  rich(c, [["0 h", false]], bx, by - 7, "left", 13 * skala, COL.dim);
+  rich(c, [["24 h", false]], bx + bw, by - 7, "right", 13 * skala, COL.dim);
+  rich(c, [["t", true], [` = ${fmt(visMaaling * 24, 1)} timer`, false]],
+       bx + bw / 2, by - 7, "center", 14 * skala, COL.fg);
+
+  // ---- GM-røret ----
+  const rw = geo.roerL;
+  const rh = Math.max(34, 2 * geo.halvVindue + 14);
+  const rx = geo.winX, ry = geo.py - rh / 2;
+  c.strokeStyle = COL.fg; c.lineWidth = 2.2;
+  rundRekt(c, rx, ry, rw, rh, Math.min(rh / 2, 22)); c.stroke();
+  c.strokeStyle = "#8a8a8a"; c.lineWidth = 1.6;
+  c.beginPath(); c.moveTo(rx + 14, geo.py); c.lineTo(rx + rw - 14, geo.py); c.stroke();
+  c.fillStyle = "#8a8a8a";
+  c.beginPath(); c.arc(rx + rw - 14, geo.py, 3, 0, 2 * Math.PI); c.fill();
+  // vinduet mod prøven, præcis så højt som acceptvinklen kræver
+  c.strokeStyle = COL.teal; c.lineWidth = 3;
+  c.beginPath();
+  c.moveTo(rx + 1, geo.py - geo.halvVindue); c.lineTo(rx + 1, geo.py + geo.halvVindue);
+  c.stroke();
+  rich(c, [["GM-rør", false]], rx + rw / 2, ry + rh + 20 * skala, "center", 15 * skala, COL.fg);
+
+  // ---- acceptvinklen tegnet som to hjælpelinjer ----
+  c.setLineDash([4, 6]); c.strokeStyle = "rgba(92,208,179,.45)"; c.lineWidth = 1.2;
+  for (const sgn of [-1, 1]){
+    c.beginPath();
+    c.moveTo(geo.px, geo.py);
+    c.lineTo(rx, geo.py + sgn * geo.halvVindue);
+    c.stroke();
+  }
+  c.setLineDash([]);
+
+  // ---- prøven ----
+  const pw = 60 * skala, ph = 24 * skala;
+  c.strokeStyle = COL.yellow; c.lineWidth = 2;
+  c.fillStyle = "rgba(244,211,69,.22)";
+  c.beginPath(); c.ellipse(geo.px, geo.py, pw / 2, ph / 2, 0, 0, 2 * Math.PI); c.fill(); c.stroke();
+
+  // ---- betapartikler: små kugler, der flyver ud i alle retninger ----
+  c.save();
+  c.beginPath(); c.rect(0, 34, W, Hm - 34); c.clip();   // hold dem væk fra tidsbjælken
+  for (const p of partikler){
+    const x = geo.px + p.r * Math.cos(p.th);
+    const y = geo.py + p.r * Math.sin(p.th);
+    const farve = p.traef ? COL.teal : "#7FB3A6";
+    // kort hale, så bevægelsesretningen kan ses
+    for (let j = 3; j >= 1; j--){
+      const rr = Math.max(0, p.r - j * 7 * skala);
+      c.fillStyle = farve + Math.round(28 + 22 * (3 - j)).toString(16).padStart(2, "0");
+      c.beginPath();
+      c.arc(geo.px + rr * Math.cos(p.th), geo.py + rr * Math.sin(p.th), 1.6 * skala, 0, 2 * Math.PI);
+      c.fill();
+    }
+    c.fillStyle = farve;
+    c.beginPath(); c.arc(x, y, 3.4 * skala, 0, 2 * Math.PI); c.fill();
+  }
+  c.restore();
+
+  // etiketter tegnes til sidst, så partiklerne ikke løber hen over dem
+  rich(c, [["prøven", false]], geo.px, geo.py + ph / 2 + 20 * skala, "center", 15 * skala, COL.fg);
+  rich(c, [["m", true], [` = ${fmt(D.m, 1)} g kulstof`, false]],
+       geo.px, geo.py + ph / 2 + 37 * skala, "center", 14 * skala, COL.dim);
+
+  // glimt i røret, når en partikel netop er registreret
+  if (performance.now() / 1000 - glimt < 0.16){
+    c.strokeStyle = "rgba(244,211,69,.9)"; c.lineWidth = 2.8;
+    rundRekt(c, rx, ry, rw, rh, Math.min(rh / 2, 22)); c.stroke();
+  }
+
+  // ---- ledning og tæller ----
+  const tw = Math.min(232 * skala, W * 0.30), th = 66 * skala;
+  const tx = geo.tx - tw, ty = geo.py - th / 2;
+  c.strokeStyle = "#5a5a5a"; c.lineWidth = 1.8;
+  c.beginPath();
+  c.moveTo(rx + rw, geo.py);
+  c.bezierCurveTo(rx + rw + (tx - rx - rw) * 0.4, geo.py + 18,
+                  tx - (tx - rx - rw) * 0.4, geo.py - 18, tx, geo.py);
+  c.stroke();
+  c.strokeStyle = "#6A6A6A"; c.lineWidth = 1.8; c.fillStyle = "#0d0d0d";
+  rundRekt(c, tx, ty, tw, th, 8); c.fill(); c.stroke();
+  rich(c, [["tællinger", false]], tx + tw / 2, ty + 19 * skala, "center", 13 * skala, COL.dim);
+  rich(c, [[String(Math.round(D.taellinger * visMaaling)), false]],
+       tx + tw / 2, ty + th - 16 * skala, "center", 30 * skala, COL.yellow);
+
+  // ---- afsluttende linje ----
+  if (visMaaling >= 1){
+    rich(c, [[`${D.taellinger} tællinger ÷ ${fmt(D.eta * 100, 2)} %  →  `, false],
+             ["A", true], [` = ${D.aMaalt} døgn⁻¹`, false]],
+         W / 2, Hm - 10, "center", 15 * skala, COL.green);
+  }
+}
+
+// ---------- henfaldskurve ----------
+function visGraf(){
+  document.getElementById("grafBoks").style.display = "";
+  layout();
+}
+function tegnGraf(){
+  if (!D || document.getElementById("grafBoks").style.display === "none") return;
+  const c = gtx, mL = 76, mR = 22, mT = 26, mB = 52;
+  const pw = GW - mL - mR, ph = GH - mT - mB;
+  const T_AKSE = 6000;                                   // fast akse, uanset opgavesæt
+  const trin = 10000;
+  const Y_AKSE = Math.ceil(D.a0Doegn / trin) * trin;
+  const X = t => mL + pw * t / T_AKSE;
+  const Y = v => mT + ph * (1 - v / Y_AKSE);
+  c.clearRect(0, 0, GW, GH);
+
+  c.lineWidth = 1; c.strokeStyle = "#262626";
+  c.font = `14px ${SERIF}`; c.fillStyle = COL.fg;
+  c.textAlign = "center"; c.textBaseline = "top";
+  for (let t = 0; t <= T_AKSE + 1e-9; t += 1000){
+    c.beginPath(); c.moveTo(X(t), mT); c.lineTo(X(t), mT + ph); c.stroke();
+    c.fillText(String(t), X(t), mT + ph + 7);
+  }
+  c.textAlign = "right"; c.textBaseline = "middle";
+  for (let v = 0; v <= Y_AKSE + 1e-9; v += trin){
+    c.beginPath(); c.moveTo(mL, Y(v)); c.lineTo(mL + pw, Y(v)); c.stroke();
+    c.fillText(String(v), mL - 8, Y(v));
+  }
+  c.strokeStyle = COL.fg; c.lineWidth = 1.8;
+  c.beginPath(); c.moveTo(mL, mT); c.lineTo(mL, mT + ph); c.lineTo(mL + pw, mT + ph); c.stroke();
+  rich(c, [["t", true], [" / år siden dødstidspunktet", false]], mL + pw, mT + ph + 42, "right", 16, COL.fg);
+  rich(c, [["A", true], [" / d\u00f8gn\u207b\u00b9", false]], mL - 8, mT - 8, "left", 16, COL.fg);
+
+  // kurven
+  c.strokeStyle = COL.blue; c.lineWidth = 2.6; c.lineJoin = "round";
+  c.beginPath();
+  for (let i = 0; i <= 300; i++){
+    const t = T_AKSE * i / 300, v = D.a0Doegn * Math.exp(-D.kAar * t);
+    i ? c.lineTo(X(t), Y(v)) : c.moveTo(X(t), Y(v));
+  }
+  c.stroke();
+
+  // laboratoriets måling
+  c.setLineDash([5, 6]); c.strokeStyle = COL.red; c.lineWidth = 1.6;
+  c.beginPath(); c.moveTo(mL, Y(D.aMaalt)); c.lineTo(X(D.tSvar), Y(D.aMaalt)); c.stroke();
+  c.beginPath(); c.moveTo(X(D.tSvar), Y(D.aMaalt)); c.lineTo(X(D.tSvar), mT + ph); c.stroke();
+  c.setLineDash([]);
+  rich(c, [["A", true], [` = ${D.aMaalt} d\u00f8gn\u207b\u00b9`, false]], mL + 8, Y(D.aMaalt) - 8, "left", 15, COL.red);
+  c.fillStyle = COL.red;
+  c.beginPath(); c.arc(X(D.tSvar), Y(D.aMaalt), 5, 0, 2 * Math.PI); c.fill();
+  rich(c, [["t", true], [` = ${Math.round(D.tSvar / 10) * 10} år`, false]],
+       X(D.tSvar) + 10, mT + ph - 10, "left", 15, COL.red);
+}
+
+function tegnAlt(){ if (D){ tegnMaaling(); tegnGraf(); } }
+
+// ---------- løsning ----------
+function byg1(){
+  const nC = sciTex(D.nC, 5), n0 = sciTex(D.n0, 5);
+  return [
+    `## 1. Antal C-14-kerner, da han døde`,
+    `Et kulstofatom vejer i gennemsnit $12\\ \\text{u}$, og $1\\ \\text{u} = 1{,}66054\\cdot 10^{-24}\\ \\text{g}$. Antallet af kulstofatomer i prøven er massen divideret med massen af ét atom: $$N_C = \\frac{m}{12\\,\\text{u}} = \\frac{${kommaTex(D.m.toFixed(1))}\\ \\text{g}}{12\\cdot 1{,}66054\\cdot 10^{-24}\\ \\text{g}} = \\frac{${kommaTex(D.m.toFixed(1))}\\ \\text{g}}{${sciTex(M_C * U_G, 5)}\\ \\text{g}} = ${nC}.$$`,
+    `Af dem er kun brøkdelen $1{,}2\\cdot 10^{-12}$ C-14. Så længe han levede, blev det indhold holdt ved lige, og det er derfor antallet på dødstidspunktet: $$N_0 = 1{,}2\\cdot 10^{-12}\\cdot ${nC} = ${n0}.$$`
+  ];
+}
+function byg2(){
+  return [
+    `## 2. Henfaldskonstanten`,
+    `Halveringstiden og henfaldskonstanten hænger sammen som $$T_{1/2} = \\frac{\\ln(2)}{k}.$$ Ganges der med $k$ på begge sider og divideres med $T_{1/2}$, er $k$ isoleret: $$k = \\frac{\\ln(2)}{T_{1/2}} = \\frac{\\ln(2)}{5730\\ \\text{år}} = \\frac{0{,}69315}{5730\\ \\text{år}} = ${sciTex(D.kAar, 5)}\\ \\text{år}^{-1}.$$`,
+    `Aktiviteten skal måles i $\\text{Bq} = \\text{s}^{-1}$, så $k$ skal omregnes til $\\text{s}^{-1}$. Et år er $$365\\cdot 24\\cdot 3600\\ \\text{s} = ${sciTex(S_PR_AAR, 5)}\\ \\text{s},$$ og da $k$ har enheden "pr. år", skal der divideres med antallet af sekunder pr. år: $$k = \\frac{${sciTex(D.kAar, 5)}\\ \\text{år}^{-1}}{${sciTex(S_PR_AAR, 5)}\\ \\text{s/år}} = ${sciTex(D.kSek, 5)}\\ \\text{s}^{-1}.$$`
+  ];
+}
+function byg3(){
+  return [
+    `## 3. Aktiviteten dengang`,
+    String.raw`Aktiviteten er antallet af henfald pr. tidsenhed, og den er proportional med antallet af radioaktive kerner: $A = k\cdot N$. Bruges $k$ i $\text{s}^{-1}$, kommer aktiviteten i $\text{Bq} = \text{s}^{-1}$: $$A_0 = k\cdot N_0 = ${sciTex(D.kSek, 5)}\ \text{s}^{-1}\cdot ${sciTex(D.n0, 5)} = ${kommaTex(D.a0.toFixed(4))}\ \text{Bq}.$$ Enhederne går op: $\text{s}^{-1}$ gange et rent antal giver $\text{s}^{-1}$.`,
+    String.raw`Aktiviteten er den samme fysiske størrelse, uanset hvilken tidsenhed den måles i, og symbolet er $A$ i begge tilfælde. Vil vi have den pr. døgn i stedet for pr. sekund, ganger vi med de $24\cdot 3600\ \text{s} = 86400\ \text{s}$, et døgn varer: $$A_0 = ${kommaTex(D.a0.toFixed(4))}\ \text{s}^{-1}\cdot 86400\ \frac{\text{s}}{\text{døgn}} = ${kommaTex(D.a0Doegn.toFixed(0))}\ \text{døgn}^{-1}.$$ Bemærk, hvordan sekunderne forkorter væk, så enheden bliver $\text{døgn}^{-1}$.`,
+    String.raw`Et døgn er forsvindende lidt i forhold til halveringstiden på $5730$ år, så aktiviteten er praktisk talt konstant hen over det døgn, målingen varer. Derfor er antallet af henfald på et døgn netop det samme tal som aktiviteten målt i $\text{døgn}^{-1}$.`
+  ];
+}
+function byg4(){
+  const forhold = D.a0Doegn / D.aMaalt;
+  return [
+    `## 4. Alderen`,
+    String.raw`Aktiviteten er proportional med antallet af C-14-kerner, der er tilbage, og aftager derfor efter samme henfaldslov: $$A(t) = A_0\cdot e^{-k\cdot t}.$$ Her er $t$ tiden siden dødstidspunktet, $A_0$ aktiviteten vi fandt i opgave 3, og $A(t)$ laboratoriets måling i dag. De to aktiviteter skal have samme enhed, så vi bruger $\text{døgn}^{-1}$ for dem begge.`,
+    String.raw`Først isoleres $t$. Divider med $A_0$ på begge sider: $$\frac{A(t)}{A_0} = e^{-k\cdot t}.$$ Tag den naturlige logaritme på begge sider. Da $\ln$ ophæver eksponentialfunktionen, fås $$\ln\!\left(\frac{A(t)}{A_0}\right) = -k\cdot t.$$ Divider med $-k$, og brug at $-\ln(a/b) = \ln(b/a)$: $$t = \frac{1}{k}\cdot\ln\!\left(\frac{A_0}{A(t)}\right).$$`,
+    String.raw`Her skal $k$ bruges i $\text{år}^{-1}$, for så kommer $t$ direkte ud i år. Enhederne i brøken inde i logaritmen forkorter væk, så der står et rent tal: $$\begin{aligned} t &= \frac{1}{${sciTex(D.kAar, 5)}\ \text{år}^{-1}}\cdot\ln\!\left(\frac{${kommaTex(D.a0Doegn.toFixed(0))}\ \text{døgn}^{-1}}{${D.aMaalt}\ \text{døgn}^{-1}}\right) \\[6pt] &= \frac{\ln(${kommaTex(forhold.toFixed(4))})}{${sciTex(D.kAar, 5)}\ \text{år}^{-1}} = \frac{${kommaTex(Math.log(forhold).toFixed(4))}}{${sciTex(D.kAar, 5)}\ \text{år}^{-1}} = ${kommaTex(D.tSvar.toFixed(0))}\ \text{år}. \end{aligned}$$`,
+    `Lyngmosemanden døde altså for ca. ${Math.round(D.tSvar / 10) * 10} år siden, det vil sige omkring ${doedsaar(D.tSvar)}. Det er midt i den danske jernalder, samme periode som Tollundmanden og Grauballemanden.`
+  ];
+}
+function bygBemaerk(){
+  return [
+    `## Bemærkninger`,
+    `*Modellen bygger på tre antagelser.* For det første at brøkdelen af C-14 i atmosfæren var den samme dengang som i dag. Det passer ikke helt: produktionen af C-14 svinger med den kosmiske stråling, og derfor kalibrerer man i praksis mod årringe i træ, hvor alderen kendes uafhængigt. For det andet at prøven ikke er forurenet med nyere kulstof fra mosevandet. For det tredje at prøven ikke har udvekslet kulstof med omgivelserne, efter at han døde.`,
+    `*Hvorfor tæller røret ikke det hele?* Prøven sender betapartikler ud i alle retninger. Kun de partikler, der rammer rørets vindue, kan registreres, og vinduet dækker kun en lille del af kuglefladen omkring prøven. Dertil kommer, at C-14 udsender meget bløde betapartikler, som let bremses i prøven selv og i rørets vindue. Tilsammen giver det et *udbytte* på ${komma((D.eta * 100).toFixed(2))} %, som laboratoriet har bestemt ved at måle på en kilde med kendt aktivitet. Derfor svarer de ${D.taellinger} tællinger til $${D.taellinger} / ${komma(D.eta.toFixed(4))} = ${D.aMaalt}$ henfald, altså en aktivitet på ${D.aMaalt} døgn⁻¹. Bemærk, at udbyttet går ud af regnestykket i opgave 4: havde vi brugt tællinger i både tæller og nævner i brøken, var alderen den samme.`,
+    `*Hvorfor overhovedet et døgn?* Aktiviteten er kun ${komma(D.a0.toFixed(2))} Bq, altså omkring ${komma((D.a0 * 60).toFixed(0))} henfald i minuttet. Tæller man i få minutter, er de statistiske udsving for store til en brugbar datering. Derfor tæller man i mange timer. I dag bruger man oftest accelerator-masse-spektroskopi i stedet, hvor man tæller selve C-14-atomerne frem for at vente på, at de henfalder. Så er nogle få milligram nok.`,
+    `*Lyngmosemanden er opdigtet,* men både metoden og talstørrelserne svarer til en rigtig datering.`
+  ];
+}
+function loesningsAfsnit(){
+  return [].concat(byg1(), byg2(), byg3(), byg4(), bygBemaerk());
+}
+function mdTilHtml(s){ return s.replace(/\*([^*$]+)\*/g, "<em>$1</em>"); }
+
+const modal = document.getElementById("modal");
+// n = 0..3 for en enkelt opgave, null for hele gennemregningen
+function afsnitFor(n){
+  if (n === null) return loesningsAfsnit();
+  return [byg1(), byg2(), byg3(), byg4().concat(bygBemaerk())][n];
+}
+let visesNu = null;
+function aabnLoesning(n){
+  visesNu = n;
+  if (n !== null && !loesningSet[n]){ loesningSet[n] = true; gemHistorik(); }
+  document.getElementById("loesTitel").textContent = n === null
+    ? `Løsning \u2013 opgave nr. ${D.nr}`
+    : `Løsning til opgave ${n + 1} \u2013 opgave nr. ${D.nr}`;
+  const body = document.getElementById("loesBody");
+  body.innerHTML = afsnitFor(n).map(p => p.startsWith("## ")
+    ? `<h3>${p.slice(3)}</h3>` : `<p>${mdTilHtml(p)}</p>`).join("");
+  modal.classList.add("open");
+  if (window.renderMathInElement){
+    renderMathInElement(body, {
+      delimiters: [{ left: "$$", right: "$$", display: true },
+                   { left: "$", right: "$", display: false }],
+      throwOnError: false
+    });
+  }
+  opdaterStatus();
+}
+document.querySelectorAll("button.visOpg").forEach(b =>
+  b.addEventListener("click", () => aabnLoesning(parseInt(b.dataset.o, 10) - 1)));
+document.getElementById("visLoes").addEventListener("click", () => aabnLoesning(null));
+
+document.getElementById("luk").addEventListener("click", () => modal.classList.remove("open"));
+modal.addEventListener("click", e => { if (e.target === modal) modal.classList.remove("open"); });
+document.addEventListener("keydown", e => { if (e.key === "Escape") modal.classList.remove("open"); });
+document.getElementById("kopier").addEventListener("click", async e => {
+  const hoved = visesNu === null
+    ? `Løsning \u2013 Hvor gammel er Lyngmosemanden? Opgave nr. ${D.nr}`
+    : `Løsning til opgave ${visesNu + 1} \u2013 Hvor gammel er Lyngmosemanden? Opgave nr. ${D.nr}`;
+  const txt = hoved + "\n"
+    + `m = ${fmt(D.m, 1)} g kulstof, ${D.taellinger} t\u00e6llinger p\u00e5 et d\u00f8gn ved ${fmt(D.eta * 100, 2)} % udbytte, A = ${D.aMaalt} d\u00f8gn^-1\n\n`
+    + afsnitFor(visesNu).map(p => p.replace(/^## /, "")).join("\n\n");
+  try { await navigator.clipboard.writeText(txt); e.target.textContent = "Kopieret \u2713"; }
+  catch { e.target.textContent = "Kunne ikke kopiere"; }
+  setTimeout(() => { e.target.textContent = "Kopiér tekst"; }, 1600);
+});
+
+
+// ---------- hændelser ----------
+document.querySelectorAll("button.tjek").forEach(b =>
+  b.addEventListener("click", () => tjek(parseInt(b.dataset.f, 10) - 1)));
+felter.forEach((f, i) => f.addEventListener("keydown", e => {
+  if (e.key === "Enter"){ e.preventDefault(); tjek(i); }
+}));
+document.getElementById("nulstil").addEventListener("click", nulstilSvar);
+document.getElementById("nytNr").addEventListener("click", nytNummer);
+document.getElementById("nrInput").addEventListener("change", e => {
+  const n = parseInt(String(e.target.value).replace(/\D/g, ""), 10);
+  if (isFinite(n) && n >= 1000 && n <= 9999) saetOpgave(n);
+  else saetOpgave(D.nr);
+});
+document.getElementById("foto").addEventListener("error", () => {
+  document.getElementById("fotoFig").style.display = "none";
+});
+
+// Ruller siden, så det, eleven skal se, står øverst i vinduet.
+function rulTil(el, luft){
+  const y = el.getBoundingClientRect().top + window.scrollY - (luft === undefined ? 14 : luft);
+  window.scrollTo({ top: Math.max(0, y), behavior: "smooth" });
+}
+// Ved start: prøven og GM-røret skal være synlige, med knapperne lige over.
+function startScroll(){ rulTil(document.querySelector(".row"), 12); }
+// Når målingen er slut: data og begyndelsen af opgaverne skal stå tydeligt.
+function faerdigScroll(){
+  document.getElementById("rNote").textContent =
+    `${D.taellinger} t\u00e6llinger \u00f7 ${fmt(D.eta * 100, 2)} % udbytte`;
+  // Den gr\u00f8nne omregning st\u00e5r nederst i l\u00e6rredet og skal blive st\u00e5ende i toppen.
+  setTimeout(() => {
+    const c = cvM.getBoundingClientRect();
+    window.scrollTo({ top: Math.max(0, c.bottom + window.scrollY - 46), behavior: "smooth" });
+  }, 260);
+}
+
+const btnKoer = document.getElementById("koer");
+btnKoer.addEventListener("click", () => {
+  if (visMaaling >= 1){ visMaaling = 0; partikler.length = 0; }
+  koerer = !koerer;
+  btnKoer.textContent = koerer ? "\u276e\u276e Pause" : (visMaaling > 0 ? "\u25b6 Forts\u00e6t" : "\u25b6 K\u00f8r m\u00e5lingen");
+  if (koerer) startScroll();
+});
+document.getElementById("spring").addEventListener("click", () => {
+  visMaaling = 1; koerer = false; partikler.length = 0;
+  btnKoer.textContent = "\u25b6 K\u00f8r igen";
+  tegnAlt();
+  faerdigScroll();
+});
+
+// ---------- løkke ----------
+const VARIGHED = 10;             // sekunder for et helt døgn
+let sidst = null, spawn = 0;
+const FART = 250;                // px pr. sekund for partiklerne
+function frame(ms){
+  const nu = ms / 1000;
+  if (sidst === null) sidst = nu;
+  const dt = Math.min(0.05, nu - sidst); sidst = nu;
+  if (koerer){
+    visMaaling = Math.min(1, visMaaling + dt / VARIGHED);
+    spawn += dt;
+    while (spawn > 0.055){ spawn -= 0.055; nyPartikel(); }
+    for (let i = partikler.length - 1; i >= 0; i--){
+      const p = partikler[i];
+      p.r += dt * FART;
+      if (p.r >= p.laengde){
+        if (p.traef) glimt = performance.now() / 1000;   // registreret i røret
+        partikler.splice(i, 1);
+      }
+    }
+    if (visMaaling >= 1){
+      koerer = false; partikler.length = 0;
+      btnKoer.textContent = "\u25b6 K\u00f8r igen";
+      faerdigScroll();
+    }
+    tegnMaaling();
+  }
+  requestAnimationFrame(frame);
+}
+
+// ---------- start ----------
+const fraHash = parseInt(location.hash.slice(1), 10);
+byg();
+saetOpgave(isFinite(fraHash) && fraHash >= 1000 && fraHash <= 9999
+  ? fraHash : 1000 + Math.floor(Math.random() * 9000));
+layout();
+window.addEventListener("resize", layout);
+if (document.fonts){
+  document.fonts.load(`16px ${SERIF}`).catch(() => {});
+  document.fonts.load(`italic 16px ${MATH}`).catch(() => {});
+  document.fonts.ready.then(tegnAlt).catch(() => {});
+}
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>
