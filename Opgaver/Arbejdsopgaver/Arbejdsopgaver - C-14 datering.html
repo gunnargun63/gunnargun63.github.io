@@ -18,6 +18,7 @@
   --green:#83C167;
   --red:#FC6255;
   --teal:#5CD0B3;
+  --orange:#F2A93B;
   --serif:"KaTeX_Main","Latin Modern Roman","CMU Serif",Georgia,"Times New Roman",serif;
 }
 *{box-sizing:border-box}
@@ -71,11 +72,14 @@ input.nr:focus{outline:none;border-color:var(--yellow)}
 .konst{border:1.5px solid #333;border-radius:10px;padding:12px 20px;margin:14px 0 0}
 .konst ul{margin:6px 0 0;padding-left:22px}
 .konst li{font-size:1.06rem;line-height:1.6}
+.opgHoved{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 16px}
+.opgHoved h2{margin-right:6px}
 
 /* ---------- opgaver ---------- */
 .opg{border-left:3px solid #333;padding:2px 0 2px 18px;margin:0 0 26px}
 .opg.ok{border-left-color:var(--green)}
 .opg.nej{border-left-color:var(--red)}
+.opg.delvis{border-left-color:var(--orange)}
 .opg h3 span.nr{color:var(--blue)}
 .felt{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;margin:10px 0 0}
 .felt .navn{font-size:1.15rem;min-width:2.6em}
@@ -84,10 +88,12 @@ input.nr:focus{outline:none;border-color:var(--yellow)}
 .felt input:focus{outline:none;border-color:var(--blue)}
 .felt input.ok{border-color:var(--green)}
 .felt input.nej{border-color:var(--red)}
+.felt input.delvis{border-color:var(--orange)}
 .felt .enhed{color:var(--dim);font-size:1.06rem;min-width:7.2em}
 .fb{font-size:1.06rem;line-height:1.5;margin:8px 0 0;min-height:1.3em}
 .fb.ok{color:var(--green)}
 .fb.nej{color:var(--red)}
+.fb.delvis{color:var(--orange)}
 .fb .tip{color:var(--dim);display:block;margin-top:3px}
 .loesRow{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;margin:10px 0 0}
 .loesRow button{font-size:.98rem;padding:4px 12px}
@@ -96,10 +102,13 @@ input.nr:focus{outline:none;border-color:var(--yellow)}
 /* ---------- status ---------- */
 .status{border:1.5px solid var(--border);border-radius:10px;background:#0b0b0b;padding:16px 22px;margin:22px 0 0}
 .status .tal{font-size:1.35rem}
+.status .noegle{color:var(--dim);font-size:.98rem;margin:10px 0 0;line-height:1.5}
+.status .noegle b{font-weight:normal}
 .prikker{display:inline-flex;gap:7px;margin-left:4px;vertical-align:-2px}
 .prik{width:13px;height:13px;border-radius:50%;border:1.6px solid var(--border)}
 .prik.ok{background:var(--green);border-color:var(--green)}
 .prik.nej{background:var(--red);border-color:var(--red)}
+.prik.delvis{background:var(--orange);border-color:var(--orange)}
 
 /* ---------- modal ---------- */
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.8);display:none;align-items:flex-start;
@@ -154,7 +163,6 @@ input.nr:focus{outline:none;border-color:var(--yellow)}
         <dt>Måletid</dt><dd>1 døgn = 24 &middot; 3600 s = 86400 s</dd>
         <dt>Tællinger på 1 døgn</dt><dd><b id="dT">&ndash;</b></dd>
         <dt>GM-rørets udbytte</dt><dd><b id="dE">&ndash;</b> af henfaldene registreres</dd>
-        <dt>Prøvens aktivitet</dt><dd><i class="sym">A</i> = <b id="dA">&ndash;</b> døgn<sup>&minus;1</sup></dd>
       </dl>
     </div>
   </div>
@@ -168,7 +176,8 @@ input.nr:focus{outline:none;border-color:var(--yellow)}
 
   <div class="resultat" id="resultat">
     <span><i class="sym">m</i> = <b id="rM">&ndash;</b></span>
-    <span><i class="sym">A</i> = <b id="rA">&ndash;</b> døgn<sup>&minus;1</sup></span>
+    <span><b id="rT">&ndash;</b> tællinger</span>
+    <span>udbytte <b id="rE">&ndash;</b></span>
     <span class="dim" id="rNote">Kør målingen, eller regn videre med tallene ovenfor.</span>
   </div>
 
@@ -182,16 +191,20 @@ input.nr:focus{outline:none;border-color:var(--yellow)}
     </ul>
   </div>
 
-  <h2>Opgaver</h2>
+  <div class="opgHoved">
+    <h2>Opgaver</h2>
+    <button id="visFormler">Relevante formler</button>
+    <span class="note" style="margin:0">Kig så meget du vil &ndash; det noteres ingen steder.</span>
+  </div>
   <p class="sub" style="margin-bottom:18px">Svar med mindst 3 betydende cifre. Tierpotenser skrives fx <span style="color:var(--fg)">3,84e&minus;12</span> eller <span style="color:var(--fg)">3,84&middot;10^&minus;12</span>.</p>
 
   <section class="opg" id="opg1">
-    <h3><span class="nr">1</span> &middot; Hvor mange C&#8209;14&#8209;kerner var der, da han døde?</h3>
-    <p>Så længe Lyngmosemanden levede, indgik han i kulstofkredsløbet, og brøkdelen af C&#8209;14 i hans væv var den samme som i luften. Beregn antallet af C&#8209;14&#8209;kerner <i class="sym">N</i><sub>0</sub> i prøven på det tidspunkt, hvor han døde.</p>
+    <h3><span class="nr">1</span> &middot; Prøvens aktivitet i dag</h3>
+    <p>Tælleren registrerede <b id="dT2" style="color:var(--yellow);font-weight:normal">&ndash;</b> tællinger på et døgn, og GM-rørets udbytte er <b id="dE2" style="color:var(--yellow);font-weight:normal">&ndash;</b>. Beregn prøvens aktivitet <i class="sym">A</i> i dag.</p>
     <div class="felt">
-      <span class="navn"><i class="sym">N</i><sub>0</sub> =</span>
+      <span class="navn"><i class="sym">A</i> =</span>
       <input id="f1" type="text" autocomplete="off" spellcheck="false">
-      <span class="enhed">kerner</span>
+      <span class="enhed">døgn<sup>&minus;1</sup></span>
       <button class="tjek" data-f="1">Tjek</button>
     </div>
     <div class="fb" id="fb1"></div>
@@ -202,12 +215,12 @@ input.nr:focus{outline:none;border-color:var(--yellow)}
   </section>
 
   <section class="opg" id="opg2">
-    <h3><span class="nr">2</span> &middot; Henfaldskonstanten</h3>
-    <p>Beregn henfaldskonstanten <i class="sym">k</i> for C&#8209;14 i enheden s<sup>&minus;1</sup>.</p>
+    <h3><span class="nr">2</span> &middot; Hvor mange C&#8209;14&#8209;kerner var der, da han døde?</h3>
+    <p>Så længe Lyngmosemanden levede, indgik han i kulstofkredsløbet, og brøkdelen af C&#8209;14 i hans væv var den samme som i luften. Beregn antallet af C&#8209;14&#8209;kerner <i class="sym">N</i><sub>0</sub> i prøven på det tidspunkt, hvor han døde.</p>
     <div class="felt">
-      <span class="navn"><i class="sym">k</i> =</span>
+      <span class="navn"><i class="sym">N</i><sub>0</sub> =</span>
       <input id="f2" type="text" autocomplete="off" spellcheck="false">
-      <span class="enhed">s<sup>&minus;1</sup></span>
+      <span class="enhed">kerner</span>
       <button class="tjek" data-f="2">Tjek</button>
     </div>
     <div class="fb" id="fb2"></div>
@@ -218,22 +231,15 @@ input.nr:focus{outline:none;border-color:var(--yellow)}
   </section>
 
   <section class="opg" id="opg3">
-    <h3><span class="nr">3</span> &middot; Prøvens aktivitet dengang</h3>
-    <p>Beregn aktiviteten <i class="sym">A</i><sub>0</sub> af prøven på dødstidspunktet, først i enheden Bq og derefter i enheden døgn<sup>&minus;1</sup>. Det er den samme fysiske størrelse begge gange &ndash; kun tidsenheden er en anden.</p>
+    <h3><span class="nr">3</span> &middot; Henfaldskonstanten</h3>
+    <p>Beregn henfaldskonstanten <i class="sym">k</i> for C&#8209;14 i enheden s<sup>&minus;1</sup>.</p>
     <div class="felt">
-      <span class="navn"><i class="sym">A</i><sub>0</sub> =</span>
+      <span class="navn"><i class="sym">k</i> =</span>
       <input id="f3" type="text" autocomplete="off" spellcheck="false">
-      <span class="enhed">Bq = s<sup>&minus;1</sup></span>
+      <span class="enhed">s<sup>&minus;1</sup></span>
       <button class="tjek" data-f="3">Tjek</button>
     </div>
     <div class="fb" id="fb3"></div>
-    <div class="felt">
-      <span class="navn"><i class="sym">A</i><sub>0</sub> =</span>
-      <input id="f4" type="text" autocomplete="off" spellcheck="false">
-      <span class="enhed">døgn<sup>&minus;1</sup></span>
-      <button class="tjek" data-f="4">Tjek</button>
-    </div>
-    <div class="fb" id="fb4"></div>
     <div class="loesRow">
       <button class="visOpg" data-o="3" disabled>Vis løsning til opgave 3</button>
       <span class="laas" id="laas3"></span>
@@ -241,12 +247,19 @@ input.nr:focus{outline:none;border-color:var(--yellow)}
   </section>
 
   <section class="opg" id="opg4">
-    <h3><span class="nr">4</span> &middot; Hvor længe er der gået?</h3>
-    <p>I dag er prøvens aktivitet <i class="sym">A</i> = <b id="dA2" style="color:var(--yellow);font-weight:normal">&ndash;</b> døgn<sup>&minus;1</sup>. Beregn, hvor mange år der er gået, siden Lyngmosemanden døde.</p>
+    <h3><span class="nr">4</span> &middot; Prøvens aktivitet dengang</h3>
+    <p>Beregn aktiviteten <i class="sym">A</i><sub>0</sub> af prøven på dødstidspunktet, først i enheden Bq og derefter i enheden døgn<sup>&minus;1</sup>. Det er den samme fysiske størrelse begge gange &ndash; kun tidsenheden er en anden.</p>
     <div class="felt">
-      <span class="navn"><i class="sym">t</i> =</span>
+      <span class="navn"><i class="sym">A</i><sub>0</sub> =</span>
+      <input id="f4" type="text" autocomplete="off" spellcheck="false">
+      <span class="enhed">Bq = s<sup>&minus;1</sup></span>
+      <button class="tjek" data-f="4">Tjek</button>
+    </div>
+    <div class="fb" id="fb4"></div>
+    <div class="felt">
+      <span class="navn"><i class="sym">A</i><sub>0</sub> =</span>
       <input id="f5" type="text" autocomplete="off" spellcheck="false">
-      <span class="enhed">år</span>
+      <span class="enhed">døgn<sup>&minus;1</sup></span>
       <button class="tjek" data-f="5">Tjek</button>
     </div>
     <div class="fb" id="fb5"></div>
@@ -256,11 +269,30 @@ input.nr:focus{outline:none;border-color:var(--yellow)}
     </div>
   </section>
 
+  <section class="opg" id="opg5">
+    <h3><span class="nr">5</span> &middot; Hvor længe er der gået?</h3>
+    <p>Brug prøvens aktivitet i dag fra opgave 1 og aktiviteten på dødstidspunktet fra opgave 4. Beregn, hvor mange år der er gået, siden Lyngmosemanden døde.</p>
+    <div class="felt">
+      <span class="navn"><i class="sym">t</i> =</span>
+      <input id="f6" type="text" autocomplete="off" spellcheck="false">
+      <span class="enhed">år</span>
+      <button class="tjek" data-f="6">Tjek</button>
+    </div>
+    <div class="fb" id="fb6"></div>
+    <div class="loesRow">
+      <button class="visOpg" data-o="5" disabled>Vis løsning til opgave 5</button>
+      <span class="laas" id="laas5"></span>
+    </div>
+  </section>
+
   <div class="status">
     <div class="row" style="margin:0">
       <span class="tal" id="statusTxt">Ingen svar tjekket endnu.</span>
       <span class="prikker" id="prikker"></span>
     </div>
+    <p class="noegle"><b style="color:var(--green)">&#9679;</b> rigtigt inden for 3 forsøg &nbsp;
+      <b style="color:var(--orange)">&#9679;</b> rigtigt, men det tog flere forsøg &nbsp;
+      <b style="color:var(--red)">&#9679;</b> forkert, eller rigtigt efter at løsningen var set</p>
     <div class="row" style="margin:14px 0 0">
       <button id="visLoes" disabled>Vis hele løsningen</button>
       <button id="nulstil">↺ Nulstil svar</button>
@@ -402,25 +434,28 @@ const taet = (a, b, tol) => isFinite(a) && isFinite(b) && b !== 0 && Math.abs(a 
 
 // ---------- opgavesættet ----------
 let D = null;                      // aktuelle data
-let svar = [null, null, null, null, null];   // true/false/null pr. felt
-let forsoeg = [0, 0, 0, 0, 0];              // antal tjek pr. felt
-let loesningSet = [false, false, false, false];   // pr. opgave
+let svar = [null, null, null, null, null, null];   // true/false/null pr. felt
+let forsoeg = [0, 0, 0, 0, 0, 0];           // antal tjek pr. felt
+let loesningSet = [false, false, false, false, false];   // pr. opgave
+// Sættes i det øjeblik et svar bliver rigtigt, og ændres ikke bagefter: åbner man
+// løsningen efter at have svaret rigtigt, skal den grønne plet blive stående.
+let kvalitet = [null, null, null, null, null, null];   // "groen" | "gul" | "roed"
 // Regnskabet følger opgavenummeret, så man ikke kan skifte nummer frem og tilbage
 // for at slette sporet efter en åbnet løsning.
 const historik = new Map();
-const OPG_FELTER = [[0], [1], [2, 3], [4]];
+const OPG_FELTER = [[0], [1], [2], [3, 4], [5]];
 let visMaaling = 0;                // fremdrift 0-1 i måleanimationen
 let koerer = false;
 
-const felter = [1, 2, 3, 4, 5].map(i => document.getElementById("f" + i));
-const fbEl   = [1, 2, 3, 4, 5].map(i => document.getElementById("fb" + i));
+const felter = [1, 2, 3, 4, 5, 6].map(i => document.getElementById("f" + i));
+const fbEl   = [1, 2, 3, 4, 5, 6].map(i => document.getElementById("fb" + i));
 
 function facit(i){
-  return [D.n0, D.kSek, D.a0, D.a0Doegn, D.tSvar][i];
+  return [D.aMaalt, D.n0, D.kSek, D.a0, D.a0Doegn, D.tSvar][i];
 }
 function tolerance(i){
   // alderen er sammensat af flere afrundede mellemresultater, så den får lidt mere plads
-  return i === 4 ? 0.04 : 0.02;
+  return i === 5 ? 0.04 : 0.02;
 }
 
 // Typiske fejl, med et målrettet tip. Rækkefølgen er vigtig: mest specifikke først.
@@ -428,6 +463,13 @@ function diagnose(i, v){
   const t = [];
   const push = (test, tekst) => { if (!t.length && test) t.push(tekst); };
   if (i === 0){
+    push(taet(v, D.taellinger * D.eta, 0.03), "Du har ganget med udbyttet i stedet for at dividere. Tælleren ser kun en brøkdel af henfaldene, så aktiviteten er større end tælletallet.");
+    push(taet(v, D.taellinger / (D.eta * 100), 0.03), "Udbyttet skal indsættes som decimaltal. " + fmt(D.eta * 100, 2) + " % svarer til " + fmt(D.eta, 4) + ".");
+    push(taet(v, D.taellinger * D.eta * 100, 0.03), "Udbyttet skal indsættes som decimaltal, og der skal divideres med det.");
+    push(taet(v, D.taellinger, 0.005), "Det er tælletallet. Kun en brøkdel af henfaldene rammer røret, så prøvens aktivitet er større.");
+    push(v > 0 && v < D.taellinger, "Aktiviteten kan ikke være mindre end tælletallet: røret registrerer højst ét klik pr. henfald, og det gør det langtfra.");
+  }
+  if (i === 1){
     push(taet(v, D.nC, 0.03), "Det er antallet af kulstofatomer i alt. Kun brøkdelen 1,2 &middot; 10\u207b\u00b9\u00b2 af dem er C-14.");
     push(taet(v, D.n0 * 12, 0.04), "Du har divideret med massen af 1 u i stedet for med massen af \u00e9t kulstofatom. Et kulstofatom vejer 12 u, alts\u00e5 12 &middot; 1,66054 &middot; 10\u207b\u00b2\u2074 g = 1,99 &middot; 10\u207b\u00b2\u00b3 g.");
     push(taet(v, D.m / U_G, 0.04), "Du har divideret med massen af 1 u i stedet for med 12 u, og du mangler at gange med br\u00f8kdelen 1,2 &middot; 10\u207b\u00b9\u00b2.");
@@ -439,24 +481,24 @@ function diagnose(i, v){
     push(taet(v, D.n0 / 100, 0.03), "Du er en faktor 100 for lavt nede. Brøkdelen 1,2 &middot; 10\u207b\u00b9\u00b2 er ikke en procentdel.");
     push(taet(v, D.m * FRAC, 0.03), "Du mangler at dele med massen af ét kulstofatom, 12 u.");
   }
-  if (i === 1){
+  if (i === 2){
     push(taet(v, D.kAar, 0.03), "Det er <i class='sym'>k</i> i enheden år\u207b\u00b9. Del med antallet af sekunder på et år.");
     push(taet(v, T_HALV / Math.LN2, 0.03), "Du har vendt brøken om. Der gælder <i class='sym'>k</i> = ln(2)/<i class='sym'>T</i><sub>1/2</sub>.");
     push(taet(v, S_PR_AAR / Math.LN2 * T_HALV, 0.03), "Du har vendt brøken om.");
     push(taet(v, Math.LN2 / (T_HALV * 365 * 24), 0.03), "Tjek omregningen: der er 3600 sekunder på en time.");
   }
-  if (i === 2){
+  if (i === 3){
     push(taet(v, D.kAar * D.n0, 0.03), "Du har brugt <i class='sym'>k</i> i år\u207b\u00b9. Aktivitet i Bq kræver <i class='sym'>k</i> i s\u207b\u00b9.");
     push(taet(v, D.a0Doegn, 0.03), "Det er aktiviteten i enheden døgn\u207b\u00b9. Her spørges om den i Bq, altså pr. sekund.");
     push(taet(v, D.n0 / T_HALV, 0.03), "Aktiviteten er <i class='sym'>A</i> = <i class='sym'>k</i> &middot; <i class='sym'>N</i>, ikke <i class='sym'>N</i> delt med halveringstiden.");
   }
-  if (i === 3){
+  if (i === 4){
     push(taet(v, D.a0, 0.03), "Det er aktiviteten i Bq, altså pr. sekund. Gang med de 86400 sekunder, døgnet varer.");
     push(taet(v, D.a0 * 3600, 0.03), "Du har ganget med en time. Et døgn er 24 &middot; 3600 s = 86400 s.");
     push(taet(v, D.a0 * 60, 0.03), "Du har ganget med et minut.");
     push(taet(v, D.aMaalt, 0.03), "Det er prøvens aktivitet i dag. Spørgsmålet er aktiviteten på dødstidspunktet.");
   }
-  if (i === 4){
+  if (i === 5){
     push(v < 0 || taet(v, -D.tSvar, 0.06), "Du har byttet om på de to tal i logaritmen. Der skal stå ln(<i class='sym'>A</i><sub>0</sub>/<i class='sym'>A</i>), og <i class='sym'>A</i><sub>0</sub> er den største.");
     push(taet(v, D.tSvar * S_PR_AAR, 0.06), "Det er alderen i sekunder. Brug <i class='sym'>k</i> i år\u207b\u00b9, så kommer <i class='sym'>t</i> direkte i år.");
     push(taet(v, D.tSvar / S_PR_AAR, 0.06), "Enhederne passer ikke. Brug <i class='sym'>k</i> i år\u207b\u00b9, så kommer <i class='sym'>t</i> direkte i år.");
@@ -467,11 +509,15 @@ function diagnose(i, v){
   return t[0] || null;
 }
 
+// Hvilken opgave et felt hører til
+function opgaveFor(i){ return OPG_FELTER.findIndex(f => f.includes(i)); }
+const KLASSE = { groen: "ok", gul: "delvis", roed: "nej" };
+
 function tjek(i){
   const v = parseTal(felter[i].value);
   const f = facit(i), tol = tolerance(i);
-  felter[i].classList.remove("ok", "nej");
-  fbEl[i].classList.remove("ok", "nej");
+  felter[i].classList.remove("ok", "nej", "delvis");
+  fbEl[i].classList.remove("ok", "nej", "delvis");
   if (!isFinite(v)){
     svar[i] = null;
     fbEl[i].className = "fb nej";
@@ -482,25 +528,37 @@ function tjek(i){
   forsoeg[i]++;
   const ok = taet(v, f, tol);
   svar[i] = ok;
-  felter[i].classList.add(ok ? "ok" : "nej");
-  fbEl[i].className = "fb " + (ok ? "ok" : "nej");
+  if (ok && kvalitet[i] === null){
+    // Karakteren fastfryses her og afhænger af, hvad der gik forud
+    kvalitet[i] = loesningSet[opgaveFor(i)] ? "roed"
+                : forsoeg[i] > FORSOEG_KRAEVET ? "gul" : "groen";
+  }
+  const kl = ok ? KLASSE[kvalitet[i]] : "nej";
+  felter[i].classList.add(kl);
+  fbEl[i].className = "fb " + kl;
   if (ok){
-    let txt = "Rigtigt.";
-    if (i === 4) txt += ` Lyngmosemanden døde for ca. ${Math.round(D.tSvar / 10) * 10} år siden, alts\u00e5 omkring ${doedsaar(D.tSvar)}`;
+    let txt = kvalitet[i] === "groen" ? "Rigtigt."
+      : kvalitet[i] === "gul" ? `Rigtigt \u2013 det tog ${forsoeg[i]} forsøg.`
+      : "Rigtigt \u2013 men løsningen var set først.";
+    if (i === 5) txt += ` Lyngmosemanden døde for ca. ${Math.round(D.tSvar / 10) * 10} år siden, alts\u00e5 omkring ${doedsaar(D.tSvar)}`;
     fbEl[i].innerHTML = txt;
   } else {
     const tip = diagnose(i, v);
     fbEl[i].innerHTML = "Ikke helt." + (tip ? `<span class="tip">${tip}</span>` : "");
   }
-  const sek = document.getElementById(i === 4 ? "opg4" : i === 2 || i === 3 ? "opg3" : "opg" + (i + 1));
-  const rel = i === 2 || i === 3 ? [svar[2], svar[3]] : [svar[i]];
-  sek.classList.remove("ok", "nej");
-  if (rel.every(x => x === true)) sek.classList.add("ok");
-  else if (rel.some(x => x === false)) sek.classList.add("nej");
-  if (i === 4) visGraf();
+  const n = opgaveFor(i);
+  const sek = document.getElementById("opg" + (n + 1));
+  const felterI = OPG_FELTER[n];
+  sek.classList.remove("ok", "nej", "delvis");
+  if (felterI.some(j => svar[j] === false)) sek.classList.add("nej");
+  else if (felterI.every(j => svar[j] === true))
+    sek.classList.add(felterI.some(j => kvalitet[j] === "roed") ? "nej"
+                    : felterI.some(j => kvalitet[j] === "gul") ? "delvis" : "ok");
+  if (i === 5) visGraf();
   gemHistorik();
   opdaterStatus();
 }
+
 
 // En løsning åbnes, når de foregående opgaver er rigtige, og denne opgave
 // enten er rigtig eller er forsøgt mindst tre gange.
@@ -512,15 +570,15 @@ function foersteUloeste(n){
   return 0;
 }
 function laaseTekst(n){
-  if (loesningSet[n]) return "Løsningen er set.";
+  if (loesningSet[n]) return "L\u00f8sningen er set.";
   const mangler = foersteUloeste(n);
-  if (mangler) return `Åbner, når opgave ${mangler} er rigtig.`;
+  if (mangler) return `\u00c5bner, n\u00e5r opgave ${mangler} er rigtig.`;
   if (opgaveRigtig(n)) return "";
   const brugt = Math.min(...OPG_FELTER[n].filter(i => svar[i] !== true).map(i => forsoeg[i]));
-  return `Åbner efter ${FORSOEG_KRAEVET} forsøg \u2013 du har brugt ${brugt}.`;
+  return `\u00c5bner efter ${FORSOEG_KRAEVET} fors\u00f8g \u2013 du har brugt ${brugt}.`;
 }
 function gemHistorik(){
-  if (D) historik.set(D.nr, { forsoeg: forsoeg.slice(), loesningSet: loesningSet.slice() });
+  if (D) historik.set(D.nr, { forsoeg: forsoeg.slice(), loesningSet: loesningSet.slice(), kvalitet: kvalitet.slice() });
 }
 function listeOver(tal){
   if (tal.length === 1) return String(tal[0]);
@@ -530,17 +588,20 @@ function listeOver(tal){
 function opdaterStatus(){
   const tjekket = svar.filter(x => x !== null).length;
   const rigtige = svar.filter(x => x === true).length;
-  const sete = [1, 2, 3, 4].filter(n => loesningSet[n - 1]);
+  const sete = [1, 2, 3, 4, 5].filter(n => loesningSet[n - 1]);
+  const seje = kvalitet.filter(k => k === "gul").length;
   const st = document.getElementById("statusTxt");
   let txt = tjekket === 0 && !sete.length
     ? "Ingen svar tjekket endnu."
-    : `${rigtige} af 5 rigtige.`;
+    : `${rigtige} af 6 rigtige.`;
+  if (seje) txt += ` ${seje === 1 ? "Et af dem tog" : seje + " af dem tog"} mere end ${FORSOEG_KRAEVET} forsøg.`;
   if (sete.length) txt += ` Løsning set til opgave ${listeOver(sete)}.`;
   st.innerHTML = txt;
   const p = document.getElementById("prikker");
-  p.innerHTML = svar.map(s => `<span class="prik ${s === true ? "ok" : s === false ? "nej" : ""}"></span>`).join("");
-  document.getElementById("visLoes").disabled = rigtige < 5;
-  for (let n = 0; n < 4; n++){
+  p.innerHTML = svar.map((s, i) =>
+    `<span class="prik ${s === true ? KLASSE[kvalitet[i]] : s === false ? "nej" : ""}"></span>`).join("");
+  document.getElementById("visLoes").disabled = rigtige < 6;
+  for (let n = 0; n < 5; n++){
     const b = document.querySelector(`button.visOpg[data-o="${n + 1}"]`);
     b.disabled = !(foersteUloeste(n) === 0 && (opgaveRigtig(n) || nokForsoeg(n)));
     document.getElementById("laas" + (n + 1)).textContent = b.disabled || loesningSet[n] ? laaseTekst(n) : "";
@@ -549,10 +610,11 @@ function opdaterStatus(){
 
 // Rydder svarene, men ikke forsøg og sete løsninger: regnskabet skal stå ved magt.
 function nulstilSvar(){
-  svar = [null, null, null, null, null];
-  felter.forEach(f => { f.value = ""; f.classList.remove("ok", "nej"); });
+  svar = [null, null, null, null, null, null];
+  kvalitet = [null, null, null, null, null, null];
+  felter.forEach(f => { f.value = ""; f.classList.remove("ok", "nej", "delvis"); });
   fbEl.forEach(f => { f.className = "fb"; f.innerHTML = ""; });
-  ["opg1","opg2","opg3","opg4"].forEach(id => document.getElementById(id).classList.remove("ok","nej"));
+  ["opg1","opg2","opg3","opg4","opg5"].forEach(id => document.getElementById(id).classList.remove("ok","nej","delvis"));
   document.getElementById("grafBoks").style.display = "none";
   opdaterStatus();
 }
@@ -564,15 +626,17 @@ function saetOpgave(nr){
   document.getElementById("dM").textContent = fmt(D.m, 1) + " g";
   document.getElementById("dT").textContent = String(D.taellinger);
   document.getElementById("dE").textContent = fmt(D.eta * 100, 2) + " %";
-  document.getElementById("dA").textContent = String(D.aMaalt);
-  document.getElementById("dA2").textContent = String(D.aMaalt);
+  document.getElementById("dT2").textContent = String(D.taellinger);
+  document.getElementById("dE2").textContent = fmt(D.eta * 100, 2) + " %";
   document.getElementById("rM").textContent = fmt(D.m, 1) + " g";
-  document.getElementById("rA").textContent = String(D.aMaalt);
+  document.getElementById("rT").textContent = String(D.taellinger);
+  document.getElementById("rE").textContent = fmt(D.eta * 100, 2) + " %";
   document.getElementById("rNote").textContent = "Kør målingen, eller regn videre med tallene ovenfor.";
   if (location.hash.slice(1) !== String(nr)) history.replaceState(null, "", "#" + nr);
   const h = historik.get(nr);
-  forsoeg = h ? h.forsoeg.slice() : [0, 0, 0, 0, 0];
-  loesningSet = h ? h.loesningSet.slice() : [false, false, false, false];
+  forsoeg = h ? h.forsoeg.slice() : [0, 0, 0, 0, 0, 0];
+  loesningSet = h ? h.loesningSet.slice() : [false, false, false, false, false];
+  kvalitet = h ? h.kvalitet.slice() : [null, null, null, null, null, null];
   nulstilSvar();
   visMaaling = 0; koerer = false;
   document.getElementById("koer").textContent = "▶ Kør målingen";
@@ -753,14 +817,17 @@ function tegnMaaling(){
 
   // ---- afsluttende linje ----
   if (visMaaling >= 1){
-    rich(c, [[`${D.taellinger} tællinger ÷ ${fmt(D.eta * 100, 2)} %  →  `, false],
-             ["A", true], [` = ${D.aMaalt} døgn⁻¹`, false]],
+    rich(c, [["Målingen er slut. ", false],
+             [`${D.taellinger} tællinger på et døgn ved ${fmt(D.eta * 100, 2)} % udbytte.`, false]],
          W / 2, Hm - 10, "center", 15 * skala, COL.green);
   }
 }
 
 // ---------- henfaldskurve ----------
+// Grafen viser den målte aktivitet, så den må først frem, når eleven selv har
+// fundet den i opgave 1.
 function visGraf(){
+  if (svar[0] !== true) return;
   document.getElementById("grafBoks").style.display = "";
   layout();
 }
@@ -817,32 +884,40 @@ function tegnAlt(){ if (D){ tegnMaaling(); tegnGraf(); } }
 
 // ---------- løsning ----------
 function byg1(){
+  return [
+    String.raw`## 1. Prøvens aktivitet i dag`,
+    String.raw`GM-røret registrerer kun en kendt brøkdel af henfaldene, *udbyttet*. Her er udbyttet ${fmt(D.eta * 100, 2)} %, altså ${fmt(D.eta, 4)} skrevet som decimaltal. Af hvert henfald i prøven bliver der med andre ord kun talt ${fmt(D.eta, 4)} klik.`,
+    String.raw`Aktiviteten findes derfor ved at dividere tælletallet med udbyttet: $$A = \frac{\text{antal tællinger}}{\text{udbytte}} = \frac{${D.taellinger}}{${kommaTex(fmt(D.eta, 4))}} = ${D.aMaalt}\ \text{døgn}^{-1}.$$ Bemærk, at aktiviteten er *større* end tælletallet. Havde man ganget i stedet for at dividere, var svaret blevet mindre, og det kan ikke passe: røret kan højst registrere ét klik pr. henfald.`,
+    String.raw`Enheden er $\text{døgn}^{-1}$, fordi der blev talt i netop ét døgn.`
+  ];
+}
+function byg2(){
   const nC = sciTex(D.nC, 5), n0 = sciTex(D.n0, 5);
   return [
-    `## 1. Antal C-14-kerner, da han døde`,
+    `## 2. Antal C-14-kerner, da han døde`,
     `Et kulstofatom vejer i gennemsnit $12\\ \\text{u}$, og $1\\ \\text{u} = 1{,}66054\\cdot 10^{-24}\\ \\text{g}$. Antallet af kulstofatomer i prøven er massen divideret med massen af ét atom: $$N_C = \\frac{m}{12\\,\\text{u}} = \\frac{${kommaTex(D.m.toFixed(1))}\\ \\text{g}}{12\\cdot 1{,}66054\\cdot 10^{-24}\\ \\text{g}} = \\frac{${kommaTex(D.m.toFixed(1))}\\ \\text{g}}{${sciTex(M_C * U_G, 5)}\\ \\text{g}} = ${nC}.$$`,
     `Af dem er kun brøkdelen $1{,}2\\cdot 10^{-12}$ C-14. Så længe han levede, blev det indhold holdt ved lige, og det er derfor antallet på dødstidspunktet: $$N_0 = 1{,}2\\cdot 10^{-12}\\cdot ${nC} = ${n0}.$$`
   ];
 }
-function byg2(){
+function byg3(){
   return [
-    `## 2. Henfaldskonstanten`,
+    `## 3. Henfaldskonstanten`,
     `Halveringstiden og henfaldskonstanten hænger sammen som $$T_{1/2} = \\frac{\\ln(2)}{k}.$$ Ganges der med $k$ på begge sider og divideres med $T_{1/2}$, er $k$ isoleret: $$k = \\frac{\\ln(2)}{T_{1/2}} = \\frac{\\ln(2)}{5730\\ \\text{år}} = \\frac{0{,}69315}{5730\\ \\text{år}} = ${sciTex(D.kAar, 5)}\\ \\text{år}^{-1}.$$`,
     `Aktiviteten skal måles i $\\text{Bq} = \\text{s}^{-1}$, så $k$ skal omregnes til $\\text{s}^{-1}$. Et år er $$365\\cdot 24\\cdot 3600\\ \\text{s} = ${sciTex(S_PR_AAR, 5)}\\ \\text{s},$$ og da $k$ har enheden "pr. år", skal der divideres med antallet af sekunder pr. år: $$k = \\frac{${sciTex(D.kAar, 5)}\\ \\text{år}^{-1}}{${sciTex(S_PR_AAR, 5)}\\ \\text{s/år}} = ${sciTex(D.kSek, 5)}\\ \\text{s}^{-1}.$$`
   ];
 }
-function byg3(){
+function byg4(){
   return [
-    `## 3. Aktiviteten dengang`,
+    `## 4. Aktiviteten dengang`,
     String.raw`Aktiviteten er antallet af henfald pr. tidsenhed, og den er proportional med antallet af radioaktive kerner: $A = k\cdot N$. Bruges $k$ i $\text{s}^{-1}$, kommer aktiviteten i $\text{Bq} = \text{s}^{-1}$: $$A_0 = k\cdot N_0 = ${sciTex(D.kSek, 5)}\ \text{s}^{-1}\cdot ${sciTex(D.n0, 5)} = ${kommaTex(D.a0.toFixed(4))}\ \text{Bq}.$$ Enhederne går op: $\text{s}^{-1}$ gange et rent antal giver $\text{s}^{-1}$.`,
     String.raw`Aktiviteten er den samme fysiske størrelse, uanset hvilken tidsenhed den måles i, og symbolet er $A$ i begge tilfælde. Vil vi have den pr. døgn i stedet for pr. sekund, ganger vi med de $24\cdot 3600\ \text{s} = 86400\ \text{s}$, et døgn varer: $$A_0 = ${kommaTex(D.a0.toFixed(4))}\ \text{s}^{-1}\cdot 86400\ \frac{\text{s}}{\text{døgn}} = ${kommaTex(D.a0Doegn.toFixed(0))}\ \text{døgn}^{-1}.$$ Bemærk, hvordan sekunderne forkorter væk, så enheden bliver $\text{døgn}^{-1}$.`,
     String.raw`Et døgn er forsvindende lidt i forhold til halveringstiden på $5730$ år, så aktiviteten er praktisk talt konstant hen over det døgn, målingen varer. Derfor er antallet af henfald på et døgn netop det samme tal som aktiviteten målt i $\text{døgn}^{-1}$.`
   ];
 }
-function byg4(){
+function byg5(){
   const forhold = D.a0Doegn / D.aMaalt;
   return [
-    `## 4. Alderen`,
+    `## 5. Alderen`,
     String.raw`Aktiviteten er proportional med antallet af C-14-kerner, der er tilbage, og aftager derfor efter samme henfaldslov: $$A(t) = A_0\cdot e^{-k\cdot t}.$$ Her er $t$ tiden siden dødstidspunktet, $A_0$ aktiviteten vi fandt i opgave 3, og $A(t)$ laboratoriets måling i dag. De to aktiviteter skal have samme enhed, så vi bruger $\text{døgn}^{-1}$ for dem begge.`,
     String.raw`Først isoleres $t$. Divider med $A_0$ på begge sider: $$\frac{A(t)}{A_0} = e^{-k\cdot t}.$$ Tag den naturlige logaritme på begge sider. Da $\ln$ ophæver eksponentialfunktionen, fås $$\ln\!\left(\frac{A(t)}{A_0}\right) = -k\cdot t.$$ Divider med $-k$, og brug at $-\ln(a/b) = \ln(b/a)$: $$t = \frac{1}{k}\cdot\ln\!\left(\frac{A_0}{A(t)}\right).$$`,
     String.raw`Her skal $k$ bruges i $\text{år}^{-1}$, for så kommer $t$ direkte ud i år. Enhederne i brøken inde i logaritmen forkorter væk, så der står et rent tal: $$\begin{aligned} t &= \frac{1}{${sciTex(D.kAar, 5)}\ \text{år}^{-1}}\cdot\ln\!\left(\frac{${kommaTex(D.a0Doegn.toFixed(0))}\ \text{døgn}^{-1}}{${D.aMaalt}\ \text{døgn}^{-1}}\right) \\[6pt] &= \frac{\ln(${kommaTex(forhold.toFixed(4))})}{${sciTex(D.kAar, 5)}\ \text{år}^{-1}} = \frac{${kommaTex(Math.log(forhold).toFixed(4))}}{${sciTex(D.kAar, 5)}\ \text{år}^{-1}} = ${kommaTex(D.tSvar.toFixed(0))}\ \text{år}. \end{aligned}$$`,
@@ -853,28 +928,134 @@ function bygBemaerk(){
   return [
     `## Bemærkninger`,
     `*Modellen bygger på tre antagelser.* For det første at brøkdelen af C-14 i atmosfæren var den samme dengang som i dag. Det passer ikke helt: produktionen af C-14 svinger med den kosmiske stråling, og derfor kalibrerer man i praksis mod årringe i træ, hvor alderen kendes uafhængigt. For det andet at prøven ikke er forurenet med nyere kulstof fra mosevandet. For det tredje at prøven ikke har udvekslet kulstof med omgivelserne, efter at han døde.`,
-    `*Hvorfor tæller røret ikke det hele?* Prøven sender betapartikler ud i alle retninger. Kun de partikler, der rammer rørets vindue, kan registreres, og vinduet dækker kun en lille del af kuglefladen omkring prøven. Dertil kommer, at C-14 udsender meget bløde betapartikler, som let bremses i prøven selv og i rørets vindue. Tilsammen giver det et *udbytte* på ${komma((D.eta * 100).toFixed(2))} %, som laboratoriet har bestemt ved at måle på en kilde med kendt aktivitet. Derfor svarer de ${D.taellinger} tællinger til $${D.taellinger} / ${komma(D.eta.toFixed(4))} = ${D.aMaalt}$ henfald, altså en aktivitet på ${D.aMaalt} døgn⁻¹. Bemærk, at udbyttet går ud af regnestykket i opgave 4: havde vi brugt tællinger i både tæller og nævner i brøken, var alderen den samme.`,
+    `*Hvorfor tæller røret ikke det hele?* Prøven sender betapartikler ud i alle retninger. Kun de partikler, der rammer rørets vindue, kan registreres, og vinduet dækker kun en lille del af kuglefladen omkring prøven. Dertil kommer, at C-14 udsender meget bløde betapartikler, som let bremses i prøven selv og i rørets vindue. Tilsammen giver det udbyttet, som laboratoriet har bestemt ved at måle på en kilde med kendt aktivitet. Bemærk, at udbyttet går ud af regnestykket i opgave 5: havde vi regnet med tællinger i både tæller og nævner i brøken, var alderen den samme.`,
     `*Hvorfor overhovedet et døgn?* Aktiviteten er kun ${komma(D.a0.toFixed(2))} Bq, altså omkring ${komma((D.a0 * 60).toFixed(0))} henfald i minuttet. Tæller man i få minutter, er de statistiske udsving for store til en brugbar datering. Derfor tæller man i mange timer. I dag bruger man oftest accelerator-masse-spektroskopi i stedet, hvor man tæller selve C-14-atomerne frem for at vente på, at de henfalder. Så er nogle få milligram nok.`,
     `*Lyngmosemanden er opdigtet,* men både metoden og talstørrelserne svarer til en rigtig datering.`
   ];
 }
 function loesningsAfsnit(){
-  return [].concat(byg1(), byg2(), byg3(), byg4(), bygBemaerk());
+  return [].concat(byg1(), byg2(), byg3(), byg4(), byg5(), bygBemaerk());
 }
 function mdTilHtml(s){ return s.replace(/\*([^*$]+)\*/g, "<em>$1</em>"); }
 
+// ---------- TeX -> almindelig tekst, så løsningen kan sættes ind i Word ----------
+// Word forstår hverken $-tegn eller LaTeX-kommandoer ved indsættelse, så teksten
+// skrives om til unicode: · for gangetegn, hævede og sænkede cifre, / for brøkstreg.
+const SUP_T = { "0":"⁰","1":"¹","2":"²","3":"³","4":"⁴","5":"⁵",
+                "6":"⁶","7":"⁷","8":"⁸","9":"⁹","+":"⁺","-":"⁻",
+                "−":"⁻","(":"⁽",")":"⁾" };
+const SUB_T = { "0":"₀","1":"₁","2":"₂","3":"₃","4":"₄","5":"₅",
+                "6":"₆","7":"₇","8":"₈","9":"₉","+":"₊","-":"₋",
+                "(":"₍",")":"₎" };
+
+function texGruppe(t, i){          // t[i] er "{"; returnerer [indhold, indeks efter "}"]
+  let d = 0, j = i;
+  for (; j < t.length; j++){
+    if (t[j] === "{") d++;
+    else if (t[j] === "}"){ d--; if (d === 0) break; }
+  }
+  return [t.slice(i + 1, j), j + 1];
+}
+function texPak(x){                // sæt parentes om en brøkdel, hvis den er sammensat
+  return /[\s+·\/−-]/.test(x.trim()) ? "(" + x.trim() + ")" : x.trim();
+}
+function texTekst(raa){
+  const t = raa
+    .replace(/\\begin\{aligned\}|\\end\{aligned\}/g, "")
+    .replace(/\\\\\s*(\[[^\]]*\])?/g, "\n")
+    .replace(/&/g, "")
+    .replace(/\{,\}/g, ",");
+  let ud = "";
+  for (let i = 0; i < t.length; ){
+    const c = t[i];
+    if (c === "\\"){
+      const m = /^\\([a-zA-Z]+|.)/.exec(t.slice(i));
+      const cmd = m[1];
+      i += m[0].length;
+      // TeX sluger mellemrum efter et kommandonavn, det gør vi også
+      if (/^[a-zA-Z]+$/.test(cmd)) while (t[i] === " ") i++;
+      if (cmd === "frac"){
+        let a, b;
+        [a, i] = texGruppe(t, i);
+        [b, i] = texGruppe(t, i);
+        ud += texPak(texTekst(a)) + "/" + texPak(texTekst(b));
+      } else if (cmd === "text"){
+        let a; [a, i] = texGruppe(t, i);
+        ud += a;
+      } else if (cmd === "cdot") ud += "·";
+      else if (cmd === "ln") ud += "ln";
+      else if (cmd === "Delta") ud += "Δ";
+      else if (cmd === "Longleftrightarrow") ud += "  ⟺  ";
+      else if (cmd === "Longrightarrow") ud += "  ⟹  ";
+      else if (cmd === "qquad") ud += "    ";
+      else if (cmd === "quad") ud += "  ";
+      else if (cmd === "%") ud += "%";
+      else if (cmd === " " || cmd === ",") ud += " ";
+      else if (cmd === "!" || cmd === "left" || cmd === "right") { /* uden virkning */ }
+      else ud += cmd;                       // ukendt: skriv navnet uden backslash
+    } else if (c === "^" || c === "_"){
+      i++;
+      let arg;
+      if (t[i] === "{"){ [arg, i] = texGruppe(t, i); } else { arg = t[i]; i++; }
+      const inde = texTekst(arg);
+      if (c === "_" && inde === "1/2"){ ud += "½"; continue; }
+      const tab = c === "^" ? SUP_T : SUB_T;
+      ud += [...inde].every(ch => tab[ch])
+        ? [...inde].map(ch => tab[ch]).join("")
+        : (c === "^" ? "^(" : "_(") + inde + ")";
+    } else if (c === "{" ){
+      let a; [a, i] = texGruppe(t, i);
+      ud += texTekst(a);
+    } else { ud += c; i++; }
+  }
+  return ud.replace(/[ \t]{3,}/g, "  ");
+}
+// Et helt afsnit: prosa med $...$ og $$...$$ imellem.
+function afsnitTilTekst(md){
+  if (md.startsWith("## ")) return "\n" + md.slice(3).toUpperCase();
+  return md
+    .replace(/\*([^*$]+)\*/g, "$1")
+    .replace(/&ndash;/g, "–")
+    .replace(/\$\$([\s\S]+?)\$\$[ \t]*/g, (_, x) =>
+      "\n    " + texTekst(x).split("\n").map(r => r.trim()).join("\n    ") + "\n")
+    .replace(/\$([^$]+)\$/g, (_, x) => texTekst(x))
+    .replace(/[ \t]+\n/g, "\n");
+}
+
 const modal = document.getElementById("modal");
-// n = 0..3 for en enkelt opgave, null for hele gennemregningen
+// Fri formelsamling. Den er generel: symboler og sammenhænge, ikke opskriften på
+// det enkelte delspørgsmål. Brugen registreres ikke noget sted.
+function formelSamling(){
+  return [
+    String.raw`## Antal atomer i en prøve`,
+    String.raw`Et atom vejer meget tæt på sit nukleontal gange atommasseenheden, og $1\ \text{u} = 1{,}66054\cdot 10^{-24}\ \text{g}$. Et kulstof-12-atom vejer altså $12\ \text{u}$. Antallet af atomer i en prøve er massen divideret med massen af ét atom: $$N = \frac{m}{m_{\text{atom}}}$$ Udgør en bestemt isotop kun en brøkdel af stoffet, ganges der med den brøkdel.`,
+    String.raw`## Halveringstid og henfaldskonstant`,
+    String.raw`$$T_{1/2} = \frac{\ln(2)}{k} \qquad\Longleftrightarrow\qquad k = \frac{\ln(2)}{T_{1/2}}$$ Enheden for $k$ er den omvendte af den tidsenhed, halveringstiden er angivet i. Sættes $T_{1/2}$ ind i år, kommer $k$ ud i $\text{år}^{-1}$. Omregning: $$1\ \text{år} = 365\cdot 24\cdot 3600\ \text{s} = 3{,}1536\cdot 10^{7}\ \text{s}$$`,
+    String.raw`## Aktivitet`,
+    String.raw`Aktiviteten er antallet af henfald pr. tidsenhed og er proportional med antallet af radioaktive kerner: $$A = k\cdot N$$ Er $k$ i $\text{s}^{-1}$, kommer $A$ i $\text{Bq} = \text{s}^{-1}$. Den samme aktivitet kan lige så godt angives pr. døgn eller pr. minut &ndash; symbolet er $A$ i alle tilfælde, kun enheden skifter.`,
+    String.raw`Er et tidsrum $\Delta t$ meget kortere end halveringstiden, er aktiviteten næsten konstant, og antallet af henfald i tidsrummet er $$\Delta N = A\cdot \Delta t$$`,
+    String.raw`## Henfaldsloven`,
+    String.raw`$$N(t) = N_0\cdot e^{-k\cdot t} \qquad\text{og}\qquad A(t) = A_0\cdot e^{-k\cdot t}$$ Aktiviteten aftager efter samme lov som antallet af kerner, netop fordi $A = k\cdot N$.`,
+    String.raw`## At løse en eksponentiel ligning`,
+    String.raw`En ligning af formen $$A_0\cdot e^{-k\cdot t} = A$$ løses enten med CAS eller i hånden ved at tage $\ln$ på begge sider. Divider først med $A_0$: $$\frac{A}{A_0} = e^{-k\cdot t} \quad\Longrightarrow\quad \ln\!\left(\frac{A}{A_0}\right) = -k\cdot t \quad\Longrightarrow\quad t = \frac{1}{k}\cdot\ln\!\left(\frac{A_0}{A}\right)$$ De to aktiviteter skal have samme enhed, så brøken bliver et rent tal. Bruges $k$ i $\text{år}^{-1}$, kommer $t$ direkte ud i år.`,
+    String.raw`## Fra tællinger til aktivitet`,
+    String.raw`En detektor registrerer kun en kendt brøkdel af henfaldene, *udbyttet*. Prøvens aktivitet er derfor $$A = \frac{\text{antal tællinger}}{\text{udbytte}}$$`
+  ];
+}
+
+// n = 0..3 for en enkelt opgave, null for hele gennemregningen, "formler" for formelsamlingen
 function afsnitFor(n){
+  if (n === "formler") return formelSamling();
   if (n === null) return loesningsAfsnit();
-  return [byg1(), byg2(), byg3(), byg4().concat(bygBemaerk())][n];
+  return [byg1(), byg2(), byg3(), byg4(), byg5().concat(bygBemaerk())][n];
 }
 let visesNu = null;
 function aabnLoesning(n){
   visesNu = n;
-  if (n !== null && !loesningSet[n]){ loesningSet[n] = true; gemHistorik(); }
-  document.getElementById("loesTitel").textContent = n === null
-    ? `Løsning \u2013 opgave nr. ${D.nr}`
+  if (n !== null && n !== "formler" && !loesningSet[n]){ loesningSet[n] = true; gemHistorik(); }
+  document.getElementById("loesTitel").textContent =
+    n === "formler" ? "Relevante formler"
+    : n === null ? `Løsning \u2013 opgave nr. ${D.nr}`
     : `Løsning til opgave ${n + 1} \u2013 opgave nr. ${D.nr}`;
   const body = document.getElementById("loesBody");
   body.innerHTML = afsnitFor(n).map(p => p.startsWith("## ")
@@ -892,21 +1073,24 @@ function aabnLoesning(n){
 document.querySelectorAll("button.visOpg").forEach(b =>
   b.addEventListener("click", () => aabnLoesning(parseInt(b.dataset.o, 10) - 1)));
 document.getElementById("visLoes").addEventListener("click", () => aabnLoesning(null));
+document.getElementById("visFormler").addEventListener("click", () => aabnLoesning("formler"));
 
 document.getElementById("luk").addEventListener("click", () => modal.classList.remove("open"));
 modal.addEventListener("click", e => { if (e.target === modal) modal.classList.remove("open"); });
 document.addEventListener("keydown", e => { if (e.key === "Escape") modal.classList.remove("open"); });
 document.getElementById("kopier").addEventListener("click", async e => {
-  const hoved = visesNu === null
-    ? `Løsning \u2013 Hvor gammel er Lyngmosemanden? Opgave nr. ${D.nr}`
+  const hoved = visesNu === "formler" ? "Relevante formler"
+    : visesNu === null ? `Løsning \u2013 Hvor gammel er Lyngmosemanden? Opgave nr. ${D.nr}`
     : `Løsning til opgave ${visesNu + 1} \u2013 Hvor gammel er Lyngmosemanden? Opgave nr. ${D.nr}`;
-  const txt = hoved + "\n"
-    + `m = ${fmt(D.m, 1)} g kulstof, ${D.taellinger} t\u00e6llinger p\u00e5 et d\u00f8gn ved ${fmt(D.eta * 100, 2)} % udbytte, A = ${D.aMaalt} d\u00f8gn^-1\n\n`
-    + afsnitFor(visesNu).map(p => p.replace(/^## /, "")).join("\n\n");
+  const data = visesNu === "formler" ? ""
+    : `m = ${fmt(D.m, 1)} g kulstof, ${D.taellinger} t\u00e6llinger p\u00e5 et d\u00f8gn, udbytte ${fmt(D.eta * 100, 2)} %\n`;
+  const txt = hoved + "\n" + data
+    + afsnitFor(visesNu).map(afsnitTilTekst).join("\n") + "\n";
   try { await navigator.clipboard.writeText(txt); e.target.textContent = "Kopieret \u2713"; }
   catch { e.target.textContent = "Kunne ikke kopiere"; }
   setTimeout(() => { e.target.textContent = "Kopiér tekst"; }, 1600);
 });
+
 
 
 // ---------- hændelser ----------
@@ -935,9 +1119,8 @@ function rulTil(el, luft){
 function startScroll(){ rulTil(document.querySelector(".row"), 12); }
 // Når målingen er slut: data og begyndelsen af opgaverne skal stå tydeligt.
 function faerdigScroll(){
-  document.getElementById("rNote").textContent =
-    `${D.taellinger} t\u00e6llinger \u00f7 ${fmt(D.eta * 100, 2)} % udbytte`;
-  // Den gr\u00f8nne omregning st\u00e5r nederst i l\u00e6rredet og skal blive st\u00e5ende i toppen.
+  document.getElementById("rNote").textContent = "M\u00e5lingen er slut \u2013 g\u00e5 videre til opgave 1.";
+  // Den gr\u00f8nne slutlinje st\u00e5r nederst i l\u00e6rredet og skal blive st\u00e5ende i toppen.
   setTimeout(() => {
     const c = cvM.getBoundingClientRect();
     window.scrollTo({ top: Math.max(0, c.bottom + window.scrollY - 46), behavior: "smooth" });
