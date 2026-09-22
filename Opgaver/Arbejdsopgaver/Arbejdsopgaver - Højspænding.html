@@ -1,0 +1,1406 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Højspænding på Korsø</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<style>
+:root{
+  --bg:#000000;
+  --fg:#EEEEEE;
+  --dim:#CFCFCF;
+  --border:#6A6A6A;
+  --blue:#58C4DD;
+  --yellow:#F4D345;
+  --green:#83C167;
+  --red:#FC6255;
+  --teal:#5CD0B3;
+  --orange:#F2A93B;
+  --serif:"KaTeX_Main","Latin Modern Roman","CMU Serif",Georgia,"Times New Roman",serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--serif)}
+body{padding:18px 16px 60px}
+.wrap{max-width:1100px;margin:0 auto}
+h1{font-weight:normal;font-size:2.1rem;margin:0 0 6px;letter-spacing:.01em}
+.sub{color:var(--dim);font-size:1.12rem;margin:0 0 16px;line-height:1.5}
+h2{font-weight:normal;font-size:1.5rem;color:var(--blue);margin:22px 0 10px}
+h3{font-weight:normal;font-size:1.28rem;margin:0 0 8px}
+p{font-size:1.12rem;line-height:1.55;margin:0 0 12px}
+i.sym{font-family:"KaTeX_Math","KaTeX_Main",Georgia,serif;font-style:italic}
+canvas{display:block;width:100%;background:var(--bg)}
+.sep{height:1px;background:#2a2a2a;margin:26px 0 4px}
+.note{color:var(--dim);font-size:1rem;line-height:1.5;margin:8px 0 0}
+
+button{
+  font-family:var(--serif);font-size:1.06rem;font-weight:bold;color:var(--fg);
+  background:transparent;border:1.5px solid var(--border);border-radius:6px;
+  padding:6px 16px;cursor:pointer;transition:border-color .15s,background .15s
+}
+button:hover:not(:disabled){border-color:var(--fg)}
+button:disabled{opacity:.38;cursor:default}
+button.primary{border-color:var(--green)}
+.row{display:flex;flex-wrap:wrap;gap:10px 20px;align-items:center;margin:12px 0}
+
+/* ---------- fundkort ---------- */
+.fund{display:flex;gap:26px;align-items:flex-start;flex-wrap:wrap;
+  border:1.5px solid var(--border);border-radius:10px;background:#0b0b0b;padding:20px 22px}
+.fund figure{margin:0;flex:0 0 268px;max-width:268px}
+.fund figure img{width:100%;display:block;border-radius:6px;border:1px solid #333;
+  max-height:238px;object-fit:cover;object-position:center 34%}
+.fund figcaption{color:var(--dim);font-size:.95rem;line-height:1.45;margin-top:8px}
+.fund .txt{flex:1 1 340px;min-width:280px}
+dl.data{display:grid;grid-template-columns:auto 1fr;gap:7px 16px;margin:14px 0 0;font-size:1.12rem}
+dl.data dt{color:var(--dim)}
+dl.data dd{margin:0}
+dl.data dd b{color:var(--yellow);font-weight:normal}
+.nrline{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 4px}
+.nrline label{color:var(--dim);font-size:1.08rem}
+input.nr{font-family:var(--serif);font-size:1.15rem;width:5.4em;color:var(--yellow);
+  background:#141414;border:1.5px solid var(--border);border-radius:6px;padding:4px 8px;text-align:center}
+input.nr:focus{outline:none;border-color:var(--yellow)}
+
+/* ---------- resultatlinje ---------- */
+.resultat{display:flex;flex-wrap:wrap;gap:8px 26px;align-items:baseline;
+  border:1.5px solid #333;border-radius:10px;padding:12px 20px;margin:12px 0 0;font-size:1.12rem}
+.resultat b{color:var(--yellow);font-weight:normal}
+.resultat .dim{color:var(--dim);font-size:1rem}
+
+/* ---------- konstanter ---------- */
+.konst{border:1.5px solid #333;border-radius:10px;padding:12px 20px;margin:14px 0 0}
+.konst ul{margin:6px 0 0;padding-left:22px}
+.konst li{font-size:1.06rem;line-height:1.6}
+.opgHoved{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 16px}
+.opgHoved h2{margin-right:6px}
+
+/* ---------- opgaver ---------- */
+.opg{border-left:3px solid #333;padding:2px 0 2px 18px;margin:0 0 26px}
+.opg.ok{border-left-color:var(--green)}
+.opg.nej{border-left-color:var(--red)}
+.opg.delvis{border-left-color:var(--orange)}
+.opg h3 span.nr{color:var(--blue)}
+.felt{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;margin:10px 0 0}
+.felt .navn{font-size:1.15rem;min-width:3.4em}
+.felt input{font-family:var(--serif);font-size:1.12rem;width:11em;color:var(--fg);
+  background:#141414;border:1.5px solid var(--border);border-radius:6px;padding:6px 10px}
+.felt input:focus{outline:none;border-color:var(--blue)}
+.felt input.ok{border-color:var(--green)}
+.felt input.nej{border-color:var(--red)}
+.felt input.delvis{border-color:var(--orange)}
+.felt .enhed{color:var(--dim);font-size:1.06rem;min-width:5.4em}
+.fb{font-size:1.06rem;line-height:1.5;margin:8px 0 0;min-height:1.3em}
+.fb.ok{color:var(--green)}
+.fb.nej{color:var(--red)}
+.fb.delvis{color:var(--orange)}
+.fb .tip{color:var(--dim);display:block;margin-top:3px}
+.loesRow{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;margin:10px 0 0}
+.loesRow button{font-size:.98rem;padding:4px 12px}
+.laas{color:var(--dim);font-size:1rem}
+
+/* ---------- status ---------- */
+.status{border:1.5px solid var(--border);border-radius:10px;background:#0b0b0b;padding:16px 22px;margin:22px 0 0}
+.status .tal{font-size:1.35rem}
+.status .noegle{color:var(--dim);font-size:.98rem;margin:10px 0 0;line-height:1.5}
+.status .noegle b{font-weight:normal}
+.prikker{display:inline-flex;gap:7px;margin-left:4px;vertical-align:-2px}
+.prik{width:13px;height:13px;border-radius:50%;border:1.6px solid var(--border)}
+.prik.ok{background:var(--green);border-color:var(--green)}
+.prik.nej{background:var(--red);border-color:var(--red)}
+.prik.delvis{background:var(--orange);border-color:var(--orange)}
+
+/* ---------- modal ---------- */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.8);display:none;align-items:flex-start;
+  justify-content:center;padding:40px 16px;overflow:auto;z-index:10}
+.modal.open{display:flex}
+.panel{position:relative;background:#0b0b0b;border:1.5px solid var(--border);border-radius:10px;
+  max-width:820px;width:100%;padding:26px 30px 22px}
+.panel h2{font-weight:normal;font-size:1.7rem;color:var(--fg);margin:0 0 14px;padding-right:150px}
+.panel h3{font-weight:normal;font-size:1.32rem;color:var(--blue);margin:24px 0 10px}
+.panel p{font-size:1.12rem;line-height:1.6;margin:0 0 14px}
+.panel .katex-display{overflow-x:auto;overflow-y:hidden;padding:2px 0}
+.panel .top{position:absolute;top:16px;right:16px;display:flex;gap:8px}
+.panel .top button{font-size:.95rem;padding:4px 10px}
+
+@media (max-width:620px){
+  body{padding:16px 16px 48px}
+  h1{font-size:1.72rem}
+  .fund{padding:16px;gap:18px}
+  .fund figure{flex:1 1 100%;max-width:none}
+  .fund figure img{max-height:200px}
+  .felt .enhed{min-width:0}
+  .panel{padding:22px 18px 18px}
+  .panel h2{padding-right:0;margin-top:34px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>Højspænding på Korsø</h1>
+  <p class="sub">Noget af den elektriske energi bliver til varme i ledningen undervejs. Derfor sender man energien af sted ved høj spænding. Her skal du regne ud, hvor meget der går tabt mellem kraftværk og by.</p>
+
+  <div class="fund">
+    <figure id="fotoFig">
+      <img id="foto" alt="Højspændingsmast i et fladt ølandskab"
+           src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b4/9940_L%C3%A6s%C3%B8%2C_Denmark_-_panoramio_%282%29.jpg/960px-9940_L%C3%A6s%C3%B8%2C_Denmark_-_panoramio_%282%29.jpg">
+      <figcaption>Højspændingsmast på Læsø. På de små øer står masterne tit alene i det flade landskab. Foto: L&#8209;BBE, Wikimedia Commons (CC&nbsp;BY&nbsp;3.0).</figcaption>
+    </figure>
+
+    <div class="txt">
+      <div class="nrline">
+        <label for="nrInput">Dit opgavenummer</label>
+        <input class="nr" id="nrInput" type="text" inputmode="numeric" maxlength="4" value="4719">
+        <button id="nytNr">↺ Nyt nummer</button>
+      </div>
+      <p class="note">Skriv dit nummer ned &ndash; samme nummer giver samme tal igen.</p>
+
+      <h3 style="margin-top:16px">Øen</h3>
+      <p><b style="font-weight:normal;color:var(--blue)">Korsø er en opdigtet dansk ø</b> &ndash; opfundet til opgaven, men med realistiske tal. Kraftværket ligger ved havnen, byen i den anden ende. Strømmen løber ud i den ene leder og tilbage i den anden.</p>
+      <dl class="data">
+        <dt>Husstande i byen</dt><dd><b id="dH">&ndash;</b></dd>
+        <dt>Elforbrug pr. husstand</dt><dd><b id="dF">&ndash;</b> pr. år</dd>
+        <dt>Fra kraftværk til by</dt><dd><i class="sym">&#8467;</i> = <b id="dL">&ndash;</b></dd>
+        <dt>Ledernes tværsnitsareal</dt><dd><i class="sym">A</i> = <b id="dA">&ndash;</b></dd>
+        <dt>Spænding over kraftværket</dt><dd><i class="sym">U</i><sub>0</sub> = <b id="dU">&ndash;</b></dd>
+      </dl>
+    </div>
+  </div>
+
+  <div class="row">
+    <button id="koer" class="primary">▶ Tænd for kraftværket</button>
+    <button id="spring">⏭ Spring til slut</button>
+  </div>
+  <canvas id="anim"></canvas>
+  <p class="note" id="animNote">Tegningen er skematisk og ikke i rigtigt forhold til de <span id="nL">&ndash;</span>, ledningen er lang. De gule kugler er ledningselektroner. De er der i forvejen overalt i kredsløbet og sætter sig i bevægelse alle sammen, når der tændes. Den røde glød viser varmetabet, og året er skrumpet til 10 sekunder.</p>
+
+  <div class="resultat" id="resultat">
+    <span><b id="rH">&ndash;</b> husstande</span>
+    <span><b id="rF">&ndash;</b> pr. husstand pr. år</span>
+    <span><i class="sym">&#8467;</i> = <b id="rL">&ndash;</b></span>
+    <span><i class="sym">A</i> = <b id="rA">&ndash;</b></span>
+    <span><i class="sym">U</i><sub>0</sub> = <b id="rU">&ndash;</b></span>
+    <span class="dim" id="rNote">Kør animationen, eller gå direkte i gang med tallene ovenfor.</span>
+  </div>
+
+  <div class="konst">
+    <h3>Det skal du bruge</h3>
+    <ul>
+      <li>Ledningen er af aluminium med stålkerne. Resistiviteten sættes til <i class="sym">&rho;</i> = 2,6 &middot; 10<sup>&minus;8</sup> &Omega;&middot;m uafhængig af temperaturen</li>
+      <li>1 kWh = 3,6 &middot; 10<sup>6</sup> J</li>
+      <li>1 år regnes som 365 døgn</li>
+    </ul>
+  </div>
+
+  <div class="opgHoved">
+    <h2>Opgaver</h2>
+    <button id="visFormler">Relevante formler</button>
+    <span class="note" style="margin:0">Kig så meget du vil &ndash; det noteres ingen steder.</span>
+  </div>
+  <p class="sub" style="margin-bottom:18px">Svar med mindst 3 betydende cifre. Tierpotenser skrives fx <span style="color:var(--fg)">1,25e3</span> eller <span style="color:var(--fg)">1,25&middot;10^3</span>.</p>
+
+  <section class="opg" id="opg1">
+    <h3><span class="nr">1</span> &middot; Byens effektbehov</h3>
+    <p>Byens <b id="dH2" style="color:var(--yellow);font-weight:normal">&ndash;</b> husstande bruger hver <b id="dF2" style="color:var(--yellow);font-weight:normal">&ndash;</b> på et år. Beregn den effekt <i class="sym">P</i><sub>0</sub>, kraftværket i gennemsnit skal levere.</p>
+    <div class="felt">
+      <span class="navn"><i class="sym">P</i><sub>0</sub> =</span>
+      <input id="f1" type="text" autocomplete="off" spellcheck="false">
+      <span class="enhed">MW</span>
+      <button class="tjek" data-f="1">Tjek</button>
+    </div>
+    <div class="fb" id="fb1"></div>
+    <div class="loesRow">
+      <button class="visOpg" data-o="1" disabled>Vis løsning til opgave 1</button>
+      <span class="laas" id="laas1"></span>
+    </div>
+  </section>
+
+  <section class="opg" id="opg2">
+    <h3><span class="nr">2</span> &middot; Ledningens resistans</h3>
+    <p>Beregn den samlede resistans <i class="sym">R</i> af ledningen mellem kraftværket og byen.</p>
+    <div class="felt">
+      <span class="navn"><i class="sym">R</i> =</span>
+      <input id="f2" type="text" autocomplete="off" spellcheck="false">
+      <span class="enhed">&Omega;</span>
+      <button class="tjek" data-f="2">Tjek</button>
+    </div>
+    <div class="fb" id="fb2"></div>
+    <div class="loesRow">
+      <button class="visOpg" data-o="2" disabled>Vis løsning til opgave 2</button>
+      <span class="laas" id="laas2"></span>
+    </div>
+  </section>
+
+  <section class="opg" id="opg3">
+    <h3><span class="nr">3</span> &middot; Strømstyrken i ledningen</h3>
+    <p>Kraftværket leverer effekten fra opgave 1 ved spændingen <i class="sym">U</i><sub>0</sub> = <b id="dU2" style="color:var(--yellow);font-weight:normal">&ndash;</b>. Beregn strømstyrken <i class="sym">I</i> i ledningen.</p>
+    <div class="felt">
+      <span class="navn"><i class="sym">I</i> =</span>
+      <input id="f3" type="text" autocomplete="off" spellcheck="false">
+      <span class="enhed">A</span>
+      <button class="tjek" data-f="3">Tjek</button>
+    </div>
+    <div class="fb" id="fb3"></div>
+    <div class="loesRow">
+      <button class="visOpg" data-o="3" disabled>Vis løsning til opgave 3</button>
+      <span class="laas" id="laas3"></span>
+    </div>
+  </section>
+
+  <section class="opg" id="opg4">
+    <h3><span class="nr">4</span> &middot; Spændingsfaldet over ledningen</h3>
+    <p>Brug resistansen fra opgave 2 og strømstyrken fra opgave 3. Beregn spændingsfaldet <i class="sym">U</i><sub>ledning</sub> over selve ledningen.</p>
+    <div class="felt">
+      <span class="navn"><i class="sym">U</i><sub>ledning</sub> =</span>
+      <input id="f4" type="text" autocomplete="off" spellcheck="false">
+      <span class="enhed">V</span>
+      <button class="tjek" data-f="4">Tjek</button>
+    </div>
+    <div class="fb" id="fb4"></div>
+    <div class="loesRow">
+      <button class="visOpg" data-o="4" disabled>Vis løsning til opgave 4</button>
+      <span class="laas" id="laas4"></span>
+    </div>
+  </section>
+
+  <section class="opg" id="opg5">
+    <h3><span class="nr">5</span> &middot; Hvor meget går tabt?</h3>
+    <p>Beregn den effekt <i class="sym">P</i><sub>tab</sub>, der afsættes som varme i ledningen, og hvor stor en procentdel det udgør af den effekt <i class="sym">P</i><sub>0</sub>, kraftværket leverer.</p>
+    <div class="felt">
+      <span class="navn"><i class="sym">P</i><sub>tab</sub> =</span>
+      <input id="f5" type="text" autocomplete="off" spellcheck="false">
+      <span class="enhed">kW</span>
+      <button class="tjek" data-f="5">Tjek</button>
+    </div>
+    <div class="fb" id="fb5"></div>
+    <div class="felt">
+      <span class="navn">andel =</span>
+      <input id="f6" type="text" autocomplete="off" spellcheck="false">
+      <span class="enhed">% af <i class="sym">P</i><sub>0</sub></span>
+      <button class="tjek" data-f="6">Tjek</button>
+    </div>
+    <div class="fb" id="fb6"></div>
+    <div class="loesRow">
+      <button class="visOpg" data-o="5" disabled>Vis løsning til opgave 5</button>
+      <span class="laas" id="laas5"></span>
+    </div>
+  </section>
+
+  <section class="opg" id="opg6">
+    <h3><span class="nr">6</span> &middot; En kold vinteraften</h3>
+    <p>På årets koldeste aften bruger byen dobbelt så stor en effekt som i gennemsnit. Kraftværket leverer stadig ved spændingen <i class="sym">U</i><sub>0</sub>. Beregn den effekt, der nu går tabt i ledningen.</p>
+    <div class="felt">
+      <span class="navn"><i class="sym">P</i><sub>tab</sub> =</span>
+      <input id="f7" type="text" autocomplete="off" spellcheck="false">
+      <span class="enhed">kW</span>
+      <button class="tjek" data-f="7">Tjek</button>
+    </div>
+    <div class="fb" id="fb7"></div>
+    <div class="loesRow">
+      <button class="visOpg" data-o="6" disabled>Vis løsning til opgave 6</button>
+      <span class="laas" id="laas6"></span>
+    </div>
+  </section>
+
+  <section class="opg" id="opg7">
+    <h3><span class="nr">7</span> &middot; Hvor høj skal spændingen være?</h3>
+    <p>Tilbage til det gennemsnitlige forbrug fra opgave 1. Elselskabet vil have tabet ned på <b id="dMaal" style="color:var(--yellow);font-weight:normal">&ndash;</b> af den leverede effekt. Ledningen er den samme. Hvilken spænding skal kraftværket så levere ved?</p>
+    <div class="felt">
+      <span class="navn"><i class="sym">U</i> =</span>
+      <input id="f8" type="text" autocomplete="off" spellcheck="false">
+      <span class="enhed">kV</span>
+      <button class="tjek" data-f="8">Tjek</button>
+    </div>
+    <div class="fb" id="fb8"></div>
+    <div class="loesRow">
+      <button class="visOpg" data-o="7" disabled>Vis løsning til opgave 7</button>
+      <span class="laas" id="laas7"></span>
+    </div>
+  </section>
+
+  <div class="status">
+    <div class="row" style="margin:0">
+      <span class="tal" id="statusTxt">Ingen svar tjekket endnu.</span>
+      <span class="prikker" id="prikker"></span>
+    </div>
+    <p class="noegle"><b style="color:var(--green)">&#9679;</b> rigtigt inden for 3 forsøg &nbsp;
+      <b style="color:var(--orange)">&#9679;</b> rigtigt, men det tog flere forsøg &nbsp;
+      <b style="color:var(--red)">&#9679;</b> forkert, eller rigtigt efter at løsningen var set</p>
+    <div class="row" style="margin:14px 0 0">
+      <button id="visLoes" disabled>Vis hele løsningen</button>
+      <button id="nulstil">↺ Nulstil svar</button>
+    </div>
+  </div>
+
+  <div id="grafBoks" style="display:none">
+    <div class="sep"></div>
+    <h2>Tabet som funktion af spændingen</h2>
+    <p class="sub">Samme by, samme ledning, samme effektbehov &ndash; kun spændingen er ændret. Kurven falder som 1/<i class="sym">U</i><sup>2</sup>: fordobles spændingen, bliver tabet en fjerdedel. Den røde prik er Korsøs drift i dag, den grønne er dit svar på opgave 7. Følg kurven mellem de to prikker, og se, hvor stejlt tabet falder i den nederste ende af spændingsskalaen.</p>
+    <canvas id="graf"></canvas>
+  </div>
+
+</div>
+
+<div class="modal" id="modal">
+  <div class="panel">
+    <div class="top"><button id="kopier">Kopiér tekst</button><button id="luk">✕</button></div>
+    <h2 id="loesTitel">Løsning</h2>
+    <div id="loesBody"></div>
+  </div>
+</div>
+
+<script>
+"use strict";
+// ================= FYSIK-START =================
+// Transport af elektrisk energi. Konstanter som i noten "Elektricitet".
+const RHO        = 2.6e-8;             // aluminium med stålkerne, ved 0 grader, i ohm*m
+const KWH_J      = 3.6e6;              // 1 kWh i joule
+const S_PR_AAR   = 365 * 24 * 3600;    // 3,1536e7 s
+const AREALER    = [0.25, 0.35, 0.5, 0.7, 1.0];   // cm^2
+const SPAENDINGER = [10, 15, 20];                 // kV
+const MAAL       = [0.2, 0.5, 1.0];               // ønsket tab i procent
+
+function mulberry32(a){
+  return function(){
+    a |= 0; a = (a + 0x6D2B79F5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+// Alle tal i et opgavesæt udledes af opgavenummeret, så det kan genskabes.
+// Kombinationer, hvor tabet ved U0 falder uden for 2-15 %, forkastes: ellers
+// bliver opgaven enten triviel eller fysisk tåbelig. Rækkefølgen af r()-kald
+// må ikke ændres, hvis allerede uddelte numre skal give samme opgave.
+function opgaveData(nr){
+  const r = mulberry32((nr * 2654435761) >>> 0);
+  r(); r();
+  for(;;){
+    const husstande = 2000 + 500 * Math.floor(r() * 13);       // 2000 - 8000
+    const forbrug   = 3000 + 100 * Math.floor(r() * 16);       // 3000 - 4500 kWh/år
+    const afstandKm = 6 + Math.floor(r() * 10);                // 6 - 15 km
+    const arealCm2  = AREALER[Math.floor(r() * AREALER.length)];
+    const u0kV      = SPAENDINGER[Math.floor(r() * SPAENDINGER.length)];
+    const maalPct   = MAAL[Math.floor(r() * MAAL.length)];
+
+    const p0   = husstande * forbrug * KWH_J / S_PR_AAR;       // W
+    const L    = 2 * afstandKm * 1000;                         // m kobber, frem og tilbage
+    const R    = RHO * L / (arealCm2 * 1e-4);                  // ohm
+    const u0   = u0kV * 1000;                                  // V
+    const I    = p0 / u0;                                      // A
+    const dU   = R * I;                                        // V
+    const ptab = R * I * I;                                    // W
+    const pct  = 100 * ptab / p0;                              // %
+    if (pct < 2 || pct > 15) continue;
+
+    return { nr, husstande, forbrug, afstandKm, arealCm2, u0kV, maalPct,
+             p0, L, R, u0, I, dU, ptab, pct,
+             ptabSpids: 4 * ptab,                              // dobbelt strøm -> firdobbelt tab
+             uNoed: p0 / Math.sqrt(maalPct / 100 * p0 / R) };  // V
+  }
+}
+// ================= FYSIK-END =================
+
+// ---------- formatering ----------
+const COL = { fg:"#EEEEEE", dim:"#CFCFCF", blue:"#58C4DD", yellow:"#F4D345",
+              green:"#83C167", red:"#FC6255", teal:"#5CD0B3", orange:"#F2A93B" };
+const SERIF = '"KaTeX_Main","Latin Modern Roman","CMU Serif",Georgia,serif';
+const MATH  = '"KaTeX_Math","KaTeX_Main",Georgia,serif';
+
+const komma = s => String(s).replace(".", ",");
+const fmt = (v, n) => komma(v.toFixed(n));
+
+// betydende cifre -> "3,84" og eksponent
+function sciDele(v, n){
+  if (v === 0) return { mant: "0", eks: 0 };
+  const eks = Math.floor(Math.log10(Math.abs(v)));
+  let mant = v / Math.pow(10, eks);
+  mant = Number(mant.toFixed(n - 1));
+  if (Math.abs(mant) >= 10){ mant /= 10; return { mant: komma(mant.toFixed(n - 1)), eks: eks + 1 }; }
+  return { mant: komma(mant.toFixed(n - 1)), eks };
+}
+// I TeX er komma et skilletegn med luft efter. Decimalkomma skal derfor skrives {,}
+const kommaTex = s => String(s).replace(/[.,]/, "{,}");
+function sciTex(v, n){
+  const d = sciDele(v, n);
+  return `${kommaTex(d.mant)}\\cdot 10^{${d.eks}}`;
+}
+// n betydende cifre som almindeligt decimaltal, uden tierpotens
+function sigTex(v, n){ return kommaTex(String(Number(v.toPrecision(n)))); }
+function sigTxt(v, n){ return komma(String(Number(v.toPrecision(n)))); }
+
+// ---------- indlæsning af elevsvar ----------
+const SUP = { "⁰":"0","¹":"1","²":"2","³":"3","⁴":"4",
+              "⁵":"5","⁶":"6","⁷":"7","⁸":"8","⁹":"9",
+              "⁺":"+","⁻":"-" };
+function parseTal(raw){
+  if (raw == null) return NaN;
+  let s = String(raw).toLowerCase();
+  // hævede cifre -> ^tal
+  s = s.replace(/[⁰¹²³⁴-⁹⁺⁻]+/g,
+                m => "^" + [...m].map(c => SUP[c]).join(""));
+  s = s.replace(/[\s   ]/g, "");
+  s = s.replace(/−|–/g, "-");         // minustegn og tankestreg
+  s = s.replace(/[·⋅×]/g, "*");  // gangetegn
+  s = s.replace(/\*\*/g, "^");
+  // enheder som eleven måske skriver med. Tierpotens-præfikser er allerede
+  // låst af feltets enhed, så de fjernes blot, hvis de er skrevet med.
+  s = s.replace(/(mw|kw|kv|kwh|Ω|ω|Ω|ohm|volt|watt|ampere|procent|%|v|w|a)/g, "");
+  s = s.replace(/,/g, ".");
+  s = s.replace(/(\d)x(?=1?0)/g, "$1*");        // "1.25x10^3"
+  let m;
+  if ((m = s.match(/^([+-]?(?:\d+\.?\d*|\.\d+))$/)))
+    return parseFloat(m[1]);
+  if ((m = s.match(/^([+-]?(?:\d+\.?\d*|\.\d+))e([+-]?\d+)$/)))
+    return parseFloat(m[1]) * Math.pow(10, parseInt(m[2], 10));
+  if ((m = s.match(/^(?:([+-]?(?:\d+\.?\d*|\.\d+))\*)?10\^?([+-]?\d+)$/)))
+    return (m[1] ? parseFloat(m[1]) : 1) * Math.pow(10, parseInt(m[2], 10));
+  return NaN;
+}
+const taet = (a, b, tol) => isFinite(a) && isFinite(b) && b !== 0 && Math.abs(a - b) <= tol * Math.abs(b);
+
+// ---------- opgavesættet ----------
+let D = null;
+let svar    = [null,null,null,null,null,null,null,null];
+let forsoeg = [0,0,0,0,0,0,0,0];
+let loesningSet = [false,false,false,false,false,false,false];
+// Har eleven allerede svaret rigtigt og åbner løsningen bagefter for at se
+// gennemregningen, er der intet at bogføre. Kun en løsning, der blev åbnet,
+// mens opgaven endnu ikke var rigtig, tæller som hjælp.
+let loesningFoerRigtig = [false,false,false,false,false,false,false];
+// Sættes i det øjeblik et svar bliver rigtigt, og ændres ikke bagefter.
+let kvalitet = [null,null,null,null,null,null,null,null];
+const historik = new Map();
+const OPG_FELTER = [[0],[1],[2],[3],[4,5],[6],[7]];
+const ANTAL_OPG = OPG_FELTER.length;
+const ANTAL_FELT = 8;
+let visAar = 0;                    // fremdrift 0-1 i animationen
+let koerer = false;
+
+const felter = [1,2,3,4,5,6,7,8].map(i => document.getElementById("f" + i));
+const fbEl   = [1,2,3,4,5,6,7,8].map(i => document.getElementById("fb" + i));
+
+// Feltets facit i feltets egen enhed.
+function facit(i){
+  return [D.p0 / 1e6, D.R, D.I, D.dU, D.ptab / 1e3, D.pct,
+          D.ptabSpids / 1e3, D.uNoed / 1e3][i];
+}
+// Sammensatte resultater får mere plads: runder eleven til 3 betydende cifre
+// i hvert mellemtrin, kan tabet forskyde sig godt 2 %.
+function tolerance(i){
+  return [0.02, 0.02, 0.02, 0.03, 0.04, 0.04, 0.04, 0.03][i];
+}
+
+// Typiske fejl, med et målrettet tip. Rækkefølgen er vigtig: mest specifikke først.
+function diagnose(i, v){
+  const t = [];
+  const push = (test, tekst) => { if (!t.length && test) t.push(tekst); };
+  const E = Math.round(D.husstande * D.forbrug);      // byens årsforbrug i kWh
+  if (i === 0){                                       // P0 i MW
+    push(taet(v, D.p0, 0.03), "Det er effekten i W. Feltet vil have MW, og 1 MW = 10<sup>6</sup> W.");
+    push(taet(v, D.p0 / 1e3, 0.03), "Det er effekten i kW. Der går 1000 kW på 1 MW.");
+    push(taet(v, E, 0.005), "Det er byens samlede energiforbrug på et år, målt i kWh. En energi er ikke en effekt: effekt er energi pr. tid.");
+    push(taet(v, E / 1e3, 0.005), "Det er årsforbruget i MWh. MWh er en energi, MW er en effekt &ndash; de to enheder hører ikke sammen, bare fordi de ligner hinanden.");
+    push(taet(v, E / 1e6, 0.005), "Det er årsforbruget i kWh divideret med 10<sup>6</sup>. Men en kWh er en energi, og den bliver ikke til MW af at blive delt med en million. Der er to ting at gøre: divider energien med den tid, den bruges på, og få enhederne til at passe. Regn kWh om til joule, divider med sekunderne i et år &ndash; så står der watt &ndash; og omsæt til sidst til MW.");
+    push(taet(v, D.p0 / 1e6 * 3600, 0.03), "Du har divideret med antallet af <i>timer</i> på et år, men energien var regnet om til joule. Joule pr. sekund giver watt, så der skal divideres med sekunder.");
+    push(taet(v, D.p0 / 1e6 * 365, 0.03), "Du har divideret med ét døgn i stedet for med et helt år.");
+    push(taet(v, D.p0 / 1e6 / 365, 0.03), "Du har divideret med 365 en ekstra gang. Forbruget er allerede opgivet pr. år.");
+    push(v > 500, "Svaret er alt for stort. Et lille kraftværk til en ø leverer nogle få MW, ikke hundredvis.");
+    push(v > 0 && v < 0.01, "Svaret er alt for lille. Nogle tusind husstande trækker megawatt, ikke brøkdele af én watt.");
+  }
+  if (i === 1){                                       // R i ohm
+    push(taet(v, D.R / 2, 0.03), "Du har kun regnet med én vej. Strømmen skal både ud til byen og tilbage igen, så den samlede længde leder er dobbelt så stor som afstanden.");
+    push(taet(v, D.R * 1e4, 0.03), "Tværsnitsarealet skal indsættes i m<sup>2</sup>. Der gælder 1 cm<sup>2</sup> = 10<sup>&minus;4</sup> m<sup>2</sup>.");
+    push(taet(v, D.R / 2 * 1e4, 0.03), "To ting: arealet skal i m<sup>2</sup> (1 cm<sup>2</sup> = 10<sup>&minus;4</sup> m<sup>2</sup>), og ledningen går både frem og tilbage.");
+    push(taet(v, D.R / 1e4, 0.03), "Du har ganget med 10<sup>&minus;4</sup>, hvor du skulle dividere. Arealet står i nævneren, så et mindre areal giver en <i>større</i> resistans.");
+    push(taet(v, D.R / 1000, 0.03), "Længden skal indsættes i meter, ikke i kilometer.");
+    push(taet(v, D.R * 1000, 0.03), "Du er en faktor 1000 for højt oppe &ndash; tjek omregningen fra km til m.");
+    push(taet(v, D.R / (RHO * 1e6) , 0.03) , "Resistiviteten skal med som 2,6 &middot; 10<sup>&minus;8</sup> &Omega;&middot;m, altså et meget lille tal.");
+    push(v > 1e4, "Svaret er alt for stort. En luftledning på nogle få kilometer har en resistans i størrelsesordenen nogle få ohm.");
+    push(v > 0 && v < 0.05, "Svaret er alt for lille. Tjek enhederne: længden i meter og arealet i kvadratmeter.");
+  }
+  if (i === 2){                                       // I i A
+    push(taet(v, D.p0 * D.u0, 0.03), "Du har ganget, hvor du skulle dividere. Af <i class='sym'>P</i> = <i class='sym'>U</i> &middot; <i class='sym'>I</i> følger <i class='sym'>I</i> = <i class='sym'>P</i>/<i class='sym'>U</i>.");
+    push(taet(v, D.p0 / D.u0kV, 0.03), "Spændingen skal indsættes i volt: " + D.u0kV + " kV = " + D.u0kV + " &middot; 10<sup>3</sup> V.");
+    push(taet(v, D.u0 / D.p0, 0.03), "Du har vendt brøken om. Strømstyrken er effekten divideret med spændingen.");
+    push(taet(v, D.p0 / 1e6 / D.u0, 0.03), "Effekten skal indsættes i watt, ikke i megawatt.");
+    push(taet(v, D.u0 / D.R, 0.03), "Du har brugt kraftværkets spænding i Ohms lov. Den spænding ligger ikke over ledningen &ndash; ledningen er ikke koblet direkte over kraftværket, byen sidder for enden af den.");
+    push(v > 1e5, "Svaret er alt for stort. Så store strømstyrker findes ikke i et almindeligt elnet.");
+    push(v > 0 && v < 1, "Svaret er alt for lille. En hel by trækker mere end en enkelt ampere.");
+  }
+  if (i === 3){                                       // dU i V
+    push(taet(v, D.u0 - D.dU, 0.02), "Det er den spænding, der er tilbage ude ved byen. Spørgsmålet er selve <i>spændingsfaldet</i> over ledningen, altså forskellen.");
+    push(taet(v, D.u0, 0.02), "Det er spændingen over kraftværket. Faldet over ledningen er meget mindre.");
+    push(taet(v, D.dU / 1000, 0.03), "Det er spændingsfaldet i kV. Feltet vil have volt.");
+    push(taet(v, D.dU * 1000, 0.03), "Du er en faktor 1000 for højt oppe &ndash; tjek, om du har blandet kV og V sammen.");
+    push(taet(v, D.R / D.I, 0.03), "Du har vendt brøken om. Ohms lov er <i class='sym'>U</i><sub>ledning</sub> = <i class='sym'>R</i> &middot; <i class='sym'>I</i>.");
+    push(taet(v, D.ptab, 0.03), "Det er den tabte effekt i watt, ikke et spændingsfald. Du har ganget med strømstyrken én gang for meget.");
+    push(v > D.u0, "Spændingsfaldet over ledningen kan ikke være større end spændingen over kraftværket &ndash; så ville der ikke være noget tilbage til byen.");
+  }
+  if (i === 4){                                       // P_tab i kW
+    push(taet(v, D.u0 * D.u0 / D.R / 1e3, 0.04), "Du har sat kraftværkets spænding ind i <i class='sym'>P</i> = <i class='sym'>U</i><sup>2</sup>/<i class='sym'>R</i>. Den formel kræver spændingen <i>over netop den modstand</i>, altså spændingsfaldet <i class='sym'>U</i><sub>ledning</sub> fra opgave 4 &ndash; ikke spændingen over kraftværket. Læg mærke til, at dit svar er større end hele den effekt, værket leverer. Brug <i class='sym'>P</i><sub>tab</sub> = <i class='sym'>R</i> &middot; <i class='sym'>I</i><sup>2</sup>.");
+    push(taet(v, D.ptab, 0.03), "Det er tabet i watt. Feltet vil have kW.");
+    push(taet(v, D.ptab / 1e6, 0.03), "Det er tabet i MW. Feltet vil have kW.");
+    push(taet(v, D.dU / 1e3, 0.03), "Det er spændingsfaldet fra opgave 4, ikke en effekt. Strømstyrken skal indgå i anden potens, så gang med den én gang mere.");
+    push(taet(v, D.I * D.I / D.R / 1e3, 0.04), "Du har divideret med resistansen. Joules lov siger <i class='sym'>P</i><sub>tab</sub> = <i class='sym'>R</i> &middot; <i class='sym'>I</i><sup>2</sup>, så der skal ganges.");
+    push(taet(v, D.p0 / 1e3, 0.03), "Det er hele den effekt, kraftværket leverer. Kun en lille del af den bliver til varme i ledningen.");
+    push(v > D.p0 / 1e3, "Tabet kan ikke være større end den effekt, kraftværket leverer.");
+  }
+  if (i === 5){                                       // andel i %
+    push(taet(v, D.pct / 100, 0.04), "Du har svaret som decimaltal. En procentdel fås ved at gange forholdet med 100.");
+    push(taet(v, 100 * D.p0 / D.ptab, 0.04), "Du har vendt brøken om. Andelen er tabet divideret med den leverede effekt.");
+    push(taet(v, D.pct * 100, 0.04), "Du har ganget med 100 én gang for meget.");
+    push(v > 100, "Andelen kan ikke være over 100 %: der går ikke mere til spilde, end kraftværket leverer.");
+    push(v > 0 && v < 0.01, "Svaret er for lille. Ved denne spænding er tabet mærkbart &ndash; det er netop derfor, opgaven er interessant.");
+  }
+  if (i === 6){                                       // P_tab ved spidsbelastning, kW
+    push(taet(v, 2 * D.ptab / 1e3, 0.03), "Tabet bliver ikke bare dobbelt så stort. Effekten er fordoblet ved samme spænding, så strømstyrken er fordoblet &ndash; og i Joules lov indgår strømstyrken i <i>anden potens</i>.");
+    push(taet(v, D.ptab / 1e3, 0.03), "Tabet er ikke uændret. Når byen trækker dobbelt så stor en effekt ved samme spænding, løber der dobbelt så stor en strøm i ledningen.");
+    push(taet(v, 8 * D.ptab / 1e3, 0.03), "Lidt for meget. Strømstyrken fordobles, og 2<sup>2</sup> = 4.");
+    push(taet(v, 16 * D.ptab / 1e3, 0.03), "Du har firdoblet strømstyrken. Det er effekten, der fordobles, og dermed også strømstyrken.");
+    push(taet(v, 4 * D.ptab, 0.03), "Rigtig faktor, forkert enhed: det er watt, og feltet vil have kW.");
+    push(taet(v, 2 * D.p0 / 1e3, 0.03), "Det er byens nye effektbehov, ikke tabet i ledningen.");
+    push(v > 2 * D.p0 / 1e3, "Tabet kan ikke være større end den effekt, kraftværket leverer.");
+  }
+  if (i === 7){                                       // nødvendig U i kV
+    push(taet(v, D.uNoed, 0.03), "Det er spændingen i volt. Feltet vil have kV.");
+    push(taet(v, D.u0kV * D.pct / D.maalPct, 0.03), "Du har regnet, som om tabet er omvendt proportionalt med spændingen. Men strømstyrken er omvendt proportional med spændingen, og tabet går med strømstyrken i anden potens &ndash; så tabet aftager med spændingen i anden potens.");
+    push(taet(v, D.u0kV * Math.sqrt(D.maalPct / D.pct), 0.03), "Du har vendt forholdet om, så spændingen blev mindre. Et mindre tab kræver en <i>højere</i> spænding.");
+    push(taet(v, D.u0kV * D.maalPct / D.pct, 0.03), "Du har vendt forholdet om og glemt kvadratroden. Et mindre tab kræver en højere spænding, og tabet aftager med spændingen i anden potens.");
+    push(v > 0 && v < D.u0kV, "Spændingen skal <i>op</i>, ikke ned. Ved " + D.u0kV + " kV er tabet for stort, og lavere spænding giver større strømstyrke og dermed endnu større tab.");
+    push(v > 5000, "Svaret er urealistisk stort. De højeste spændinger i et rigtigt elnet ligger omkring 400 kV.");
+  }
+  return t[0] || null;
+}
+
+function opgaveFor(i){ return OPG_FELTER.findIndex(f => f.includes(i)); }
+const KLASSE = { groen: "ok", gul: "delvis", roed: "nej" };
+const FORSOEG_KRAEVET = 3;
+
+function tjek(i){
+  const v = parseTal(felter[i].value);
+  const f = facit(i), tol = tolerance(i);
+  felter[i].classList.remove("ok", "nej", "delvis");
+  fbEl[i].classList.remove("ok", "nej", "delvis");
+  if (!isFinite(v)){
+    svar[i] = null;
+    fbEl[i].className = "fb nej";
+    fbEl[i].innerHTML = "Kunne ikke læse tallet. Skriv det fx som <b>1,25e3</b> eller <b>1,25&middot;10^3</b>.";
+    opdaterStatus();
+    return;
+  }
+  forsoeg[i]++;
+  const ok = taet(v, f, tol);
+  svar[i] = ok;
+  if (ok && kvalitet[i] === null){
+    kvalitet[i] = loesningFoerRigtig[opgaveFor(i)] ? "roed"
+                : forsoeg[i] > FORSOEG_KRAEVET ? "gul" : "groen";
+  }
+  const kl = ok ? KLASSE[kvalitet[i]] : "nej";
+  felter[i].classList.add(kl);
+  fbEl[i].className = "fb " + kl;
+  if (ok){
+    let txt = kvalitet[i] === "groen" ? "Rigtigt."
+      : kvalitet[i] === "gul" ? `Rigtigt – det tog ${forsoeg[i]} forsøg.`
+      : "Rigtigt – men løsningen var set først.";
+    if (i === 3) txt += " Læg mærke til, hvor lille spændingsfaldet er i forhold til de " + D.u0kV + " kV over kraftværket.";
+    if (i === 6) txt += " Dobbelt så stor en strømstyrke giver fire gange så stort et tab.";
+    if (i === 7) txt += " Derfor transformerer man op, før energien sendes af sted. Grafen nederst på siden viser hele sammenhængen \u2013 se din egen ø på kurven.";
+    fbEl[i].innerHTML = txt;
+  } else {
+    const tip = diagnose(i, v);
+    fbEl[i].innerHTML = "Ikke helt." + (tip ? `<span class="tip">${tip}</span>` : "");
+  }
+  const n = opgaveFor(i);
+  const sek = document.getElementById("opg" + (n + 1));
+  const felterI = OPG_FELTER[n];
+  sek.classList.remove("ok", "nej", "delvis");
+  if (felterI.some(j => svar[j] === false)) sek.classList.add("nej");
+  else if (felterI.every(j => svar[j] === true))
+    sek.classList.add(felterI.some(j => kvalitet[j] === "roed") ? "nej"
+                    : felterI.some(j => kvalitet[j] === "gul") ? "delvis" : "ok");
+  visGraf();
+  gemHistorik();
+  opdaterStatus();
+}
+
+function opgaveRigtig(n){ return OPG_FELTER[n].every(i => svar[i] === true); }
+function nokForsoeg(n){ return OPG_FELTER[n].every(i => svar[i] === true || forsoeg[i] >= FORSOEG_KRAEVET); }
+function foersteUloeste(n){
+  for (let m = 0; m < n; m++) if (!opgaveRigtig(m)) return m + 1;
+  return 0;
+}
+// Begge betingelser skal stå i teksten. Skrives kun kæden, læses den som
+// tilstrækkelig: "Åbner, når opgave 2 er rigtig" lyder, som om løsningen
+// ligger og venter på det ene svar, og det gør den ikke.
+function laaseTekst(n){
+  if (loesningSet[n]) return "Løsningen er set.";
+  const mangler = foersteUloeste(n);
+  const rigtig = opgaveRigtig(n);
+  if (!mangler && rigtig) return "";
+  if (mangler && (rigtig || nokForsoeg(n)))
+    return `Åbner, når opgave ${mangler} er rigtig.`;
+  const brugt = Math.min(...OPG_FELTER[n].filter(i => svar[i] !== true).map(i => forsoeg[i]));
+  if (mangler)
+    return `Åbner, når opgave ${mangler} er rigtig – og denne her er rigtig `
+         + `eller forsøgt ${FORSOEG_KRAEVET} gange. Du har brugt ${brugt}.`;
+  return `Åbner efter ${FORSOEG_KRAEVET} forsøg – du har brugt ${brugt}.`;
+}
+function gemHistorik(){
+  if (D) historik.set(D.nr, { forsoeg: forsoeg.slice(), loesningSet: loesningSet.slice(),
+                              loesningFoerRigtig: loesningFoerRigtig.slice(), kvalitet: kvalitet.slice() });
+}
+function listeOver(tal){
+  if (tal.length === 1) return String(tal[0]);
+  return tal.slice(0, -1).join(", ") + " og " + tal[tal.length - 1];
+}
+
+function opdaterStatus(){
+  const tjekket = svar.filter(x => x !== null).length;
+  const rigtige = svar.filter(x => x === true).length;
+  const sete = [];
+  for (let n = 0; n < ANTAL_OPG; n++) if (loesningFoerRigtig[n]) sete.push(n + 1);
+  const seje = kvalitet.filter(k => k === "gul").length;
+  const st = document.getElementById("statusTxt");
+  let txt = tjekket === 0 && !sete.length
+    ? "Ingen svar tjekket endnu."
+    : `${rigtige} af ${ANTAL_FELT} rigtige.`;
+  if (seje) txt += ` ${seje === 1 ? "Et af dem tog" : seje + " af dem tog"} mere end ${FORSOEG_KRAEVET} forsøg.`;
+  if (sete.length) txt += ` Løsning set til opgave ${listeOver(sete)}.`;
+  st.innerHTML = txt;
+  const p = document.getElementById("prikker");
+  p.innerHTML = svar.map((s, i) =>
+    `<span class="prik ${s === true ? KLASSE[kvalitet[i]] : s === false ? "nej" : ""}"></span>`).join("");
+  document.getElementById("visLoes").disabled = rigtige < ANTAL_FELT;
+  for (let n = 0; n < ANTAL_OPG; n++){
+    const b = document.querySelector(`button.visOpg[data-o="${n + 1}"]`);
+    b.disabled = !(foersteUloeste(n) === 0 && (opgaveRigtig(n) || nokForsoeg(n)));
+    document.getElementById("laas" + (n + 1)).textContent = b.disabled || loesningSet[n] ? laaseTekst(n) : "";
+  }
+}
+
+// Rydder svarene, men ikke forsøg og sete løsninger: regnskabet skal stå ved magt.
+function nulstilSvar(){
+  svar = [null,null,null,null,null,null,null,null];
+  kvalitet = [null,null,null,null,null,null,null,null];
+  felter.forEach(f => { f.value = ""; f.classList.remove("ok", "nej", "delvis"); });
+  fbEl.forEach(f => { f.className = "fb"; f.innerHTML = ""; });
+  for (let n = 1; n <= ANTAL_OPG; n++)
+    document.getElementById("opg" + n).classList.remove("ok","nej","delvis");
+  document.getElementById("grafBoks").style.display = "none";
+  opdaterStatus();
+}
+
+// ---------- opgavesæt ----------
+function saetOpgave(nr){
+  D = opgaveData(nr);
+  const sH = String(D.husstande), sF = D.forbrug + " kWh",
+        sL = D.afstandKm + " km", sA = fmt(D.arealCm2, 2) + " cm²",
+        sU = D.u0kV + " kV";
+  document.getElementById("nrInput").value = String(nr);
+  document.getElementById("dH").textContent = sH;
+  document.getElementById("dF").textContent = sF;
+  document.getElementById("dL").textContent = sL;
+  document.getElementById("dA").textContent = sA;
+  document.getElementById("dU").textContent = sU;
+  document.getElementById("dH2").textContent = sH;
+  document.getElementById("dF2").textContent = sF;
+  document.getElementById("dU2").textContent = sU;
+  document.getElementById("dMaal").textContent = fmt(D.maalPct, 1) + " %";
+  document.getElementById("rH").textContent = sH;
+  document.getElementById("rF").textContent = sF;
+  document.getElementById("rL").textContent = sL;
+  document.getElementById("rA").textContent = sA;
+  document.getElementById("rU").textContent = sU;
+  document.getElementById("nL").textContent = sL;
+  document.getElementById("rNote").textContent = "Kør animationen, eller gå direkte i gang med tallene ovenfor.";
+  if (location.hash.slice(1) !== String(nr)) history.replaceState(null, "", "#" + nr);
+  const h = historik.get(nr);
+  forsoeg = h ? h.forsoeg.slice() : [0,0,0,0,0,0,0,0];
+  loesningSet = h ? h.loesningSet.slice() : [false,false,false,false,false,false,false];
+  loesningFoerRigtig = h ? h.loesningFoerRigtig.slice() : [false,false,false,false,false,false,false];
+  kvalitet = h ? h.kvalitet.slice() : [null,null,null,null,null,null,null,null];
+  nulstilSvar();
+  visAar = 0; koerer = false;
+  document.getElementById("koer").textContent = "▶ Tænd for kraftværket";
+  fyldLadninger();
+  byg();
+  tegnAlt();
+}
+function nytNummer(){ saetOpgave(1000 + Math.floor(Math.random() * 9000)); }
+
+// ---------- animation ----------
+const cvA = document.getElementById("anim"), ctx = cvA.getContext("2d");
+const cvG = document.getElementById("graf"), gtx = cvG.getContext("2d");
+let W = 900, Ha = 300, GW = 900, GH = 320;
+const ladninger = [];
+
+function layout(){
+  const dpr = window.devicePixelRatio || 1;
+  W = cvA.clientWidth || 900;
+  // På smalle skærme presses scenen sammen vandret, så den skal have mere
+  // højde, ellers lander etiketterne oven i hinanden.
+  Ha = W < 620 ? Math.max(300, Math.min(360, W * 0.86))
+               : Math.max(270, Math.min(330, W * 0.34));
+  cvA.style.height = Ha + "px";
+  cvA.width = Math.round(W * dpr); cvA.height = Math.round(Ha * dpr);
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+  GW = cvG.clientWidth || 900;
+  GH = Math.max(250, Math.min(340, GW * 0.38));
+  cvG.style.height = GH + "px";
+  cvG.width = Math.round(GW * dpr); cvG.height = Math.round(GH * dpr);
+  gtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  byg();
+  tegnAlt();
+}
+
+// Tekst med symboler i kursiv og sænkede indekser:
+// dele = [[tekst, erSymbol, erSaenket], ...]
+function rich(c, dele, x, y, align, size, farve){
+  const stoer = p => (p[2] ? size * 0.72 : size);
+  const fontOf = p => (p[1] ? `italic ${stoer(p)}px ${MATH}` : `${stoer(p)}px ${SERIF}`);
+  let w = 0;
+  for (const p of dele){ c.font = fontOf(p); w += c.measureText(p[0]).width; }
+  let cx = align === "right" ? x - w : align === "center" ? x - w / 2 : x;
+  c.fillStyle = farve; c.textBaseline = "alphabetic"; c.textAlign = "left";
+  for (const p of dele){
+    c.font = fontOf(p);
+    c.fillText(p[0], cx, y + (p[2] ? size * 0.22 : 0));
+    cx += c.measureText(p[0]).width;
+  }
+  return w;
+}
+// Samme, men med en dæmpet plade bagved, så etiketten kan læses hen over en kurve.
+function richPlade(c, dele, x, y, align, size, farve){
+  const w = (() => { let s = 0; for (const p of dele){
+    c.font = (p[1] ? "italic " : "") + (p[2] ? size * 0.72 : size) + "px " + (p[1] ? MATH : SERIF);
+    s += c.measureText(p[0]).width; } return s; })();
+  const vx = align === "right" ? x - w : align === "center" ? x - w / 2 : x;
+  c.fillStyle = "rgba(0,0,0,.78)";
+  rundRekt(c, vx - 5, y - size * 0.92, w + 10, size * 1.32, 4);
+  c.fill();
+  rich(c, dele, x, y, align, size, farve);
+}
+function rundRekt(c, x, y, w, h, r){
+  c.beginPath();
+  c.moveTo(x + r, y); c.lineTo(x + w - r, y); c.quadraticCurveTo(x + w, y, x + w, y + r);
+  c.lineTo(x + w, y + h - r); c.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  c.lineTo(x + r, y + h); c.quadraticCurveTo(x, y + h, x, y + h - r);
+  c.lineTo(x, y + r); c.quadraticCurveTo(x, y, x + r, y);
+  c.closePath();
+}
+
+let geo = {};
+function byg(){
+  const skala = Math.max(0.68, Math.min(1, W / 900));
+  const vx = 0.13 * W;              // kraftværkets midte
+  const bx = 0.87 * W;              // byens midte
+  geo = {
+    skala, vx, bx,
+    vBredde: 92 * skala, vHoejde: 66 * skala,
+    // Plads til to linjer etiketter under jordlinjen og til slutlinjen nederst.
+    jord: Ha - 78 * skala,
+    yUd:  Ha * 0.34,                 // lederen ud til byen
+    yHjem: Ha * 0.34 + 26 * skala,   // lederen tilbage til værket
+    xA: vx + 52 * skala,             // ledningens venstre ende
+    xB: bx - 52 * skala              // ledningens højre ende
+  };
+}
+
+// Ledningselektronerne er der i forvejen, jævnt fordelt i hele kredsløbet. Der
+// kommer ikke nye til fra kraftværket: når der tændes, sætter de sig alle sammen
+// i bevægelse næsten samtidig, hele vejen rundt. Positionen s løber fra 0 til 2:
+// 0-1 er turen ud ad den øverste leder, 1-2 turen tilbage ad den nederste.
+const ANTAL_LADNINGER = 44;
+function fyldLadninger(){
+  ladninger.length = 0;
+  for (let k = 0; k < ANTAL_LADNINGER; k++)
+    ladninger.push({ s: 2 * k / ANTAL_LADNINGER });
+}
+
+function tegnHus(c, x, y, b, h, farve){
+  c.strokeStyle = farve; c.lineWidth = 1.6;
+  c.beginPath();
+  c.moveTo(x - b / 2, y); c.lineTo(x - b / 2, y - h); c.lineTo(x, y - h - b * 0.42);
+  c.lineTo(x + b / 2, y - h); c.lineTo(x + b / 2, y); c.closePath();
+  c.stroke();
+}
+function tegnMast(c, x, yTop, yJord, skala){
+  c.strokeStyle = "#8a8a8a"; c.lineWidth = 1.4;
+  const br = 13 * skala;
+  c.beginPath();
+  c.moveTo(x - br, yJord); c.lineTo(x - br * 0.34, yTop);
+  c.moveTo(x + br, yJord); c.lineTo(x + br * 0.34, yTop);
+  // tværbånd
+  for (let k = 1; k <= 3; k++){
+    const f = k / 4, yy = yJord + (yTop - yJord) * f;
+    const bb = br * (1 - f * 0.66);
+    c.moveTo(x - bb, yy); c.lineTo(x + bb, yy);
+  }
+  c.stroke();
+}
+
+function tegnAnim(){
+  const c = ctx, g = geo, sk = geo.skala;
+  c.clearRect(0, 0, W, Ha);
+  if (!D) return;
+
+  // ---- fremdriftsbjælke: året ----
+  const bx0 = 8, bw = W - 16, by = 15, bh = 7;
+  c.strokeStyle = "#3a3a3a"; c.lineWidth = 1.4;
+  rundRekt(c, bx0, by, bw, bh, bh / 2); c.stroke();
+  c.fillStyle = COL.teal;
+  rundRekt(c, bx0, by, Math.max(bh, bw * visAar), bh, bh / 2); c.fill();
+  rich(c, [["januar", false]], bx0, by - 7, "left", 13 * sk, COL.dim);
+  rich(c, [["december", false]], bx0 + bw, by - 7, "right", 13 * sk, COL.dim);
+  rich(c, [["1 år", false]], bx0 + bw / 2, by - 7, "center", 14 * sk, COL.fg);
+
+  // ---- jordlinje ----
+  c.strokeStyle = "#2f2f2f"; c.lineWidth = 1.4;
+  c.beginPath(); c.moveTo(0, g.jord); c.lineTo(W, g.jord); c.stroke();
+
+  // ---- master ----
+  for (let k = 1; k <= 3; k++){
+    const x = g.xA + (g.xB - g.xA) * k / 4;
+    tegnMast(c, x, g.yUd - 10 * sk, g.jord, sk);
+  }
+
+  // ---- gløden under ledningen: varmen, der afsættes undervejs ----
+  // Gløden er kun et signal om, at der afsættes varme, ikke et mål for hvor meget.
+  // Før der tændes, løber der ingen strøm, og så er der heller ingen glød.
+  const puls = 0.55 + 0.45 * Math.sin(performance.now() / 420);
+  const styrke = koerer || visAar > 0 ? 0.30 + 0.20 * puls : 0;
+  for (const y of [g.yUd, g.yHjem]){
+    c.strokeStyle = `rgba(252,98,85,${styrke})`;
+    c.lineWidth = 9 * sk;
+    c.beginPath(); c.moveTo(g.xA, y); c.lineTo(g.xB, y); c.stroke();
+  }
+
+  // ---- de to ledere ----
+  c.strokeStyle = COL.fg; c.lineWidth = 2;
+  for (const y of [g.yUd, g.yHjem]){
+    c.beginPath(); c.moveTo(g.xA, y); c.lineTo(g.xB, y); c.stroke();
+  }
+  // lodrette stykker ind i værk og by
+  c.beginPath();
+  c.moveTo(g.xA, g.yUd); c.lineTo(g.xA - 12 * sk, g.yUd);
+  c.moveTo(g.xA, g.yHjem); c.lineTo(g.xA - 12 * sk, g.yHjem);
+  c.moveTo(g.xB, g.yUd); c.lineTo(g.xB + 12 * sk, g.yUd);
+  c.moveTo(g.xB, g.yHjem); c.lineTo(g.xB + 12 * sk, g.yHjem);
+  c.stroke();
+
+  // strømretningspile på de to ledere
+  const pil = (x, y, ret) => {
+    c.strokeStyle = COL.dim; c.lineWidth = 1.4;
+    c.beginPath();
+    c.moveTo(x - 5 * sk * ret, y - 4 * sk); c.lineTo(x + 4 * sk * ret, y);
+    c.lineTo(x - 5 * sk * ret, y + 4 * sk);
+    c.stroke();
+  };
+  pil((g.xA + g.xB) / 2 - 60 * sk, g.yUd - 11 * sk, 1);
+  pil((g.xA + g.xB) / 2 + 60 * sk, g.yHjem + 11 * sk, -1);
+
+  // ---- ladninger ----
+  const L1 = g.xB - g.xA;
+  for (const p of ladninger){
+    const u = p.s % 2;
+    const x = u < 1 ? g.xA + L1 * u : g.xB - L1 * (u - 1);
+    const y = u < 1 ? g.yUd : g.yHjem;
+    c.fillStyle = COL.yellow;
+    c.beginPath(); c.arc(x, y, 3.6 * sk, 0, 2 * Math.PI); c.fill();
+  }
+
+  // ---- kraftværket ----
+  const vw = g.vBredde, vh = g.vHoejde;
+  const vx0 = g.vx - vw / 2, vy0 = g.jord - vh;
+  c.strokeStyle = COL.blue; c.lineWidth = 2; c.fillStyle = "rgba(88,196,221,.10)";
+  rundRekt(c, vx0, vy0, vw, vh, 4); c.fill(); c.stroke();
+  // skorsten
+  c.beginPath();
+  c.rect(vx0 + vw * 0.62, vy0 - 30 * sk, 13 * sk, 30 * sk);
+  c.fill(); c.stroke();
+  // røg
+  c.strokeStyle = "rgba(207,207,207,.35)"; c.lineWidth = 1.4;
+  c.beginPath();
+  for (let k = 0; k < 3; k++){
+    const yy = vy0 - 34 * sk - k * 11 * sk;
+    const dx = Math.sin(performance.now() / 900 + k) * 6 * sk;
+    c.moveTo(vx0 + vw * 0.62 + 2 * sk + dx, yy);
+    c.lineTo(vx0 + vw * 0.62 + 11 * sk + dx, yy);
+  }
+  c.stroke();
+  rich(c, [["kraftværket", false]], g.vx, g.jord + 20 * sk, "center", 15 * sk, COL.fg);
+  rich(c, [["U", true], ["0", false, true], [` = ${D.u0kV} kV`, false]],
+       g.vx, g.jord + 37 * sk, "center", 14 * sk, COL.blue);
+
+  // ---- byen ----
+  tegnHus(c, g.bx - 26 * sk, g.jord, 30 * sk, 26 * sk, COL.yellow);
+  tegnHus(c, g.bx + 4 * sk, g.jord, 24 * sk, 34 * sk, COL.yellow);
+  tegnHus(c, g.bx + 30 * sk, g.jord, 28 * sk, 22 * sk, COL.yellow);
+  rich(c, [["Korsø by", false]], g.bx, g.jord + 20 * sk, "center", 15 * sk, COL.fg);
+  rich(c, [[`${D.husstande} husstande`, false]], g.bx, g.jord + 37 * sk, "center", 14 * sk, COL.dim);
+
+  // ---- elmåleren i byen ----
+  // Den ligger under ledningen og til højre, så den ikke dækker lederne.
+  // Årsforbruget er mange millioner kWh, så det vises i MWh.
+  const mw = Math.min(196 * sk, Math.max(150 * sk, W * 0.26)), mh = 54 * sk;
+  const mx = W - mw - 8;
+  // På smalle skærme er der ikke plads ved siden af byen, så måleren rykker
+  // op under fremdriftsbjælken.
+  const my = W < 620 ? 36 * sk : g.yHjem + 14 * sk;
+  c.strokeStyle = "#6A6A6A"; c.lineWidth = 1.7; c.fillStyle = "#0d0d0d";
+  rundRekt(c, mx, my, mw, mh, 7); c.fill(); c.stroke();
+  rich(c, [["leveret til byen", false]], mx + mw / 2, my + 17 * sk, "center", 12 * sk, COL.dim);
+  const mwh = Math.round(D.husstande * D.forbrug * visAar / 1000);
+  rich(c, [[String(mwh) + " MWh", false]], mx + mw / 2, my + mh - 12 * sk, "center", 19 * sk, COL.yellow);
+
+  // ---- klamme med afstanden ----
+  const ky = g.jord - 16 * sk;
+  c.strokeStyle = "#5a5a5a"; c.lineWidth = 1.2;
+  c.beginPath();
+  c.moveTo(g.vx, ky + 6 * sk); c.lineTo(g.vx, ky); c.lineTo(g.bx, ky); c.lineTo(g.bx, ky + 6 * sk);
+  c.stroke();
+  richPlade(c, [["ℓ", true], [` = ${D.afstandKm} km`, false]],
+       (g.vx + g.bx) / 2, ky - 6 * sk, "center", 14 * sk, COL.dim);
+
+  // ---- afsluttende linje ----
+  if (visAar >= 1){
+    rich(c, [["Året er gået. Ledningen har været varm hele vejen igennem.", false]],
+         W / 2, Ha - 8, "center", 15 * sk, COL.green);
+  }
+}
+
+// ---------- grafen ----------
+// Kurven viser tabets andel ved enhver spænding og ville dermed afsløre både
+// opgave 5 og opgave 7. Den må derfor først frem, når opgave 7 er rigtig.
+function visGraf(){
+  const vis = opgaveRigtig(6);
+  const boks = document.getElementById("grafBoks");
+  const varSkjult = boks.style.display === "none";
+  boks.style.display = vis ? "" : "none";
+  if (!vis) return;
+  tegnGraf();
+  // Den står nederst på siden og bliver ellers let overset.
+  if (varSkjult) setTimeout(() => rulTil(boks, 12), 320);
+}
+function tegnGraf(){
+  if (!D || document.getElementById("grafBoks").style.display === "none") return;
+  const c = gtx, mL = 62, mR = 20, mT = 26, mB = 54;
+  const pw = GW - mL - mR, ph = GH - mT - mB;
+  // Faste akser, så to opgavesæt kan sammenlignes.
+  const U_AKSE = 200;                       // kV
+  const Y_AKSE = 20;                        // %
+  const X = u => mL + pw * u / U_AKSE;
+  const Y = v => mT + ph * (1 - Math.min(v, Y_AKSE) / Y_AKSE);
+  const andel = u => 100 * D.R * D.p0 / Math.pow(u * 1000, 2);   // u i kV
+  c.clearRect(0, 0, GW, GH);
+
+  c.lineWidth = 1; c.strokeStyle = "#262626";
+  c.font = `14px ${SERIF}`; c.fillStyle = COL.fg;
+  c.textAlign = "center"; c.textBaseline = "top";
+  for (let u = 0; u <= U_AKSE + 1e-9; u += 25){
+    c.beginPath(); c.moveTo(X(u), mT); c.lineTo(X(u), mT + ph); c.stroke();
+    c.fillText(String(u), X(u), mT + ph + 7);
+  }
+  c.textAlign = "right"; c.textBaseline = "middle";
+  for (let v = 0; v <= Y_AKSE + 1e-9; v += 2.5){
+    c.beginPath(); c.moveTo(mL, Y(v)); c.lineTo(mL + pw, Y(v)); c.stroke();
+    c.fillText(komma(v.toFixed(1)), mL - 8, Y(v));
+  }
+  c.strokeStyle = COL.fg; c.lineWidth = 1.8;
+  c.beginPath(); c.moveTo(mL, mT); c.lineTo(mL, mT + ph); c.lineTo(mL + pw, mT + ph); c.stroke();
+  rich(c, [["U", true], [" / kV", false]], mL + pw, mT + ph + 44, "right", 16, COL.fg);
+  rich(c, [["tab / % af ", false], ["P", true], ["0", false, true]], mL - 8, mT - 8, "left", 16, COL.fg);
+
+  // kurven for det gennemsnitlige forbrug
+  const kurve = (faktor, farve, bredde) => {
+    c.strokeStyle = farve; c.lineWidth = bredde; c.lineJoin = "round";
+    c.save(); c.beginPath(); c.rect(mL, mT, pw, ph); c.clip();
+    c.beginPath();
+    let foerste = true;
+    for (let i = 0; i <= 400; i++){
+      const u = 4 + (U_AKSE - 4) * i / 400;
+      const y = Y(andel(u) * faktor);
+      if (foerste){ c.moveTo(X(u), y); foerste = false; } else c.lineTo(X(u), y);
+    }
+    c.stroke(); c.restore();
+  };
+  if (opgaveRigtig(5)) kurve(4, COL.orange, 1.8);
+  kurve(1, COL.blue, 2.6);
+
+  // elevens udgangspunkt
+  c.setLineDash([5, 6]); c.strokeStyle = COL.red; c.lineWidth = 1.5;
+  c.beginPath(); c.moveTo(X(D.u0kV), mT + ph); c.lineTo(X(D.u0kV), Y(D.pct)); c.lineTo(mL, Y(D.pct)); c.stroke();
+  c.setLineDash([]);
+  c.fillStyle = COL.red;
+  c.beginPath(); c.arc(X(D.u0kV), Y(D.pct), 5, 0, 2 * Math.PI); c.fill();
+  richPlade(c, [[`${D.u0kV} kV: ${sigTxt(D.pct, 3)} %`, false]],
+       X(D.u0kV) + 12, Y(D.pct) - 8, "left", 15, COL.red);
+
+  // det nye driftspunkt
+  const un = D.uNoed / 1000;
+  c.setLineDash([5, 6]); c.strokeStyle = COL.green; c.lineWidth = 1.5;
+  c.beginPath(); c.moveTo(X(un), mT + ph); c.lineTo(X(un), Y(D.maalPct)); c.lineTo(mL, Y(D.maalPct)); c.stroke();
+  c.setLineDash([]);
+  c.fillStyle = COL.green;
+  c.beginPath(); c.arc(X(un), Y(D.maalPct), 5, 0, 2 * Math.PI); c.fill();
+  richPlade(c, [[`${sigTxt(un, 3)} kV: ${fmt(D.maalPct, 1)} %`, false]],
+       Math.min(X(un) + 12, mL + pw - 150), Y(D.maalPct) - 12, "left", 15, COL.green);
+
+  if (opgaveRigtig(5))
+    richPlade(c, [["orange: dobbelt effektbehov", false]], mL + pw - 6, mT + 14, "right", 14, COL.orange);
+}
+
+function tegnAlt(){ if (D){ tegnAnim(); tegnGraf(); } }
+
+// ---------- løsninger ----------
+function byg1(){
+  const E = D.husstande * D.forbrug;
+  return [
+    String.raw`## 1. Byens effektbehov`,
+    String.raw`Effekten er den energi, der bruges, divideret med den tid, den bruges på: $$P = \frac{\Delta E}{\Delta t}.$$ Her er tidsrummet $\Delta t$ ét år, og $\Delta E$ er den energi, byen bruger på det år.`,
+    String.raw`Først findes $\Delta E$. Hver af de ${D.husstande} husstande bruger ${D.forbrug} kWh på et år, så $$\Delta E = ${D.husstande}\cdot ${D.forbrug}\ \text{kWh} = ${sigTex(E, 6)}\ \text{kWh}.$$`,
+    String.raw`Resultatet skal ende i watt, altså i joule pr. sekund, så energien regnes om til joule med $1\ \text{kWh} = 3{,}6\cdot 10^{6}\ \text{J}$: $$\Delta E = ${sigTex(E, 6)}\ \text{kWh}\cdot 3{,}6\cdot 10^{6}\ \frac{\text{J}}{\text{kWh}} = ${sciTex(E * KWH_J, 5)}\ \text{J}.$$ Læg mærke til, at kWh forkorter væk, så der står joule tilbage.`,
+    String.raw`Og tidsrummet i sekunder: $$\Delta t = 1\ \text{år} = 365\cdot 24\cdot 3600\ \text{s} = ${sciTex(S_PR_AAR, 5)}\ \text{s}.$$`,
+    String.raw`Så er effekten $$P_0 = \frac{\Delta E}{\Delta t} = \frac{${sciTex(E * KWH_J, 5)}\ \text{J}}{${sciTex(S_PR_AAR, 5)}\ \text{s}} = ${sigTex(D.p0, 5)}\ \frac{\text{J}}{\text{s}} = ${sigTex(D.p0, 5)}\ \text{W} = ${sigTex(D.p0 / 1e6, 4)}\ \text{MW}.$$ Bemærk de to skridt til sidst: $\text{J}/\text{s}$ *er* watt, og først derefter deles med $10^{6}$ for at komme fra W til MW.`,
+    String.raw`Det er et gennemsnit over hele året. Om natten bruger byen mindre, og en kold vinteraften mere &ndash; det ser vi på i opgave 6.`
+  ];
+}
+function byg2(){
+  const Am2 = D.arealCm2 * 1e-4;
+  return [
+    String.raw`## 2. Ledningens resistans`,
+    String.raw`Resistansen af en leder afhænger af materialet, af hvor lang den er, og af hvor tyk den er: $$R = \rho\cdot\frac{\ell}{A}.$$ Her er $\rho$ ledningsmaterialets resistivitet, $\ell$ den samlede længde leder, og $A$ ledernes tværsnitsareal.`,
+    String.raw`Strømmen skal ud til byen i den ene leder og tilbage til værket i den anden, for et kredsløb skal være lukket. Den samlede længde leder er derfor det dobbelte af afstanden: $$\ell = 2\cdot ${D.afstandKm}\ \text{km} = ${2 * D.afstandKm}\ \text{km} = ${sigTex(D.L, 5)}\ \text{m}.$$`,
+    String.raw`Arealet skal i kvadratmeter. Da $1\ \text{cm} = 10^{-2}\ \text{m}$, er $1\ \text{cm}^2 = (10^{-2}\ \text{m})^2 = 10^{-4}\ \text{m}^2$, og dermed $$A = ${kommaTex(fmt(D.arealCm2, 2))}\ \text{cm}^2 = ${kommaTex(fmt(D.arealCm2, 2))}\cdot 10^{-4}\ \text{m}^2 = ${sciTex(Am2, 4)}\ \text{m}^2.$$`,
+    String.raw`Ledningen er af aluminium med stålkerne, og resistiviteten er $\rho = 2{,}6\cdot 10^{-8}\ \Omega\cdot\text{m}$. Nu kan resistansen beregnes: $$R = 2{,}6\cdot 10^{-8}\ \Omega\cdot\text{m}\cdot\frac{${sigTex(D.L, 5)}\ \text{m}}{${sciTex(Am2, 4)}\ \text{m}^2} = ${sigTex(D.R, 4)}\ \Omega.$$ Metrene forkorter: $\Omega\cdot\text{m}\cdot\text{m}/\text{m}^2 = \Omega$, som det skal være.`
+  ];
+}
+function byg3(){
+  return [
+    String.raw`## 3. Strømstyrken i ledningen`,
+    String.raw`Den effekt, kraftværket leverer, hænger sammen med spændingen og strømstyrken som $$P = U\cdot I.$$ Divideres der med $U$ på begge sider, er strømstyrken isoleret: $$I = \frac{P}{U}.$$`,
+    String.raw`Spændingen skal indsættes i volt: $$U_0 = ${D.u0kV}\ \text{kV} = ${D.u0kV}\cdot 10^{3}\ \text{V} = ${sigTex(D.u0, 5)}\ \text{V}.$$`,
+    String.raw`Og effekten i watt, altså ${sigTxt(D.p0 / 1e6, 4)} MW $= ${sigTex(D.p0, 5)}$ W. Så er $$I = \frac{${sigTex(D.p0, 5)}\ \text{W}}{${sigTex(D.u0, 5)}\ \text{V}} = ${sigTex(D.I, 4)}\ \text{A}.$$ Enhederne passer: $\text{W}/\text{V} = \text{A}$, for netop $1\ \text{W} = 1\ \text{V}\cdot 1\ \text{A}$.`,
+    String.raw`Det er den samme strøm, der løber hele vejen rundt i kredsløbet: ud i den ene leder, gennem byen og tilbage i den anden.`
+  ];
+}
+function byg4(){
+  return [
+    String.raw`## 4. Spændingsfaldet over ledningen`,
+    String.raw`Ledningen er en modstand som enhver anden, så Ohms lov gælder for den: $$U_{\text{ledning}} = R\cdot I.$$ Her er $U_{\text{ledning}}$ spændingsfaldet over netop ledningen, altså forskellen mellem spændingen ved værket og spændingen ude ved byen.`,
+    String.raw`Med $R = ${sigTex(D.R, 4)}\ \Omega$ fra opgave 2 og $I = ${sigTex(D.I, 4)}\ \text{A}$ fra opgave 3 er $$U_{\text{ledning}} = ${sigTex(D.R, 4)}\ \Omega\cdot ${sigTex(D.I, 4)}\ \text{A} = ${sigTex(D.dU, 4)}\ \text{V}.$$ Enhederne går op, for $1\ \Omega\cdot 1\ \text{A} = 1\ \text{V}$.`,
+    String.raw`Det er værd at stoppe op her. Kraftværket leverer ved ${D.u0kV} kV $= ${sigTex(D.u0, 5)}$ V, og spændingsfaldet over hele ledningen er kun ${sigTxt(D.dU, 4)} V. Langt det meste af spændingen ligger altså over byen og ikke over ledningen: $$U_{\text{by}} = ${sigTex(D.u0, 5)}\ \text{V} - ${sigTex(D.dU, 4)}\ \text{V} = ${sigTex(D.u0 - D.dU, 5)}\ \text{V}.$$`,
+    String.raw`Derfor er det en fælde at sætte kraftværkets spænding ind i $P = U^2/R$. Det $U$, der står i den formel, er spændingen *over den modstand, man regner på* &ndash; her altså $U_{\text{ledning}}$, ikke $U_0$. Det bruger vi i næste opgave.`
+  ];
+}
+function byg5(){
+  return [
+    String.raw`## 5. Hvor meget går tabt?`,
+    String.raw`Den effekt, der afsættes som varme i ledningen, findes med Joules lov: $$P_{\text{tab}} = R\cdot I^2.$$ Med tallene fra opgave 2 og 3: $$P_{\text{tab}} = ${sigTex(D.R, 4)}\ \Omega\cdot\left(${sigTex(D.I, 4)}\ \text{A}\right)^2 = ${sigTex(D.R, 4)}\ \Omega\cdot ${sigTex(D.I * D.I, 5)}\ \text{A}^2 = ${sigTex(D.ptab, 5)}\ \text{W} = ${sigTex(D.ptab / 1e3, 4)}\ \text{kW}.$$ Enhederne: $\Omega\cdot\text{A}^2 = \text{V}/\text{A}\cdot\text{A}^2 = \text{V}\cdot\text{A} = \text{W}$.`,
+    String.raw`Man kan også bruge spændingsfaldet fra opgave 4 og regne $P_{\text{tab}} = U_{\text{ledning}}\cdot I = ${sigTex(D.dU, 4)}\ \text{V}\cdot ${sigTex(D.I, 4)}\ \text{A} = ${sigTex(D.ptab, 5)}\ \text{W}$. Samme resultat, for $U_{\text{ledning}} = R\cdot I$.`,
+    String.raw`Andelen af den leverede effekt findes ved at dividere og gange med 100: $$\frac{P_{\text{tab}}}{P_0} = \frac{${sigTex(D.ptab, 5)}\ \text{W}}{${sigTex(D.p0, 5)}\ \text{W}} = ${kommaTex((D.pct / 100).toPrecision(4))},$$ altså $$ ${kommaTex((D.pct / 100).toPrecision(4))}\cdot 100\ \% = ${sigTex(D.pct, 3)}\ \%.$$ Watt forkorter væk i brøken, så der står et rent tal &ndash; det skal der, før det giver mening at tale om procent.`,
+    String.raw`Kraftværket skal altså producere lidt mere, end byen bruger: de ${sigTxt(D.pct, 3)} % varmer luften op omkring ledningen.`
+  ];
+}
+function byg6(){
+  return [
+    String.raw`## 6. En kold vinteraften`,
+    String.raw`Byen skal nu bruge effekten $2P_0$, og kraftværket leverer stadig ved $U_0$. Først strømstyrken: $$I_{\text{ny}} = \frac{2P_0}{U_0} = 2\cdot\frac{P_0}{U_0} = 2I.$$ Når effekten fordobles ved uændret spænding, fordobles strømstyrken.`,
+    String.raw`Så ind i Joules lov: $$P_{\text{tab,ny}} = R\cdot\left(2I\right)^2 = R\cdot 4I^2 = 4\cdot R\cdot I^2 = 4\cdot P_{\text{tab}}.$$ Det er hele pointen: strømstyrken indgår i *anden potens*, så en fordobling af strømstyrken giver en *firdobling* af tabet.`,
+    String.raw`Med tallene: $$P_{\text{tab,ny}} = 4\cdot ${sigTex(D.ptab / 1e3, 4)}\ \text{kW} = ${sigTex(D.ptabSpids / 1e3, 4)}\ \text{kW}.$$ Man kan også regne det forfra: $I_{\text{ny}} = 2\cdot ${sigTex(D.I, 4)}\ \text{A} = ${sigTex(2 * D.I, 4)}\ \text{A}$, og $R\cdot I_{\text{ny}}^2 = ${sigTex(D.R, 4)}\ \Omega\cdot\left(${sigTex(2 * D.I, 4)}\ \text{A}\right)^2 = ${sigTex(D.ptabSpids, 5)}\ \text{W}$.`,
+    String.raw`Andelen vokser også. Byen får dobbelt så meget, men tabet er firdoblet, så andelen bliver $$\frac{4P_{\text{tab}}}{2P_0} = 2\cdot\frac{P_{\text{tab}}}{P_0} = 2\cdot ${sigTex(D.pct, 3)}\ \% = ${sigTex(2 * D.pct, 3)}\ \%.$$ Det er derfor, et elnet skal dimensioneres efter spidsbelastningen og ikke efter gennemsnittet: netop når forbruget er størst, er nettet også dårligst til at levere.`
+  ];
+}
+function byg7(){
+  const maal = D.maalPct / 100;
+  const ptabMaal = maal * D.p0;
+  const iMaal = Math.sqrt(ptabMaal / D.R);
+  return [
+    String.raw`## 7. Hvor høj skal spændingen være?`,
+    String.raw`Vi er tilbage ved det gennemsnitlige forbrug, $P_0 = ${sigTex(D.p0, 5)}$ W, og ledningen er uændret med $R = ${sigTex(D.R, 4)}\ \Omega$. Tabet må højst være ${fmt(D.maalPct, 1)} % af $P_0$: $$P_{\text{tab}} = ${kommaTex(String(maal))}\cdot ${sigTex(D.p0, 5)}\ \text{W} = ${sigTex(ptabMaal, 5)}\ \text{W}.$$`,
+    String.raw`Hvilken strømstyrke svarer det til? Af Joules lov $P_{\text{tab}} = R\cdot I^2$ isoleres $I$ ved at dividere med $R$ og tage kvadratroden på begge sider: $$I^2 = \frac{P_{\text{tab}}}{R} \quad\Longrightarrow\quad I = \sqrt{\frac{P_{\text{tab}}}{R}}.$$ Indsat: $$I = \sqrt{\frac{${sigTex(ptabMaal, 5)}\ \text{W}}{${sigTex(D.R, 4)}\ \Omega}} = \sqrt{${sigTex(ptabMaal / D.R, 5)}\ \text{A}^2} = ${sigTex(iMaal, 4)}\ \text{A}.$$ Enhederne: $\text{W}/\Omega = \text{V}\cdot\text{A}/(\text{V}/\text{A}) = \text{A}^2$, og kvadratroden af det er ampere.`,
+    String.raw`Den effekt skal stadig leveres, så af $P_0 = U\cdot I$ fås spændingen ved at dividere med $I$: $$U = \frac{P_0}{I} = \frac{${sigTex(D.p0, 5)}\ \text{W}}{${sigTex(iMaal, 4)}\ \text{A}} = ${sigTex(D.uNoed, 5)}\ \text{V} = ${sigTex(D.uNoed / 1000, 4)}\ \text{kV}.$$`,
+    String.raw`*Den korte vej.* Tabet er $P_{\text{tab}} = R\cdot I^2$ og $I = P_0/U$, så $$P_{\text{tab}} = R\cdot\frac{P_0^2}{U^2}.$$ Tabet er altså omvendt proportionalt med $U^2$. Skal tabet fra opgave 5 ned fra ${sigTxt(D.pct, 3)} % til ${fmt(D.maalPct, 1)} %, altså med en faktor ${sigTxt(D.pct / D.maalPct, 3)}, skal $U^2$ op med samme faktor, og $U$ altså op med $\sqrt{${sigTex(D.pct / D.maalPct, 3)}} = ${sigTex(Math.sqrt(D.pct / D.maalPct), 3)}$: $$U = ${D.u0kV}\ \text{kV}\cdot ${sigTex(Math.sqrt(D.pct / D.maalPct), 3)} = ${sigTex(D.uNoed / 1000, 4)}\ \text{kV}.$$ Samme svar, og her ses sammenhængen tydeligere.`
+  ];
+}
+function bygBemaerk(){
+  return [
+    String.raw`## Bemærkninger`,
+    String.raw`*Hvorfor kan man bare skrue op for spændingen?* Kraftværkets generator laver ikke ${sigTxt(D.uNoed / 1000, 4)} kV direkte. I stedet står der en transformer ved værket, som transformerer spændingen op, før energien sendes af sted, og en transformer nede ved byen, som transformerer den ned igen til de 400 V, der kommer ind i husene.`,
+    String.raw`Det afgørende er, at transformeren samtidig transformerer *strømstyrken ned* i samme forhold, som den sætter spændingen op. Ganges spændingen med 5, divideres strømstyrken med 5, og produktet $P = U\cdot I$ er det samme på de to sider af transformeren. Transformeren laver altså ikke energi; den bytter høj strømstyrke ved lav spænding for lav strømstyrke ved høj spænding. Og da varmetabet $R\cdot I^2$ kun afhænger af strømstyrken, er det netop den byttehandel, der er hele gevinsten. En transformer virker kun med vekselstrøm, og det er hovedgrunden til, at vekselstrøm i sin tid vandt over jævnstrøm.`,
+    String.raw`*De gule kugler i animationen.* De er kun et billede på strømmen. Ledningselektronerne bevæger sig i virkeligheden ganske langsomt, typisk brøkdele af en millimeter i sekundet, for der er uhyre mange af dem. Til gengæld sætter de sig i bevægelse næsten samtidig i hele ledningen, når der sluttes strøm til, og det er derfor lyset tænder med det samme.`,
+    String.raw`*Er høj spænding hård ved ledningen?* Tværtimod. Det er alene strømstyrken, der bestemmer varmetabet gennem $R\cdot I^2$, og høj spænding betyder netop lille strømstyrke ved den samme effekt. Høj spænding er altså ikke mere ødelæggende for ledningen; den er skånsom mod den. Prisen betales et andet sted: isolationen. Afstanden fra lederen til masten og til jorden skal være stor nok til, at der ikke slår gnister, og det er derfor højspændingsmaster er så høje og har så lange isolatorkæder.`,
+    String.raw`*Hvorfor ikke bare en tykkere ledning?* Det virker også: fordobles tværsnitsarealet, halveres $R$, og tabet halveres. Men en ledning med det dobbelte areal vejer det dobbelte, så masterne skal stå tættere og være kraftigere. At fordoble spændingen er billigere, for det koster kun en større transformer i hver ende.`,
+    String.raw`*Hvorfor aluminium og ikke kobber?* Kobber leder bedre, men aluminium er både lettere og billigere, og vægten er afgørende, når ledningen skal hænge frit mellem master. Stålkernen bærer trækket, så aluminiumet slipper for det. Til gengæld er resistiviteten lidt større end kobbers, og det er prisen for den lavere vægt.`,
+    String.raw`*Modellen forenkler.* Vi har regnet med én fast resistivitet. I virkeligheden stiger den med temperaturen, og en ledning, der leverer strøm på en varm sommerdag, er både opvarmet af solen og af sin egen strøm. Dens resistans er derfor større end den, vi har brugt, og tabet tilsvarende større. Vi regner desuden her, som om det var jævnstrøm. I et rigtigt vekselstrømsnet spiller også *strømfortrængning* ind: vekselstrømmen skaber selv et magnetfelt, der modvirker strømmen kraftigst inde midt i lederen, så strømmen fortrænges ud mod overfladen. Den inderste del af lederen kommer dermed til at bære mindre strøm, det effektive tværsnitsareal bliver mindre end det fysiske, og resistansen bliver en smule større end den, vi har regnet med. Dertil kommer faseforskydning mellem spænding og strøm.`,
+    String.raw`*Korsø er opdigtet,* men både metoden og størrelsesordenen af tallene svarer til et rigtigt ø-net.`
+  ];
+}
+function loesningsAfsnit(){
+  return [].concat(byg1(), byg2(), byg3(), byg4(), byg5(), byg6(), byg7(), bygBemaerk());
+}
+function mdTilHtml(s){ return s.replace(/\*([^*$]+)\*/g, "<em>$1</em>"); }
+
+// ---------- TeX -> almindelig tekst, så løsningen kan sættes ind i Word ----------
+// Word forstår hverken $-tegn eller LaTeX-kommandoer ved indsættelse, så teksten
+// skrives om til unicode: · for gangetegn, hævede og sænkede cifre, / for brøkstreg.
+const SUP_T = { "0":"⁰","1":"¹","2":"²","3":"³","4":"⁴","5":"⁵",
+                "6":"⁶","7":"⁷","8":"⁸","9":"⁹","+":"⁺","-":"⁻",
+                "−":"⁻","(":"⁽",")":"⁾" };
+const SUB_T = { "0":"₀","1":"₁","2":"₂","3":"₃","4":"₄","5":"₅",
+                "6":"₆","7":"₇","8":"₈","9":"₉","+":"₊","-":"₋",
+                "(":"₍",")":"₎" };
+
+function texGruppe(t, i){          // t[i] er "{"; returnerer [indhold, indeks efter "}"]
+  let d = 0, j = i;
+  for (; j < t.length; j++){
+    if (t[j] === "{") d++;
+    else if (t[j] === "}"){ d--; if (d === 0) break; }
+  }
+  return [t.slice(i + 1, j), j + 1];
+}
+function texPak(x){                // sæt parentes om en brøkdel, hvis den er sammensat
+  return /[\s+·\/−-]/.test(x.trim()) ? "(" + x.trim() + ")" : x.trim();
+}
+function texTekst(raa){
+  const t = raa
+    .replace(/\\begin\{aligned\}|\\end\{aligned\}/g, "")
+    .replace(/\\\\\s*(\[[^\]]*\])?/g, "\n")
+    .replace(/&/g, "")
+    .replace(/\{,\}/g, ",");
+  let ud = "";
+  for (let i = 0; i < t.length; ){
+    const c = t[i];
+    if (c === "\\"){
+      const m = /^\\([a-zA-Z]+|.)/.exec(t.slice(i));
+      const cmd = m[1];
+      i += m[0].length;
+      // TeX sluger mellemrum efter et kommandonavn, det gør vi også. Står der
+      // et relationstegn bagefter, sætter TeX selv luft omkring det, og så skal
+      // mellemrummet tilbage: "\Omega = " skal give "Ω =", mens "\Delta U"
+      // skal give "ΔU" og "\cdot 10" skal give "·10".
+      let slugt = false;
+      if (/^[a-zA-Z]+$/.test(cmd)) while (t[i] === " "){ i++; slugt = true; }
+      const genskab = slugt && "=+<>".includes(t[i]);
+      if (cmd === "frac"){
+        let a, b;
+        [a, i] = texGruppe(t, i);
+        [b, i] = texGruppe(t, i);
+        ud += texPak(texTekst(a)) + "/" + texPak(texTekst(b));
+      } else if (cmd === "text"){
+        let a; [a, i] = texGruppe(t, i);
+        ud += a;
+      } else if (cmd === "sqrt"){
+        let a; [a, i] = texGruppe(t, i);
+        ud += "√(" + texTekst(a).trim() + ")";
+      } else if (cmd === "cdot") ud += "·";
+      else if (cmd === "ln") ud += "ln";
+      else if (cmd === "Delta") ud += "Δ";
+      else if (cmd === "rho") ud += "ρ";
+      else if (cmd === "ell") ud += "ℓ";
+      else if (cmd === "Omega") ud += "Ω";
+      else if (cmd === "approx") ud += "≈";
+      else if (cmd === "Longleftrightarrow") ud += "  ⟺  ";
+      else if (cmd === "Longrightarrow") ud += "  ⟹  ";
+      else if (cmd === "qquad") ud += "    ";
+      else if (cmd === "quad") ud += "  ";
+      else if (cmd === "%") ud += "%";
+      else if (cmd === " " || cmd === ",") ud += " ";
+      else if (cmd === "!" || cmd === "left" || cmd === "right") { /* uden virkning */ }
+      else ud += cmd;                       // ukendt: skriv navnet uden backslash
+      if (genskab) ud += " ";
+    } else if (c === "^" || c === "_"){
+      i++;
+      let arg;
+      if (t[i] === "{"){ [arg, i] = texGruppe(t, i); } else { arg = t[i]; i++; }
+      const inde = texTekst(arg);
+      if (c === "_" && inde === "1/2"){ ud += "½"; continue; }
+      const tab = c === "^" ? SUP_T : SUB_T;
+      if ([...inde].every(ch => tab[ch])) ud += [...inde].map(ch => tab[ch]).join("");
+      // Et sænket ord som "ledning" har ingen unicode-form. Det skrives som
+      // U_ledning, ikke U_(ledning), for det er sådan man skriver det i hånden.
+      else if (c === "_" && /^[A-Za-zÆØÅæøå0-9]+$/.test(inde)) ud += "_" + inde;
+      else ud += (c === "^" ? "^(" : "_(") + inde + ")";
+    } else if (c === "{" ){
+      let a; [a, i] = texGruppe(t, i);
+      ud += texTekst(a);
+    } else { ud += c; i++; }
+  }
+  return ud.replace(/[ \t]{3,}/g, "  ");
+}
+// Et helt afsnit: prosa med $...$ og $$...$$ imellem.
+function afsnitTilTekst(md){
+  if (md.startsWith("## ")) return "\n" + md.slice(3).toUpperCase();
+  return md
+    .replace(/\*([^*$]+)\*/g, "$1")
+    .replace(/&ndash;/g, "–")
+    .replace(/\$\$([\s\S]+?)\$\$[ \t]*/g, (_, x) =>
+      "\n    " + texTekst(x).split("\n").map(r => r.trim()).join("\n    ") + "\n")
+    .replace(/\$([^$]+)\$/g, (_, x) => texTekst(x))
+    .replace(/[ \t]+\n/g, "\n");
+}
+
+const modal = document.getElementById("modal");
+// Fri formelsamling. Den er generel: symboler og sammenhænge, ikke opskriften på
+// det enkelte delspørgsmål. Brugen registreres ikke noget sted.
+function formelSamling(){
+  return [
+    String.raw`## Energi og effekt`,
+    String.raw`Effekt er tilført eller afgivet energi pr. tid: $$P = \frac{\Delta E}{\Delta t}$$ Enheden watt er joule pr. sekund, $1\ \text{W} = 1\ \text{J}/\text{s}$. Elforbrug opgives normalt i kilowatt-timer, som er en enhed for *energi*, men ikke for effekt: $$1\ \text{kWh} = 1000\ \text{W}\cdot 3600\ \text{s} = 3{,}6\cdot 10^{6}\ \text{J}$$`,
+    String.raw`## Resistansen af en leder`,
+    String.raw`$$R = \rho\cdot\frac{\ell}{A}$$ hvor $\rho$ er materialets resistivitet, $\ell$ den samlede længde af lederen, og $A$ dens tværsnitsareal. Resistiviteten afhænger af materialet og af temperaturen og slås op i en tabel. Går strømmen ud ad én leder og tilbage ad en anden, er det den samlede vej gennem metallet, der tæller.`,
+    String.raw`## Ohms lov`,
+    String.raw`$$U = R\cdot I$$ Her er $U$ spændingsfaldet *over netop den modstand*, der har resistansen $R$. Det er ikke det samme som spændingen over spændingskilden, når der også er andet i kredsløbet.`,
+    String.raw`## Effekt i et kredsløb`,
+    String.raw`Den effekt, en spændingskilde leverer, er $$P = U\cdot I$$ Bemærk, at en given effekt kan leveres enten ved høj spænding og lille strømstyrke eller ved lav spænding og stor strømstyrke.`,
+    String.raw`## Joules lov`,
+    String.raw`Den effekt, der afsættes som varme i ledningen, er $$P_{\text{tab}} = R\cdot I^2$$ Kombineres den med Ohms lov, fås de to andre former $$P_{\text{tab}} = U_{\text{ledning}}\cdot I = \frac{U_{\text{ledning}}^2}{R}$$ hvor $U_{\text{ledning}}$ er spændingsfaldet over selve ledningen.`
+  ];
+}
+
+function afsnitFor(n){
+  if (n === "formler") return formelSamling();
+  if (n === null) return loesningsAfsnit();
+  return [byg1(), byg2(), byg3(), byg4(), byg5(), byg6(),
+          byg7().concat(bygBemaerk())][n];
+}
+let visesNu = null;
+function aabnLoesning(n){
+  visesNu = n;
+  if (n !== null && n !== "formler"){
+    loesningSet[n] = true;
+    if (!opgaveRigtig(n)) loesningFoerRigtig[n] = true;
+    gemHistorik();
+  }
+  document.getElementById("loesTitel").textContent =
+    n === "formler" ? "Relevante formler"
+    : n === null ? `Løsning – opgave nr. ${D.nr}`
+    : `Løsning til opgave ${n + 1} – opgave nr. ${D.nr}`;
+  const body = document.getElementById("loesBody");
+  body.innerHTML = afsnitFor(n).map(p => p.startsWith("## ")
+    ? `<h3>${p.slice(3)}</h3>` : `<p>${mdTilHtml(p)}</p>`).join("");
+  modal.classList.add("open");
+  if (window.renderMathInElement){
+    renderMathInElement(body, {
+      delimiters: [{ left: "$$", right: "$$", display: true },
+                   { left: "$", right: "$", display: false }],
+      throwOnError: false
+    });
+  }
+  opdaterStatus();
+}
+document.querySelectorAll("button.visOpg").forEach(b =>
+  b.addEventListener("click", () => aabnLoesning(parseInt(b.dataset.o, 10) - 1)));
+document.getElementById("visLoes").addEventListener("click", () => aabnLoesning(null));
+document.getElementById("visFormler").addEventListener("click", () => aabnLoesning("formler"));
+
+document.getElementById("luk").addEventListener("click", () => modal.classList.remove("open"));
+modal.addEventListener("click", e => { if (e.target === modal) modal.classList.remove("open"); });
+document.addEventListener("keydown", e => { if (e.key === "Escape") modal.classList.remove("open"); });
+document.getElementById("kopier").addEventListener("click", async e => {
+  const hoved = visesNu === "formler" ? "Relevante formler"
+    : visesNu === null ? `Løsning – Højspænding på Korsø. Opgave nr. ${D.nr}`
+    : `Løsning til opgave ${visesNu + 1} – Højspænding på Korsø. Opgave nr. ${D.nr}`;
+  const data = visesNu === "formler" ? ""
+    : `${D.husstande} husstande à ${D.forbrug} kWh/år, ${D.afstandKm} km, ${fmt(D.arealCm2, 2)} cm², ${D.u0kV} kV\n`;
+  const txt = hoved + "\n" + data
+    + afsnitFor(visesNu).map(afsnitTilTekst).join("\n") + "\n";
+  try { await navigator.clipboard.writeText(txt); e.target.textContent = "Kopieret ✓"; }
+  catch { e.target.textContent = "Kunne ikke kopiere"; }
+  setTimeout(() => { e.target.textContent = "Kopiér tekst"; }, 1600);
+});
+
+// ---------- hændelser ----------
+document.querySelectorAll("button.tjek").forEach(b =>
+  b.addEventListener("click", () => tjek(parseInt(b.dataset.f, 10) - 1)));
+felter.forEach((f, i) => f.addEventListener("keydown", e => {
+  if (e.key === "Enter"){ e.preventDefault(); tjek(i); }
+}));
+document.getElementById("nulstil").addEventListener("click", nulstilSvar);
+document.getElementById("nytNr").addEventListener("click", nytNummer);
+document.getElementById("nrInput").addEventListener("change", e => {
+  const n = parseInt(String(e.target.value).replace(/\D/g, ""), 10);
+  if (isFinite(n) && n >= 1000 && n <= 9999) saetOpgave(n);
+  else saetOpgave(D.nr);
+});
+document.getElementById("foto").addEventListener("error", () => {
+  document.getElementById("fotoFig").style.display = "none";
+});
+
+// Ruller siden, så det, eleven skal se, står øverst i vinduet.
+function rulTil(el, luft){
+  const y = el.getBoundingClientRect().top + window.scrollY - (luft === undefined ? 14 : luft);
+  window.scrollTo({ top: Math.max(0, y), behavior: "smooth" });
+}
+function startScroll(){ rulTil(document.querySelector(".row"), 12); }
+// Når året er gået: data og begyndelsen af opgaverne skal stå tydeligt, men den
+// grønne slutlinje nederst i lærredet skal stadig kunne ses øverst i vinduet.
+function faerdigScroll(){
+  document.getElementById("rNote").textContent = "Året er gået – gå videre til opgave 1.";
+  setTimeout(() => {
+    const c = cvA.getBoundingClientRect();
+    window.scrollTo({ top: Math.max(0, c.bottom + window.scrollY - 46), behavior: "smooth" });
+  }, 260);
+}
+
+const btnKoer = document.getElementById("koer");
+btnKoer.addEventListener("click", () => {
+  // Ladningerne bliver stående, hvor de er. De forsvinder ikke ud af ledningen,
+  // fordi året er gået, og de kommer ikke nye til, fordi der tændes igen.
+  if (visAar >= 1) visAar = 0;
+  koerer = !koerer;
+  btnKoer.textContent = koerer ? "❮❮ Pause"
+    : (visAar > 0 ? "▶ Fortsæt" : "▶ Tænd for kraftværket");
+  if (koerer) startScroll();
+});
+document.getElementById("spring").addEventListener("click", () => {
+  visAar = 1; koerer = false;
+  if (!ladninger.length) fyldLadninger();
+  btnKoer.textContent = "▶ Kør igen";
+  tegnAlt();
+  faerdigScroll();
+});
+
+// ---------- løkke ----------
+const VARIGHED = 10;             // sekunder for et helt år
+const LADNINGSFART = 0.42;       // gennemløb pr. sekund (rent visuelt)
+let sidst = null;
+function frame(ms){
+  const nu = ms / 1000;
+  if (sidst === null) sidst = nu;
+  const dt = Math.min(0.05, nu - sidst); sidst = nu;
+  if (koerer){
+    visAar = Math.min(1, visAar + dt / VARIGHED);
+    // Alle ladninger rykker lige meget frem på én gang, hele vejen rundt.
+    for (const p of ladninger) p.s = (p.s + dt * LADNINGSFART) % 2;
+    if (visAar >= 1){
+      koerer = false;
+      btnKoer.textContent = "▶ Kør igen";
+      faerdigScroll();
+    }
+    tegnAnim();
+  }
+  requestAnimationFrame(frame);
+}
+
+// ---------- start ----------
+const fraHash = parseInt(location.hash.slice(1), 10);
+byg();
+saetOpgave(isFinite(fraHash) && fraHash >= 1000 && fraHash <= 9999
+  ? fraHash : 1000 + Math.floor(Math.random() * 9000));
+layout();
+window.addEventListener("resize", layout);
+if (document.fonts){
+  document.fonts.load(`16px ${SERIF}`).catch(() => {});
+  document.fonts.load(`italic 16px ${MATH}`).catch(() => {});
+  document.fonts.ready.then(tegnAlt).catch(() => {});
+}
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>
