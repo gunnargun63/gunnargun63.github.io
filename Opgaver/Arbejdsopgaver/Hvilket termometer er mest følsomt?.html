@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hvilket termometer er mest følsomt?</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<style>
+:root{
+  --bg:#000000; --fg:#EEEEEE; --dim:#CFCFCF; --border:#6A6A6A;
+  --blue:#58C4DD; --yellow:#F4D345; --green:#83C167; --red:#FC6255; --teal:#5CD0B3;
+  --serif:"KaTeX_Main","Latin Modern Roman","CMU Serif",Georgia,"Times New Roman",serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--serif)}
+body{padding:18px 16px 48px}
+.wrap{max-width:1100px;margin:0 auto}
+h1{font-weight:normal;font-size:2.1rem;margin:0 0 6px;letter-spacing:.01em}
+.sub{color:var(--dim);font-size:1.12rem;margin:0 0 10px;line-height:1.45}
+a{color:var(--teal)}
+canvas{display:block;width:100%;background:var(--bg)}
+#graf{cursor:crosshair;touch-action:manipulation}
+.row{display:flex;flex-wrap:wrap;gap:10px 24px;align-items:center;margin:10px 0}
+.group{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.label{color:var(--dim);font-size:1.08rem}
+.q{font-size:1.2rem}
+i.sym{font-family:"KaTeX_Math","KaTeX_Main",Georgia,serif;font-style:italic}
+button{
+  font-family:var(--serif);font-size:1.05rem;font-weight:bold;color:var(--fg);
+  background:transparent;border:1.5px solid var(--border);border-radius:6px;
+  padding:5px 13px;cursor:pointer;transition:border-color .15s,background .15s
+}
+button:hover:not(:disabled){border-color:var(--fg)}
+button[hidden]{display:none}
+button:disabled{opacity:.55;cursor:default}
+button.pred.sel, button.tog.on, button.step.on{background:#EEEEEE;border-color:#EEEEEE;color:#000;opacity:1}
+button.primary{border-color:var(--green)}
+button.step{font-weight:normal}
+select{
+  font-family:var(--serif);font-size:1.05rem;color:var(--fg);background:#111;
+  border:1.5px solid var(--border);border-radius:6px;padding:5px 8px
+}
+.result{min-height:1.6em;font-size:1.18rem;line-height:1.55;margin:6px 0 12px}
+.cA{color:var(--blue)} .cB{color:var(--yellow)} .cC{color:var(--green)} .cD{color:var(--teal)}
+.hint{color:var(--dim);font-style:italic}
+.sep{height:1px;background:#2a2a2a;margin:18px 0 10px}
+.pushright{margin-left:auto}
+.task{font-size:1.12rem;line-height:1.55;margin:8px 0 4px;padding:6px 14px 10px;border-left:3px solid #5CD0B3;background:#0d0d0d}
+.task ol{margin:6px 0 8px;padding-left:1.4em}
+.task li{margin:6px 0}
+.task .inp{display:inline-flex;align-items:center;gap:6px;margin-left:6px;white-space:nowrap}
+.task input{font-family:var(--serif);font-size:1.08rem;width:5.5em;background:#111;color:var(--fg);border:1.5px solid var(--border);border-radius:6px;padding:3px 8px}
+.task input:focus{outline:none;border-color:var(--blue)}
+.task button{font-size:.98rem;padding:3px 10px}
+.fb{display:block;color:var(--dim);font-style:italic;margin-top:2px;min-height:3.2em}
+.fb.ok{color:var(--green);font-style:normal}
+.fb.flash{animation:fbflash .5s ease-out}
+@keyframes fbflash{from{opacity:.15;transform:translateX(-5px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.fb.flash{animation:none}}
+#solbody{padding-top:10px}
+#solbody .katex-display{overflow-x:auto;overflow-y:hidden;padding:2px 0}
+details#intro{margin:2px 0 10px}
+details#intro summary{cursor:pointer;color:var(--teal);font-size:1.08rem;padding:2px 0;list-style:revert}
+details#intro .sub{margin-top:8px}
+.graphcap{font-size:1.06rem;line-height:1.45;color:var(--dim);margin:8px 0 2px}
+#stepgraf{margin-bottom:6px}
+.steptext{font-size:1.12rem;line-height:1.5;margin:8px 0 2px;padding:8px 14px;border-left:3px solid #6A6A6A;background:#0d0d0d}
+/* modal */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.78);display:none;align-items:flex-start;justify-content:center;padding:40px 16px;overflow:auto;z-index:10}
+.modal.open{display:flex}
+.panel{position:relative;background:#0b0b0b;border:1.5px solid var(--border);border-radius:10px;max-width:780px;width:100%;padding:26px 30px 22px}
+.panel h2{font-weight:normal;font-size:1.7rem;margin:0 0 14px;padding-right:130px}
+.panel h3{font-weight:normal;font-size:1.35rem;color:var(--blue);margin:22px 0 10px}
+.panel h3 .adv{display:inline-block;vertical-align:2px;margin-left:10px;font-size:.72rem;letter-spacing:.09em;text-transform:uppercase;color:var(--yellow);border:1px solid var(--yellow);border-radius:4px;padding:2px 7px}
+.panel p{font-size:1.15rem;line-height:1.6;margin:0 0 14px}
+.panel .katex-display{overflow-x:auto;overflow-y:hidden;padding:2px 0}
+.panel .top{position:absolute;top:16px;right:16px;display:flex;gap:8px}
+.panel .top button{font-size:.95rem;padding:4px 10px}
+@media (max-width:600px){
+  .panel{padding:22px 16px 18px}
+  .panel h2{padding-right:0;margin-top:34px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Hvilket termometer er mest følsomt?</h1>
+  <details id="intro" open>
+    <summary>Om opstillingen: NTC-resistor, kredsløb og hvad «følsomt» betyder</summary>
+  <p class="sub">Et elektronisk termometer indeholder en <b>NTC-resistor</b>. Det er en temperaturfølsom resistor, hvis resistans <i class="sym">R</i><sub>NTC</sub> falder, når temperaturen stiger. <a href="#grafrow" id="togr">Scroll ned til grafen</a> for at se, hvordan <i class="sym">R</i><sub>NTC</sub> afhænger af temperaturen <i class="sym">T</i>. NTC-resistoren sidder i serie med en fast resistor <i class="sym">R</i> og en spændingskilde på <i class="sym">U</i> = 5,0 V. Et voltmeter måler spændingsfaldet <i class="sym">U</i><sub>NTC</sub> over NTC-resistoren. Når temperaturen ændrer sig, ændrer <i class="sym">R</i><sub>NTC</sub> sig, og dermed også <i class="sym">U</i><sub>NTC</sub>. Elektronikken i termometeret omregner spændingen til en temperatur.</p>
+  <p class="sub">Men hvor stor skal den faste resistor <i class="sym">R</i> være? Et godt termometer er <b>følsomt</b>: Voltmeterets visning skal ændre sig meget, når temperaturen ændrer sig lidt. Så kan termometeret kende forskel på fx 37,0 °C og 37,1 °C. Vi måler følsomheden som ændringen i spændingen, når temperaturen stiger 1 °C.</p>
+  </details>
+
+  <div class="row" style="margin-bottom:4px">
+    <span class="group">
+      <button class="step" data-s="1">1 · Kropstemperatur</button>
+      <button class="step" data-s="2">2 · Sauna</button>
+      <button class="step" data-s="3">3 · Byg termometeret</button>
+      <button class="step" data-s="4">4 · Brug termometeret</button>
+    </span>
+  </div>
+
+  <div id="steptext" class="steptext"></div>
+  <div class="row" id="qrow"><span class="q" id="question"></span></div>
+  <div id="grafcap" class="graphcap"></div>
+  <canvas id="stepgraf"></canvas>
+  <div id="task" class="task" hidden>
+    <ol type="a">
+      <li>Aflæs på grafen for <i class="sym">R</i><sub>NTC</sub> nederst på siden, hvor stor NTC-resistorens resistans er ved 5 °C.
+        <span class="inp"><span><i class="sym">R</i><sub>NTC</sub> =</span> <input id="ta" type="text" inputmode="decimal"> kΩ <button id="ca">Tjek</button></span>
+        <span id="fa" class="fb"></span></li>
+      <li>Hvilken fast resistor <i class="sym">R</i> giver det mest følsomme termometer ved 5 °C?
+        <span class="inp"><span><i class="sym">R</i> =</span> <input id="tb" type="text" inputmode="decimal"> kΩ <button id="cb">Tjek</button></span>
+        <span id="fbb" class="fb"></span></li>
+      <li>Beregn, hvad voltmeteret viser ved 5 °C med din resistor.
+        <span class="inp"><span><i class="sym">U</i><sub>NTC</sub> =</span> <input id="tc" type="text" inputmode="decimal"> V <button id="cc">Tjek</button></span>
+        <span id="fc" class="fb"></span></li>
+      <li>Test dit termometer: tryk på «Test dit termometer». Temperaturen stiger fra 0 °C til 10 °C. Passer voltmeteret med din beregning, og er termometeret så følsomt som muligt ved 5 °C?</li>
+    </ol>
+    <button id="sol" hidden>Vis løsning</button>
+  </div>
+
+  <div id="task4" class="task" hidden>
+    <ol type="a">
+      <li>Hvor stor er NTC-resistorens resistans? Isolér <i class="sym">R</i><sub>NTC</sub> i spændingsdelerformlen, eller brug et CAS-værktøj.
+        <span class="inp"><span><i class="sym">R</i><sub>NTC</sub> =</span> <input id="qa" type="text" inputmode="decimal"> kΩ <button id="da">Tjek</button></span>
+        <span id="ga" class="fb"></span></li>
+      <li>Aflæs temperaturen på grafen for <i class="sym">R</i><sub>NTC</sub> nederst på siden.
+        <span class="inp"><span><i class="sym">T</i> =</span> <input id="qb" type="text" inputmode="decimal"> °C <button id="db">Tjek</button></span>
+        <span id="gb" class="fb"></span></li>
+      <li>Tryk på «Mål temperaturen» for at se, hvor varmt vandet i akvariet er.</li>
+    </ol>
+    <button id="sol4" hidden>Vis løsning</button>
+  </div>
+
+  <div class="row">
+    <span class="group" id="preds"></span>
+    <button id="start" class="primary" disabled>▶ Start</button>
+    <span id="hint" class="hint"></span>
+  </div>
+
+  <canvas id="scene"></canvas>
+
+  <div id="result" class="result"></div>
+  <div id="solbody" class="task" hidden></div>
+
+  <div class="row">
+    <button id="reset">↺ Nulstil</button>
+    <span class="group"><span class="label">Tempo</span>
+      <select id="tempo">
+        <option value="2">2×</option>
+        <option value="1" selected>1×</option>
+        <option value="0.5">½×</option>
+      </select>
+    </span>
+    <button id="why" class="pushright" disabled>Hvorfor?</button>
+  </div>
+
+  <div class="sep"></div>
+
+  <div class="row" id="grafrow">
+    <span class="group"><span class="label">Graf</span>
+      <button class="tog on" data-g="R"><i class="sym">R</i><sub>NTC</sub> som funktion af <i class="sym">T</i></button>
+      <button class="tog" data-g="U"><i class="sym">U</i><sub>NTC</sub> som funktion af <i class="sym">T</i></button>
+      <button class="tog" data-g="S">Følsomhed som funktion af <i class="sym">T</i></button>
+      <button class="tog" data-g="SR">Følsomhed som funktion af <i class="sym">R</i></button>
+    </span>
+  </div>
+  <div class="row" style="margin-top:0">
+    <span class="hint" id="ghint">Klik på grafen for at aflæse et punkt.</span>
+  </div>
+  <canvas id="graf"></canvas>
+</div>
+
+<div class="modal" id="modal">
+  <div class="panel">
+    <div class="top"><button id="copy">Kopiér tekst</button><button id="close">✕</button></div>
+    <h2>Hvad gør et termometer følsomt?</h2>
+    <div id="whyBody"></div>
+  </div>
+</div>
+
+<script>
+"use strict";
+// ================= PHYSICS-START =================
+// NTC-resistor (B-model), en typisk NTC med 20 kΩ ved 37 °C:
+//   R_NTC = 20 kΩ · exp( B·(1/T − 1/T0) ),  B = 3900 K,  T0 = 310,15 K (37 °C)
+// Spændingsdeler med ideelt voltmeter over NTC: U_NTC = R_NTC/(R + R_NTC) · U.
+// Følsomhed S(T) = U_NTC(T) − U_NTC(T + 1 °C), angivet i mV pr. °C.
+const U0 = 5.0;           // V
+const B_NTC = 3900;       // K
+const T_REF = 37;         // °C, hvor R_NTC = 20 kΩ
+const R_REF = 20;         // kΩ
+const Rntc = T => R_REF*Math.exp(B_NTC*(1/(T + 273.15) - 1/(T_REF + 273.15)));   // kΩ, T i °C
+const Untc = (R, T) => Rntc(T)/(R + Rntc(T))*U0;                                  // V
+const Sens = (R, T) => (Untc(R, T) - Untc(R, T + 1))*1000;                          // mV pr. °C
+const Tof  = R => 1/(Math.log(R/R_REF)/B_NTC + 1/(T_REF + 273.15)) - 273.15;        // °C ud fra R_NTC (kΩ)
+// ================= PHYSICS-END =================
+
+const COL = { A:"#58C4DD", B:"#F4D345", C:"#83C167", D:"#5CD0B3", S:"#5CD0B3", fg:"#EEEEEE", dim:"#CFCFCF", red:"#FC6255" };
+const SERIF = '"KaTeX_Main","Latin Modern Roman","CMU Serif",Georgia,serif';
+const MATH  = '"KaTeX_Math","KaTeX_Main",Georgia,serif';
+const fmt = (v, n) => v.toFixed(n).replace(".", ",").replace(/^-(0,0*)$/, "$1");
+const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+
+const TRIO = [{ key: "A", R: 2 }, { key: "B", R: 20 }, { key: "C", R: 200 }];
+const R4 = 15, T4 = 25;  // akvarie-opgaven: fast resistor og vandets sande temperatur
+let RT = null;           // elevens R i opgaven (kΩ)
+let tempo = 1, graphMode = "R", step = 1, unlocked = 1;
+
+const STEPS = {
+  1: { T0: 37, from: 31, to: 43,
+       text: "Vi vil bygge et febertermometer, der er så følsomt som muligt omkring 37 °C, som er normal kropstemperatur. Ved 37 °C har NTC-resistoren resistansen 20 kΩ. Vi prøver tre forskellige faste resistorer: <span class=\"cA\">A</span> med <i class=\"sym\">R</i> = 2 kΩ, <span class=\"cB\">B</span> med <i class=\"sym\">R</i> = 20 kΩ og <span class=\"cC\">C</span> med <i class=\"sym\">R</i> = 200 kΩ. De tre termometre sættes i det samme vandbad, som varmes op fra 31 °C til 43 °C.",
+       q: "Hvilket termometer er mest følsomt ved 37 °C?",
+       opts: [["A", "A"], ["B", "B"], ["C", "C"], ["L", "Lige følsomme"]] },
+  2: { T0: 80, from: 74, to: 86,
+       text: "Nu skal de samme tre termometre bruges i en sauna, hvor temperaturen er omkring 80 °C. Se på grafen for <i class=\"sym\">R</i><sub>NTC</sub>, hvor stor NTC-resistorens resistans er ved 80 °C. Vandet varmes op fra 74 °C til 86 °C.",
+       q: "Hvilket termometer er mest følsomt ved 80 °C?",
+       opts: [["A", "A"], ["B", "B"], ["C", "C"], ["L", "Lige følsomme"]] },
+  3: { T0: 5, from: 0, to: 10,
+       text: "Et køleskab skal holde ca. 5 °C, og termometeret skal være så følsomt som muligt netop dér. Spændingskilden er stadig 5,0 V, og voltmeteret måler over NTC-resistoren. Du skal vælge den faste resistor <i class=\"sym\">R</i>.",
+       q: "", opts: [] },
+  4: { T0: T4, from: T4, to: T4,
+       text: "Nu skal termometeret bruges. Det hænger i et akvarium, og du kan ikke se, hvor varmt vandet er. Den faste resistor er <i class=\"sym\">R</i> = 15 kΩ, spændingskilden giver 5,0 V, og voltmeteret viser <b>3,44 V</b>. Brug spændingsdelerformlen baglæns: find først NTC-resistorens resistans, og aflæs derefter temperaturen på grafen.",
+       q: "", opts: [] }
+};
+const st = {};
+for (const k of [1, 2, 3, 4]) st[k] = { pred: null, running: false, done: false, T: STEPS[k].from, verdict: "" };
+function bandsOf(s){
+  if (s === 3) return [{ key: "D", R: RT || 20, known: !!RT, name: "Dit termometer", short: "din", glab: "din" }];
+  if (s === 4) return [{ key: "D", R: R4, known: true, name: "Termometeret", short: "", dec: 2, glab: `${R4} kΩ` }];
+  return TRIO;
+}
+
+// ---------- DOM ----------
+const cv = document.getElementById("scene"), ctx = cv.getContext("2d");
+const gv = document.getElementById("graf"), gtx = gv.getContext("2d");
+const sg = document.getElementById("stepgraf"), sgx = sg.getContext("2d");
+const btnStart = document.getElementById("start"), hint = document.getElementById("hint");
+const resultEl = document.getElementById("result"), btnWhy = document.getElementById("why");
+const qEl = document.getElementById("question"), predsEl = document.getElementById("preds");
+const stepBtns = [...document.querySelectorAll("button.step")];
+const togs = [...document.querySelectorAll("button.tog")];
+
+let W = 900, H = 440, GW = 800, GH = 300, SGW = 800, SGH = 300, narrow = false;
+function layout(){
+  const dpr = window.devicePixelRatio || 1;
+  W = cv.clientWidth || 900;
+  narrow = W < 640;
+  H = narrow ? 350 : 200;
+  cv.style.height = H + "px";
+  cv.width = Math.round(W*dpr); cv.height = Math.round(H*dpr);
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  SGW = sg.clientWidth || 800;
+  const sgNarrow = SGW < 700;
+  SGH = step >= 3 ? 205 : (sgNarrow ? 290 + 200 : 275);
+  sg.style.height = SGH + "px";
+  sg.width = Math.round(SGW*dpr); sg.height = Math.round(SGH*dpr);
+  sgx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  GW = gv.clientWidth || 800;
+  GH = Math.max(250, Math.min(330, GW*0.34));
+  gv.style.height = GH + "px";
+  gv.width = Math.round(GW*dpr); gv.height = Math.round(GH*dpr);
+  gtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+
+// ---------- tegnehjælp ----------
+function rich(c, parts, x, y, align, size, color, outline){
+  const fontOf = p => (p[1] ? `italic ${size}px ${MATH}` : `${p[2] ? Math.round(size*0.72) : size}px ${SERIF}`);
+  let w = 0;
+  for (const p of parts){ c.font = fontOf(p); w += c.measureText(p[0]).width; }
+  let x0 = align === "right" ? x - w : align === "center" ? x - w/2 : x;
+  c.textBaseline = "alphabetic"; c.textAlign = "left";
+  for (const p of parts){
+    c.font = fontOf(p);
+    const yy = p[2] ? y + size*0.25 : y;
+    if (outline){ c.lineWidth = 3; c.strokeStyle = "rgba(0,0,0,.7)"; c.lineJoin = "round"; c.strokeText(p[0], x0, yy); }
+    c.fillStyle = color; c.fillText(p[0], x0, yy);
+    x0 += c.measureText(p[0]).width;
+  }
+  return w;
+}
+const hex = h => [1,3,5].map(i => parseInt(h.substr(i, 2), 16));
+const mix = (a, b, t) => "rgb(" + a.map((v, i) => Math.round(v + (b[i] - v)*t)).join(",") + ")";
+const kOhm = R => R >= 100 ? fmt(R, 0) : R >= 10 ? fmt(R, 1) : fmt(R, 2);
+const kOhmIn = R => (Math.abs(R - Math.round(R)) < 1e-9 ? String(Math.round(R)) : fmt(R, 1));
+
+// ---------- vandbad ----------
+function drawBath(x, y, w, h, T, bands){
+  const aq = step === 4;                       // akvariet i trin 4 står ikke på en varmeplade
+  const heat = aq ? 0.2 : clamp(T/90, 0, 1);
+  const bw = Math.min(w*0.78, 190), bh = Math.min(h - 78, 106);
+  const cx = x + w/2, bx = cx - bw/2, by = y + 34;
+  if (!aq){
+    ctx.fillStyle = "#2a2a2a"; ctx.fillRect(cx - bw*0.62, by + bh + 4, bw*1.24, 14);
+    ctx.fillStyle = mix(hex("#3a3a3a"), hex("#FC6255"), clamp(T/90, 0, 1)); ctx.fillRect(cx - bw*0.52, by + bh + 4, bw*1.04, 5);
+  }
+  ctx.fillStyle = mix(hex("#1E4E7A"), hex("#8A3A2A"), heat);
+  ctx.globalAlpha = 0.75; ctx.fillRect(bx + 2, by + bh*0.22, bw - 4, bh*0.78 - 2); ctx.globalAlpha = 1;
+  if (T > 60){
+    ctx.fillStyle = "rgba(255,255,255,0.35)";
+    const tt = performance.now()/1000;
+    for (let i = 0; i < 8; i++){
+      const px = bx + 10 + ((i*37) % (bw - 20)), py = by + bh - ((tt*30 + i*23) % (bh*0.7));
+      ctx.beginPath(); ctx.arc(px, py, 2 + (i % 3), 0, 2*Math.PI); ctx.fill();
+    }
+  }
+  if (aq) drawAquariumLife(bx, by, bw, bh);
+  ctx.strokeStyle = "#CFCFCF"; ctx.lineWidth = 2.2;
+  if (aq) ctx.strokeRect(bx, by, bw, bh);
+  else { ctx.beginPath(); ctx.moveTo(bx - 4, by); ctx.lineTo(bx, by + 4); ctx.lineTo(bx, by + bh); ctx.lineTo(bx + bw, by + bh); ctx.lineTo(bx + bw, by + 4); ctx.lineTo(bx + bw + 4, by); ctx.stroke(); }
+  bands.forEach((b, i) => {
+    const px = bx + bw*(bands.length === 1 ? (aq ? 0.22 : 0.5) : 0.25 + 0.25*i);
+    ctx.strokeStyle = "#999"; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(px, by - 14); ctx.lineTo(px, by + bh*0.8); ctx.stroke();
+    ctx.fillStyle = COL[b.key]; ctx.beginPath(); ctx.ellipse(px, by + bh*0.82, 4, 7, 0, 0, 2*Math.PI); ctx.fill();
+    const lab = b.short !== undefined ? b.short : (b.key === "D" ? "din" : b.key);
+    if (lab) rich(ctx, [[lab, false]], px, by - 19, "center", 14, COL[b.key]);
+  });
+  const shown = aq && !st[4].done;
+  rich(ctx, [["T", true], [shown ? " = ?" : ` = ${fmt(T, 1)} °C`, false]], cx, y + h - 6, "center", narrow ? 19 : 22, shown ? COL.dim : COL.fg);
+}
+// Planter, bund og en enkelt fisk, så akvariet ikke ligner et vandbad.
+function drawAquariumLife(bx, by, bw, bh){
+  const gy = by + bh - 8;
+  ctx.fillStyle = "#3b3226"; ctx.fillRect(bx + 2, gy, bw - 4, 6);
+  ctx.strokeStyle = "#4E8A4E"; ctx.lineWidth = 2.4; ctx.lineCap = "round";
+  for (const [fx, fh, bend] of [[0.62, 0.45, 8], [0.70, 0.60, -7], [0.78, 0.38, 6]]){
+    const px = bx + bw*fx;
+    ctx.beginPath(); ctx.moveTo(px, gy);
+    ctx.quadraticCurveTo(px + bend, gy - bh*fh*0.6, px + bend*1.6, gy - bh*fh); ctx.stroke();
+  }
+  const t = performance.now()/1000;
+  const fx = bx + bw*(0.42 + 0.14*Math.sin(t*0.5)), fy = by + bh*0.42, s = 9;
+  ctx.fillStyle = "#C9803A";
+  ctx.beginPath(); ctx.ellipse(fx, fy, s, s*0.55, 0, 0, 2*Math.PI); ctx.fill();
+  const dir = Math.cos(t*0.5) >= 0 ? -1 : 1;
+  ctx.beginPath(); ctx.moveTo(fx + dir*s, fy); ctx.lineTo(fx + dir*s*1.7, fy - s*0.5); ctx.lineTo(fx + dir*s*1.7, fy + s*0.5); ctx.closePath(); ctx.fill();
+}
+
+// ---------- kredsløb ----------
+function drawCircuit(ctx, x, y, w, h, bands, nar){
+  const narrow = nar;
+  const fs = narrow ? 14 : 16;
+  const span = 300, off = Math.max(0, (w - span)/2);
+  const xb = x + off + 72, xn = xb + 92, xo = xn + 70;
+  const yT = y + 26, yB = y + h - 22, yM = (yT + yB)/2;
+  ctx.strokeStyle = COL.fg; ctx.lineWidth = 2; ctx.lineCap = "round"; ctx.lineJoin = "round";
+  ctx.beginPath();
+  ctx.moveTo(xb, yM - 8); ctx.lineTo(xb, yT); ctx.lineTo(xn, yT); ctx.lineTo(xn, yB); ctx.lineTo(xb, yB); ctx.lineTo(xb, yM + 8);
+  ctx.moveTo(xn, yM); ctx.lineTo(xo, yM); ctx.moveTo(xn, yB); ctx.lineTo(xo, yB);
+  ctx.stroke();
+  ctx.fillStyle = COL.fg;
+  for (const [px, py] of [[xn, yM], [xn, yB]]){ ctx.beginPath(); ctx.arc(px, py, 3.5, 0, 2*Math.PI); ctx.fill(); }
+  // batteri
+  ctx.fillStyle = "#000"; ctx.fillRect(xb - 18, yM - 8, 36, 16);
+  ctx.lineCap = "butt";
+  ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(xb - 15, yM - 5); ctx.lineTo(xb + 15, yM - 5); ctx.stroke();
+  ctx.lineWidth = 5; ctx.beginPath(); ctx.moveTo(xb - 7, yM + 5); ctx.lineTo(xb + 7, yM + 5); ctx.stroke();
+  ctx.lineCap = "round";
+  rich(ctx, [["U", true], [" = 5,0 V", false]], xb - 20, yM + 5, "right", fs, COL.fg);
+  // resistorer
+  const segT = (yT + yM)/2, segB = (yM + yB)/2, rh = Math.min(30, (yM - yT)*0.55), rw = 11;
+  ctx.lineWidth = 2;
+  for (const cy of [segT, segB]){
+    ctx.fillStyle = "#000"; ctx.fillRect(xn - rw/2, cy - rh/2, rw, rh);
+    ctx.strokeStyle = COL.fg; ctx.strokeRect(xn - rw/2, cy - rh/2, rw, rh);
+  }
+  // NTC-symbol: skrå streg med knæk
+  ctx.beginPath(); ctx.moveTo(xn - 13, segB + rh/2 + 4); ctx.lineTo(xn - 13 + 6, segB + rh/2 + 4); ctx.lineTo(xn + 13, segB - rh/2 - 4); ctx.stroke();
+  rich(ctx, [["−t°", false]], xn - 16, segB + rh/2 + 4, "right", fs - 3, COL.dim);
+  const rLab = bands.length === 1 ? (bands[0].known ? ` = ${kOhmIn(bands[0].R)} kΩ` : " = ?") : "";
+  if (bands.length > 1){
+    const lh = fs + 1, y0 = segT - lh - 2;
+    rich(ctx, [["R", true], [":", false]], xn + 14, y0, "left", fs, COL.fg);
+    [["A", "2 kΩ"], ["B", "20 kΩ"], ["C", "200 kΩ"]].forEach(([k, v], i) => {
+      rich(ctx, [[`${k}: ${v}`, false]], xn + 14, y0 + (i + 1)*lh, "left", fs - 2, COL[k]);
+    });
+  } else rich(ctx, [["R", true], [rLab, false]], xn + 14, segT + 5, "left", fs, COL.fg);
+  rich(ctx, [["R", true], ["NTC", false, true]], xn + 14, segB + 5, "left", fs, COL.fg);
+  // voltmeter over NTC
+  const vx = xo, vy = (yM + yB)/2, vr = 12;
+  ctx.strokeStyle = COL.fg; ctx.lineWidth = 2;
+  ctx.fillStyle = "#000"; ctx.beginPath(); ctx.moveTo(vx, yM); ctx.lineTo(vx, vy - vr); ctx.moveTo(vx, vy + vr); ctx.lineTo(vx, yB); ctx.stroke();
+  ctx.beginPath(); ctx.arc(vx, vy, vr, 0, 2*Math.PI); ctx.fill(); ctx.stroke();
+  ctx.fillStyle = COL.fg; ctx.font = `${fs}px ${SERIF}`; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText("V", vx, vy + 1);
+  rich(ctx, [["U", true], ["NTC", false, true]], vx + vr + 8, vy + 5, "left", fs, COL.fg);
+}
+
+// ---------- analoge voltmetre ----------
+function drawMeter(cx, cy, r, b, T){
+  const known = b.known !== undefined ? b.known : true;
+  const U = Untc(b.R, T), S = Sens(b.R, T), col = COL[b.key];
+  const a0 = Math.PI*1.1, a1 = Math.PI*1.9;
+  ctx.strokeStyle = "#555"; ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.arc(cx, cy, r, a0, a1); ctx.stroke();
+  ctx.fillStyle = COL.dim; ctx.font = `${Math.round(r*0.2)}px ${SERIF}`; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+  for (let v = 0; v <= 5; v += 0.5){
+    const a = a0 + (a1 - a0)*v/5, big = Math.abs(v - Math.round(v)) < 1e-9;
+    ctx.strokeStyle = COL.dim; ctx.lineWidth = big ? 1.6 : 1;
+    ctx.beginPath(); ctx.moveTo(cx + Math.cos(a)*r, cy + Math.sin(a)*r); ctx.lineTo(cx + Math.cos(a)*(r - (big ? 9 : 5)), cy + Math.sin(a)*(r - (big ? 9 : 5))); ctx.stroke();
+    if (big) ctx.fillText(String(v), cx + Math.cos(a)*(r - 20), cy + Math.sin(a)*(r - 20));
+  }
+  const a = a0 + (a1 - a0)*clamp(U/5, 0, 1);
+  if (known){
+    ctx.strokeStyle = col; ctx.lineWidth = 2.6;
+    ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(cx + Math.cos(a)*(r - 4), cy + Math.sin(a)*(r - 4)); ctx.stroke();
+  }
+  ctx.fillStyle = col; ctx.beginPath(); ctx.arc(cx, cy, 4, 0, 2*Math.PI); ctx.fill();
+  const fs = narrow ? 13 : 15;
+  const name = b.name || b.key;
+  rich(ctx, [[name, false], [`:  `, false], ["R", true], [known ? ` = ${kOhmIn(b.R)} kΩ` : " = ?", false]], cx, cy + 22, "center", fs, col);
+  rich(ctx, [["U", true], ["NTC", false, true], [known ? ` = ${fmt(U, b.dec || 3)} V` : " = –", false]], cx, cy + 22 + fs + 5, "center", fs, COL.fg);
+  const vis = known && (st[step].running || st[step].done);
+  rich(ctx, [[vis ? `${fmt(S, 1)} mV pr. °C` : "", false]], cx, cy + 22 + 2*(fs + 5), "center", fs, COL.fg);
+}
+
+function drawScene(){
+  ctx.clearRect(0, 0, W, H);
+  const S = st[step], bands = bandsOf(step), n = bands.length;
+  if (narrow){
+    const mw = W/n, r = Math.min(mw*0.4, 52);
+    bands.forEach((b, i) => drawMeter(mw*(i + 0.5), 14 + r, r, b, S.T));
+    drawBath(0, 178, W, 170, S.T, bands);
+  } else {
+    const bathW = Math.min(280, W*0.28), mArea = W - bathW - 10;
+    const mw = mArea/n, r = Math.min(mw*0.36, 66);
+    bands.forEach((b, i) => drawMeter(mw*(i + 0.5), 16 + r, r, b, S.T));
+    drawBath(mArea + 10, 0, bathW, H, S.T, bands);
+  }
+}
+
+// ---------- graf ----------
+let mark = null, gGeom = null;
+const AX = {
+  R: { max: 110, step: 10, parts: [["R", true], ["NTC", false, true], [" / kΩ", false]], f: (b, T) => Rntc(T), dec: 1, unit: "kΩ", lab: [["R", true], ["NTC", false, true]] },
+  U: { max: 5, step: 1, parts: [["U", true], ["NTC", false, true], [" / V", false]], f: (b, T) => Untc(b.R, T), dec: 2, unit: "V", lab: [["U", true], ["NTC", false, true]] },
+  S: { max: 70, step: 10, parts: [["Følsomhed / (mV pr. °C)", false]], f: (b, T) => Sens(b.R, T), dec: 1, unit: "mV pr. °C", lab: [["følsomhed", false]] }
+};
+// Grafer med den faste resistor R ud ad en logaritmisk akse (1 kΩ til 1000 kΩ).
+const RMIN = 1, RMAX = 1000;
+function graphT0(){ return step === 2 ? 80 : step === 3 ? 5 : step === 4 ? T4 : 37; }
+function drawRGraph(c, Wg, Hg, o){
+  // o: { mode:"UR"|"SR", T0, values:bool, mark, setGeom:bool }
+  const nar = Wg < 560;
+  const mL = nar ? 48 : 64, mR = 16, mT = 38, mB = nar ? 78 : 64;
+  const pw = Wg - mL - mR, ph = Hg - mT - mB;
+  const T0 = o.T0, DT = 5, isU = o.mode === "UR", yMax = isU ? 5 : 70, yStep = isU ? 1 : 10;
+  const dec = Math.log10(RMAX/RMIN);
+  const X = R => mL + pw*Math.log10(R/RMIN)/dec, Y = v => mT + ph*(1 - v/yMax);
+  if (o.setGeom) gGeom = { mL, mT, pw, ph, log: true, dec, yMax };
+  c.lineWidth = 1; c.font = `15px ${SERIF}`; c.fillStyle = COL.fg;
+  for (let d = RMIN; d < RMAX; d *= 10) for (let k = 1; k <= 9; k++){
+    const R2 = d*k; c.strokeStyle = k === 1 ? "#3a3a3a" : "#1c1c1c";
+    c.beginPath(); c.moveTo(X(R2), mT); c.lineTo(X(R2), mT + ph); c.stroke();
+  }
+  c.strokeStyle = "#3a3a3a"; c.beginPath(); c.moveTo(X(RMAX), mT); c.lineTo(X(RMAX), mT + ph); c.stroke();
+  c.textAlign = "center"; c.textBaseline = "top";
+  for (const R2 of [1, 10, 100, 1000]) c.fillText(String(R2), X(R2), mT + ph + 7);
+  c.textAlign = "right"; c.textBaseline = "middle"; c.strokeStyle = "#262626";
+  for (let v = 0; v <= yMax + 1e-9; v += yStep){ c.beginPath(); c.moveTo(mL, Y(v)); c.lineTo(mL + pw, Y(v)); c.stroke(); c.fillText(String(v), mL - 8, Y(v)); }
+  c.strokeStyle = COL.fg; c.lineWidth = 1.8;
+  c.beginPath(); c.moveTo(mL, mT); c.lineTo(mL, mT + ph); c.lineTo(mL + pw, mT + ph); c.stroke();
+  rich(c, [["R", true], [" / kΩ", false]], mL + pw, mT + ph + 40, "right", 17, COL.fg);
+  rich(c, [["Logaritmisk akse: hvert tal er 10 gange større end det forrige.", false]], nar ? 4 : mL, mT + ph + (nar ? 62 : 40), "left", nar ? 12 : 14, COL.dim);
+  rich(c, isU ? [["U", true], ["NTC", false, true], [" / V", false]] : [["Følsomhed / (mV pr. °C)", false]], mL - 8, mT - 14, "left", 17, COL.fg);
+
+  const N = 300, xs = [];
+  for (let i = 0; i <= N; i++) xs.push(RMIN*Math.pow(10, dec*i/N));
+  c.save(); c.beginPath(); c.rect(mL, mT - 2, pw, ph + 4); c.clip();
+  if (isU){
+    c.fillStyle = "rgba(238,238,238,0.16)"; c.beginPath();
+    xs.forEach((R2, i) => { const px = X(R2), py = Y(Untc(R2, T0 - DT)); i ? c.lineTo(px, py) : c.moveTo(px, py); });
+    for (let i = N; i >= 0; i--) c.lineTo(X(xs[i]), Y(Untc(xs[i], T0 + DT)));
+    c.closePath(); c.fill();
+    for (const [dT, col] of [[-DT, COL.fg], [DT, COL.red]]){
+      c.strokeStyle = col; c.lineWidth = 2.4; c.beginPath();
+      xs.forEach((R2, i) => { const px = X(R2), py = Y(Untc(R2, T0 + dT)); i ? c.lineTo(px, py) : c.moveTo(px, py); });
+      c.stroke();
+    }
+  } else {
+    c.strokeStyle = COL.S; c.lineWidth = 2.4; c.beginPath();
+    xs.forEach((R2, i) => { const px = X(R2), py = Y(Sens(R2, T0)); i ? c.lineTo(px, py) : c.moveTo(px, py); });
+    c.stroke();
+  }
+  const Rn = Rntc(T0);
+  if (o.values){
+    c.setLineDash([3, 5]); c.strokeStyle = COL.dim; c.lineWidth = 1.2;
+    c.beginPath(); c.moveTo(X(Rn), mT); c.lineTo(X(Rn), mT + ph); c.stroke(); c.setLineDash([]);
+  }
+  const pts = (o.bands || TRIO).filter(b => b.known !== false);
+  for (const b of pts){
+    const px = X(b.R);
+    c.strokeStyle = COL[b.key]; c.lineWidth = 2.4;
+    if (isU){
+      const y1 = Y(Untc(b.R, T0 - DT)), y2 = Y(Untc(b.R, T0 + DT));
+      c.beginPath(); c.moveTo(px, y1); c.lineTo(px, y2); c.stroke();
+      c.fillStyle = COL[b.key];
+      c.beginPath(); c.arc(px, y1, 3.8, 0, 2*Math.PI); c.fill();
+      c.beginPath(); c.arc(px, y2, 3.8, 0, 2*Math.PI); c.fill();
+    } else {
+      c.fillStyle = COL[b.key]; c.beginPath(); c.arc(px, Y(Sens(b.R, T0)), 5, 0, 2*Math.PI); c.fill();
+    }
+  }
+  const m = o.mark;
+  if (m){
+    const px = X(m.x), py = Y(m.v);
+    c.setLineDash([4, 4]); c.strokeStyle = COL.S; c.lineWidth = 1.4;
+    c.beginPath(); c.moveTo(px, mT + ph); c.lineTo(px, py); c.lineTo(mL, py); c.stroke(); c.setLineDash([]);
+    c.fillStyle = COL.S; c.beginPath(); c.arc(px, py, 4.5, 0, 2*Math.PI); c.fill();
+  }
+  c.restore();
+  const fs = nar ? 13 : 15;
+  for (const b of pts){
+    const px = X(b.R), sv = Sens(b.R, T0), lbl = b.glab || b.key;
+    if (isU){
+      const y1 = Y(Untc(b.R, T0 - DT)), y2 = Y(Untc(b.R, T0 + DT)), ym = (y1 + y2)/2;
+      const txt = o.values ? `${lbl}: ${fmt(Untc(b.R, T0 - DT) - Untc(b.R, T0 + DT), 2)} V` : lbl;
+      rich(c, [[txt, false]], px + 9, b.key === "A" ? ym + 24 : ym + 5, "left", fs, COL[b.key], true);
+    } else rich(c, [[`${lbl}: ${fmt(sv, 1)} mV`, false]], px, Y(sv) - 12, "center", fs, COL[b.key], true);
+  }
+  if (o.values)
+    rich(c, [["R", true], [" = ", false], ["R", true], ["NTC", false, true], [` = ${fmt(Rn, 1)} kΩ`, false]],
+      isU && nar ? X(Rn) - 6 : X(Rn) + 6, isU ? mT + ph - 8 : mT + 14, isU && nar ? "right" : "left", fs, COL.dim, true);
+  if (isU){
+    const lx = mL + pw - (nar ? 150 : 210), ly = mT + 16;
+    c.strokeStyle = COL.fg; c.lineWidth = 2.4; c.beginPath(); c.moveTo(lx, ly - 5); c.lineTo(lx + 22, ly - 5); c.stroke();
+    rich(c, [[`${T0 - DT} °C`, false]], lx + 28, ly, "left", fs, COL.fg, true);
+    c.strokeStyle = COL.red; c.beginPath(); c.moveTo(lx, ly + 15); c.lineTo(lx + 22, ly + 15); c.stroke();
+    rich(c, [[`${T0 + DT} °C`, false]], lx + 28, ly + 20, "left", fs, COL.red, true);
+  }
+  if (m){
+    const px = X(m.x), py = Y(m.v), right = px > mL + pw*0.6;
+    const parts = [["R", true], [` = ${m.x >= 100 ? fmt(m.x, 0) : fmt(m.x, 1)} kΩ,  `, false],
+      ...(isU ? [["U", true], ["NTC", false, true], [` = ${fmt(m.v, 2)} V`, false]] : [[`følsomhed = ${fmt(m.v, 1)} mV pr. °C`, false]])];
+    rich(c, parts, right ? px - 10 : px + 10, py < mT + 40 ? py + 26 : py - 12, right ? "right" : "left", 16, COL.S, true);
+  }
+}
+function drawGraphR(){
+  gtx.clearRect(0, 0, GW, GH);
+  drawRGraph(gtx, GW, GH, { mode: graphMode, T0: graphT0(), values: true, bands: step >= 3 ? bandsOf(step) : null,
+    mark: (mark && mark.mode === graphMode) ? mark : null, setGeom: true });
+}
+function drawStepGraph(){
+  const bands = bandsOf(step), sgNarrow = SGW < 700;
+  sgx.clearRect(0, 0, SGW, SGH);
+  if (step >= 3){
+    drawCircuit(sgx, 0, 0, SGW, SGH, bands, SGW < 640);
+    return;
+  }
+  if (sgNarrow){
+    drawRGraph(sgx, SGW, 290, { mode: "UR", T0: STEPS[step].T0, values: st[step].done, mark: null, setGeom: false });
+    drawCircuit(sgx, 0, 292, SGW, 198, bands, SGW < 640);
+  } else {
+    const gw = Math.round(SGW*0.66);
+    drawRGraph(sgx, gw, SGH, { mode: "UR", T0: STEPS[step].T0, values: st[step].done, mark: null, setGeom: false });
+    drawCircuit(sgx, gw + 8, 4, SGW - gw - 8, SGH - 8, bands, SGW - gw < 340);
+  }
+}
+function drawGraph(){
+  if (graphMode === "SR") return drawGraphR();
+  const c = gtx, Wg = GW, Hg = GH, nar = Wg < 560;
+  const mL = nar ? 48 : 64, mR = 16, mT = 38, mB = 52;
+  const pw = Wg - mL - mR, ph = Hg - mT - mB;
+  const TMAX = 90, ax = AX[graphMode], yMax = ax.max;
+  const X = T => mL + pw*T/TMAX, Y = v => mT + ph*(1 - v/yMax);
+  gGeom = { mL, mT, pw, ph, TMAX, yMax };
+  c.clearRect(0, 0, Wg, Hg);
+  c.lineWidth = 1; c.strokeStyle = "#262626"; c.font = `15px ${SERIF}`; c.fillStyle = COL.fg;
+  c.textAlign = "center"; c.textBaseline = "top";
+  for (let T = 0; T <= TMAX; T += 10){ c.beginPath(); c.moveTo(X(T), mT); c.lineTo(X(T), mT + ph); c.stroke(); c.fillText(String(T), X(T), mT + ph + 7); }
+  c.textAlign = "right"; c.textBaseline = "middle";
+  for (let v = 0; v <= yMax + 1e-9; v += ax.step){ c.beginPath(); c.moveTo(mL, Y(v)); c.lineTo(mL + pw, Y(v)); c.stroke(); c.fillText(String(v), mL - 8, Y(v)); }
+  c.strokeStyle = COL.fg; c.lineWidth = 1.8;
+  c.beginPath(); c.moveTo(mL, mT); c.lineTo(mL, mT + ph); c.lineTo(mL + pw, mT + ph); c.stroke();
+  rich(c, [["T", true], [" / °C", false]], mL + pw, mT + ph + 42, "right", 17, COL.fg);
+  rich(c, ax.parts, mL - 8, mT - 14, "left", 17, COL.fg);
+
+  const S = st[step], bands = graphMode === "R" ? [{ key: "fg", R: 0 }] : bandsOf(step);
+  c.save(); c.beginPath(); c.rect(mL, mT - 2, pw, ph + 4); c.clip();
+  for (const b of bands){
+    c.strokeStyle = b.key === "fg" ? COL.fg : COL[b.key]; c.lineWidth = 2.4; c.beginPath();
+    for (let i = 0; i <= 360; i++){
+      const T = TMAX*i/360, v = ax.f(b, T);
+      i ? c.lineTo(X(T), Y(v)) : c.moveTo(X(T), Y(v));
+    }
+    c.stroke();
+  }
+  // markør for vandets temperatur
+  if (S.running || S.done || S.T > STEPS[step].from){
+    for (const b of bands){
+      const v = ax.f(b, S.T);
+      c.fillStyle = b.key === "fg" ? COL.fg : COL[b.key];
+      c.beginPath(); c.arc(X(S.T), Y(v), 5, 0, 2*Math.PI); c.fill();
+    }
+  }
+  // aflæsning fra klik
+  if (mark && mark.mode === graphMode){
+    const px = X(mark.T), py = Y(mark.v);
+    c.setLineDash([4, 4]); c.strokeStyle = COL.S; c.lineWidth = 1.4;
+    c.beginPath(); c.moveTo(px, mT + ph); c.lineTo(px, py); c.lineTo(mL, py); c.stroke(); c.setLineDash([]);
+    c.fillStyle = COL.S; c.beginPath(); c.arc(px, py, 4.5, 0, 2*Math.PI); c.fill();
+  }
+  c.restore();
+  if (mark && mark.mode === graphMode){
+    const px = X(mark.T), py = Y(mark.v), right = px > mL + pw*0.6;
+    const parts = [["T", true], [` = ${fmt(mark.T, 1)} °C,  `, false], ...ax.lab, [` = ${fmt(mark.v, ax.dec)} ${ax.unit}`, false]];
+    rich(c, parts, right ? px - 10 : px + 10, py < mT + 40 ? py + 26 : py - 12, right ? "right" : "left", 16, COL.S, true);
+  }
+}
+gv.addEventListener("pointerdown", e => {
+  if (!gGeom) return;
+  const r = gv.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top;
+  const { mL, mT, pw, ph, TMAX, yMax } = gGeom;
+  if (x < mL || x > mL + pw || y < mT || y > mT + ph){ mark = null; return; }
+  if (gGeom.log) mark = { mode: graphMode, x: RMIN*Math.pow(10, gGeom.dec*(x - mL)/pw), v: (1 - (y - mT)/ph)*yMax };
+  else mark = { mode: graphMode, T: (x - mL)/pw*TMAX, v: (1 - (y - mT)/ph)*yMax };
+});
+function setGhint(){ document.getElementById("ghint").innerHTML = "Klik på grafen for at aflæse et punkt."; }
+togs.forEach(t => t.addEventListener("click", () => { graphMode = t.dataset.g; togs.forEach(u => u.classList.toggle("on", u === t)); setGhint(); }));
+document.getElementById("togr").addEventListener("click", e => {
+  e.preventDefault();
+  graphMode = "R"; togs.forEach(u => u.classList.toggle("on", u.dataset.g === "R"));
+  document.getElementById("grafrow").scrollIntoView({ behavior: "smooth", block: "start" });
+});
+
+// ---------- styring ----------
+function stepGraphCaption(){
+  const T0 = STEPS[step].T0;
+  return step >= 3 ? "" :
+    `Grafen viser voltmeterets visning med forskellige faste resistorer <i class="sym">R</i>: den <b>hvide</b> kurve ved ${T0 - 5} °C og den <b style="color:var(--red)">røde</b> ved ${T0 + 5} °C. Den lodrette afstand mellem kurverne er, hvor meget visningen ændrer sig, når temperaturen stiger fra ${T0 - 5} °C til ${T0 + 5} °C. Stregerne viser A, B og C.`;
+}
+function renderStep(){
+  const S = st[step];
+  document.getElementById("steptext").innerHTML = STEPS[step].text;
+  document.getElementById("grafcap").innerHTML = stepGraphCaption();
+  document.getElementById("task").hidden = step !== 3;
+  document.getElementById("task4").hidden = step !== 4;
+  solBody.hidden = true; solShown = null;
+  document.getElementById("sol").textContent = "Vis løsning";
+  document.getElementById("sol4").textContent = "Vis løsning";
+  qEl.innerHTML = STEPS[step].q;
+  document.getElementById("qrow").style.display = STEPS[step].q ? "" : "none";
+  predsEl.style.display = STEPS[step].q ? "" : "none";
+  predsEl.innerHTML = STEPS[step].opts.map(([k, t]) => `<button class="pred" data-p="${k}">${t}</button>`).join("");
+  predsEl.querySelectorAll("button.pred").forEach(b => b.addEventListener("click", () => { st[step].pred = b.dataset.p; updateUI(); }));
+  resultEl.innerHTML = S.verdict || "";
+  if (typeof setGhint === "function") setGhint();
+  layout(); updateUI();
+}
+function updateUI(){
+  const S = st[step];
+  stepBtns.forEach(b => { const s = +b.dataset.s; b.disabled = s > unlocked; b.classList.toggle("on", s === step); });
+  predsEl.querySelectorAll("button.pred").forEach(b => { b.disabled = S.running || S.done; b.classList.toggle("sel", S.pred === b.dataset.p); });
+  btnStart.disabled = !S.pred;
+  // I opgavetrinnene hedder knappen altid det samme som i opgaveteksten, så eleven kan finde den.
+  const first = step === 4 ? "▶ Mål temperaturen" : step === 3 ? "▶ Test dit termometer" : "▶ Start opvarmningen";
+  btnStart.textContent = S.running ? "❚❚ Pause"
+    : step >= 3 ? first
+    : (S.done ? "▶ Kør igen" : S.T > STEPS[step].from ? "▶ Fortsæt" : first);
+  hint.textContent = S.pred ? "" : (step === 4 ? "Skriv først din temperatur i b." : step === 3 ? "Skriv først din værdi af R i b." : "Vælg din forudsigelse først.");
+  btnWhy.disabled = !st[1].done;
+  document.getElementById("sol").hidden = !st[3].done;
+  document.getElementById("sol4").hidden = !st[4].done;
+  // Kun de grafer, der hører til trinnet, er fremme. Den graf, der ville røbe svaret,
+  // dukker først op, når svaret er afsløret.
+  const ok = allowedGraphs();
+  togs.forEach(t => t.hidden = !ok.includes(t.dataset.g));
+  if (!ok.includes(graphMode)){
+    graphMode = "R"; togs.forEach(u => u.classList.toggle("on", u.dataset.g === "R")); mark = null;
+  }
+}
+function allowedGraphs(){
+  if (step === 3) return st[3].done ? ["R", "SR"] : ["R"];
+  if (step === 4) return st[4].done ? ["R", "U"] : ["R"];
+  return st[step].done ? ["R", "U", "S", "SR"] : ["R", "U"];
+}
+function resetRun(s){ const S = st[s]; S.T = STEPS[s].from; S.running = false; S.done = false; }
+
+function finish(){
+  const S = st[step], T0 = STEPS[step].T0;
+  S.done = true; S.running = false;
+  let txt;
+  if (step < 3){
+    const sens = TRIO.map(b => [b.key, Sens(b.R, T0)]).sort((p, q) => q[1] - p[1]);
+    const [w, sw] = sens[0];
+    txt = `Termometer <span class="c${w}"><b>${w}</b></span> er mest følsomt ved ${T0} °C: Fra ${T0} °C til ${T0 + 1} °C ændrede spændingen sig ${fmt(sw, 1)} mV. ` +
+          sens.slice(1).map(([k, v]) => `<span class="c${k}">${k}</span>: ${fmt(v, 1)} mV`).join(", ") + ". " +
+          `NTC-resistorens resistans var ${fmt(Rntc(T0), 1)} kΩ. ` +
+          `Du forudsagde ${S.pred === "L" ? "lige følsomme" : S.pred}.`;
+  } else if (step === 3){
+    const R = RT, U5 = Untc(R, 5), s5 = Sens(R, 5), best = Sens(Rntc(5), 5);
+    txt = `Med <i class="sym">R</i> = ${kOhmIn(R)} kΩ viste voltmeteret ${fmt(U5, 2)} V ved 5 °C, og fra 5 °C til 6 °C faldt spændingen ${fmt(s5, 1)} mV. ` +
+          `Det mest følsomme termometer ved 5 °C giver ${fmt(best, 1)} mV pr. °C. `;
+    const rel = Math.abs(R - R5)/R5;
+    txt += rel <= 0.01 ? `<span style="color:var(--green)">Dit termometer er så følsomt, som det kan blive.</span>`
+         : s5 >= 0.98*best ? `<span style="color:var(--green)">Dit termometer er næsten så følsomt, som det kan blive.</span> Reglen giver <i class="sym">R</i> = ${fmt(R5, 1)} kΩ, men toppen på følsomhedskurven er flad, så en lille afvigelse betyder næsten ingenting.`
+         : `Dit termometer kan gøres mere følsomt. Skal <i class="sym">R</i> være større eller mindre?`;
+    document.getElementById("sol").hidden = false;
+  } else if (step === 4){
+    const g = num(qbIn.value), rn = Rntc(T4);
+    txt = `Vandet i akvariet er ${fmt(T4, 1)} °C, og NTC-resistoren har resistansen ${fmt(RA4, 1)} kΩ. `;
+    txt += isFinite(g)
+      ? (Math.abs(g - T4) <= 2 ? `<span style="color:var(--green)">Du fandt ${fmt(g, 1)} °C. Flot ramt.</span> `
+                               : `Du fandt ${fmt(g, 1)} °C. Prøv at aflæse grafen igen. `)
+      : "";
+    txt += `Læg mærke til, at termometeret ikke er det mest følsomme ved ${T4} °C: Med <i class="sym">R</i> = ${R4} kΩ ændrer spændingen sig ${fmt(Sens(R4, T4), 1)} mV pr. °C, mens en fast resistor på ${fmt(rn, 0)} kΩ ville give ${fmt(Sens(rn, T4), 1)} mV pr. °C. Det kan stadig sagtens måle temperaturen — det gør det bare med lidt mindre præcision.`;
+    document.getElementById("sol4").hidden = false;
+  }
+  S.verdict = txt; resultEl.innerHTML = txt;
+  if (unlocked < 4 && step === unlocked) unlocked = step + 1;
+  updateUI();
+  requestAnimationFrame(() => resultEl.scrollIntoView({ behavior: "smooth", block: "end" }));
+}
+
+btnStart.addEventListener("click", () => {
+  const S = st[step];
+  if (!S.pred) return;
+  if (S.done) resetRun(step);
+  S.running = !S.running;
+  if (S.running) cv.scrollIntoView({ behavior: "smooth", block: "end" });
+  updateUI();
+});
+document.getElementById("reset").addEventListener("click", () => {
+  resetRun(step); st[step].pred = predOf(step); st[step].verdict = ""; resultEl.innerHTML = "";
+  if (step === 4) document.getElementById("sol4").hidden = true;
+  solBody.hidden = true; updateUI();
+});
+stepBtns.forEach(b => b.addEventListener("click", () => {
+  const s = +b.dataset.s; if (s > unlocked) return;
+  st[step].running = false; step = s; renderStep();
+}));
+document.getElementById("tempo").addEventListener("change", e => { tempo = parseFloat(e.target.value); });
+
+// ---------- opgave ----------
+const R5 = Rntc(5);
+const num = v => parseFloat(String(v).replace(",", ".").trim());
+const taIn = document.getElementById("ta"), tbIn = document.getElementById("tb"), tcIn = document.getElementById("tc");
+const fa = document.getElementById("fa"), fbb = document.getElementById("fbb"), fc = document.getElementById("fc");
+// Hvert tjek skal ses, også når teksten er den samme som sidst: feltet blinker kort.
+function say(el, ok, html){
+  el.className = "fb" + (ok ? " ok" : "");
+  el.innerHTML = html;
+  void el.offsetWidth;
+  el.classList.add("flash");
+}
+const vNum = (v, u) => `${String(v).replace(".", ",").trim()} ${u}`;
+const aOk = a => isFinite(a) && Math.abs(a - R5) <= 5;
+function checkA(){
+  const a = num(taIn.value);
+  if (!isFinite(a)) return say(fa, false, "Skriv et tal, fx 45.");
+  if (aOk(a)) say(fa, true, `Godt aflæst. Kurven giver ${fmt(R5, 1)} kΩ ved 5 °C.`);
+  else if (Math.abs(a - R5) <= 15) say(fa, false, `${vNum(taIn.value, "kΩ")} er tæt på. Gå lodret op fra 5 °C og vandret ud til R-aksen.`);
+  else say(fa, false, `${vNum(taIn.value, "kΩ")} passer ikke. Brug grafen for R<sub>NTC</sub>, og aflæs ved 5 °C.`);
+}
+function checkB(){
+  const b = num(tbIn.value), a = num(taIn.value);
+  if (!isFinite(b)) return say(fbb, false, "Skriv et tal, fx 45.");
+  const ref = aOk(a) ? a : R5;                       // elevens egen aflæsning tæller
+  if (Math.abs(b - ref)/ref <= 0.012)
+    say(fbb, true, "Rigtigt: den faste resistor skal have samme resistans som NTC-resistoren ved 5 °C.");
+  else if (Math.abs(b - ref)/ref <= 0.12)
+    say(fbb, false, `${kOhmIn(b)} kΩ er tæt på, men reglen er, at <i class="sym">R</i> skal være <b>lig</b> R<sub>NTC</sub> ved 5 °C, altså ${fmt(ref, 1)} kΩ.`);
+  else if (b < ref) say(fbb, false, `${kOhmIn(b)} kΩ er for lille. Hvilken sammenhæng fandt du i trin 1 og 2?`);
+  else say(fbb, false, `${kOhmIn(b)} kΩ er for stor. Hvilken sammenhæng fandt du i trin 1 og 2?`);
+}
+function checkC(){
+  const c = num(tcIn.value), b = num(tbIn.value), a = num(taIn.value);
+  if (!isFinite(b)) return say(fc, false, "Skriv først din værdi af R i b.");
+  if (!isFinite(c)) return say(fc, false, "Skriv et tal, fx 1,23.");
+  const exact = R5/(b + R5)*U0, own = aOk(a) ? a/(b + a)*U0 : NaN;
+  if (Math.abs(c - exact) <= 0.04 || (isFinite(own) && Math.abs(c - own) <= 0.04))
+    say(fc, true, "Rigtigt. Test nu dit termometer i animationen.");
+  else if (Math.abs(c - (U0 - exact)) <= 0.04 || (isFinite(own) && Math.abs(c - (U0 - own)) <= 0.04))
+    say(fc, false, `${vNum(tcIn.value, "V")} er spændingen over den faste resistor. Voltmeteret måler over NTC-resistoren.`);
+  else say(fc, false, `${vNum(tcIn.value, "V")} passer ikke. Prøv igen: U<sub>NTC</sub> = R<sub>NTC</sub> / (R + R<sub>NTC</sub>) · U.`);
+}
+[["ca", checkA, taIn], ["cb", checkB, tbIn], ["cc", checkC, tcIn]].forEach(([id, fn, inp]) => {
+  document.getElementById(id).addEventListener("click", () => { fn(); inp.focus({ preventScroll: true }); });
+  inp.addEventListener("keydown", e => { if (e.key === "Enter"){ e.preventDefault(); fn(); } });
+});
+tbIn.addEventListener("input", () => {
+  const b = num(tbIn.value);
+  RT = isFinite(b) && b >= 0.1 && b <= 1000 ? b : null;
+  resetRun(3); st[3].pred = RT ? "T" : null; st[3].verdict = "";
+  if (step === 3){ resultEl.innerHTML = ""; document.getElementById("sol").hidden = true; solBody.hidden = true; updateUI(); }
+});
+
+// ---------- opgave 4: brug termometeret ----------
+const RN4 = Rntc(T4), UM4 = Math.round(Untc(R4, T4)*100)/100;   // aflæst spænding, 2 decimaler
+const qaIn = document.getElementById("qa"), qbIn = document.getElementById("qb");
+const ga = document.getElementById("ga"), gb = document.getElementById("gb");
+const RA4 = R4*UM4/(U0 - UM4);                                   // facit ud fra den viste spænding
+function checkQA(){
+  const v = num(qaIn.value);
+  if (!isFinite(v)) return say(ga, false, "Skriv et tal, fx 45.");
+  if (Math.abs(v - RA4)/RA4 <= 0.03) say(ga, true, `Rigtigt: R<sub>NTC</sub> = ${fmt(RA4, 1)} kΩ.`);
+  else if (Math.abs(v - R4*(U0 - UM4)/UM4)/RA4 <= 0.05) say(ga, false, `${vNum(qaIn.value, "kΩ")}: du har byttet om. De ${fmt(UM4, 2)} V hører til NTC-resistoren.`);
+  else say(ga, false, `${vNum(qaIn.value, "kΩ")} passer ikke. R<sub>NTC</sub> = R · U<sub>NTC</sub> / (U − U<sub>NTC</sub>).`);
+}
+function checkQB(){
+  const v = num(qbIn.value), r = num(qaIn.value);
+  const ref = isFinite(r) && Math.abs(r - RA4)/RA4 <= 0.05 ? r : RA4;
+  const T = Tof(ref);
+  if (!isFinite(v)) return say(gb, false, "Skriv et tal, fx 20.");
+  if (Math.abs(v - T) <= 2) say(gb, true, "Godt aflæst. Tryk nu på «Mål temperaturen».");
+  else if (Math.abs(v - T) <= 6) say(gb, false, `${vNum(qbIn.value, "°C")} er tæt på. Gå vandret ud fra ${fmt(ref, 1)} kΩ og ned til T-aksen.`);
+  else say(gb, false, `${vNum(qbIn.value, "°C")} passer ikke. Find din værdi af R<sub>NTC</sub> på den lodrette akse.`);
+}
+[["da", checkQA, qaIn], ["db", checkQB, qbIn]].forEach(([id, fn, inp]) => {
+  document.getElementById(id).addEventListener("click", () => { fn(); inp.focus({ preventScroll: true }); });
+  inp.addEventListener("keydown", e => { if (e.key === "Enter"){ e.preventDefault(); fn(); } });
+});
+qbIn.addEventListener("input", () => {
+  resetRun(4); st[4].pred = predOf(4); st[4].verdict = "";
+  if (step === 4){ resultEl.innerHTML = ""; document.getElementById("sol4").hidden = true; solBody.hidden = true; updateUI(); }
+});
+function predOf(s){
+  if (s === 3) return RT ? "T" : null;
+  if (s === 4) return isFinite(num(qbIn.value)) ? "T" : null;
+  return null;
+}
+const SOL4 = String.raw`<p><b>a)</b> Spændingsdelerformlen er $$U_{\text{NTC}} = \frac{R_{\text{NTC}}}{R + R_{\text{NTC}}}\cdot U.$$</p>
+<p>$R_{\text{NTC}}$ isoleres: $$R_{\text{NTC}} = R\cdot\frac{U_{\text{NTC}}}{U - U_{\text{NTC}}} = 15\ \text{k}\Omega\cdot\frac{3{,}44\ \text{V}}{5{,}00\ \text{V} - 3{,}44\ \text{V}} = 33{,}1\ \text{k}\Omega.$$</p>
+<p><b>b)</b> På grafen for $R_{\text{NTC}}$ svarer $33\ \text{k}\Omega$ til ca. $25\ ^\circ\text{C}$.</p>
+<p><b>c)</b> Vandet i akvariet er $25{,}0\ ^\circ\text{C}$. Bemærk, at den faste resistor på $15\ \text{k}\Omega$ ikke er den mest følsomme her — den skulle have været $33\ \text{k}\Omega$. Men termometeret måler stadig temperaturen rigtigt: følsomheden handler om, hvor små temperaturforskelle det kan kende forskel på.</p>`;
+const SOL = String.raw`<p><b>a)</b> Ved $5\ ^\circ\text{C}$ aflæses $R_{\text{NTC}} \approx 85\ \text{k}\Omega$.</p>
+<p><b>b)</b> Termometeret er mest følsomt, når den faste resistor har samme resistans som NTC-resistoren ved den temperatur, man vil måle. Vælg altså $R = 85\ \text{k}\Omega$.</p>
+<p><b>c)</b> Med spændingsdelerformlen er $$U_{\text{NTC}} = \frac{R_{\text{NTC}}}{R + R_{\text{NTC}}}\cdot U = \frac{85\ \text{k}\Omega}{85\ \text{k}\Omega + 85\ \text{k}\Omega}\cdot 5{,}0\ \text{V} = 2{,}5\ \text{V}.$$ Når $R = R_{\text{NTC}}$, deler de to resistorer spændingen ligeligt.</p>
+<p><b>d)</b> Med $R = 85\ \text{k}\Omega$ viser voltmeteret $2{,}5\ \text{V}$ ved $5\ ^\circ\text{C}$, og spændingen falder ca. $63\ \text{mV}$ pr. $^\circ\text{C}$. Det er mere end ved $37\ ^\circ\text{C}$, fordi NTC-resistorens resistans ændrer sig relativt mere pr. grad ved lave temperaturer.</p>`;
+const solBody = document.getElementById("solbody");
+let solShown = null;
+function solToggle(btn, key, tex){
+  if (!solBody.hidden && solShown === key){ solBody.hidden = true; btn.textContent = "Vis løsning"; return; }
+  solBody.innerHTML = tex; solShown = key; solBody.hidden = false;
+  if (window.renderMathInElement) renderMathInElement(solBody, { delimiters: [{left:"$$", right:"$$", display:true}, {left:"$", right:"$", display:false}], throwOnError:false });
+  btn.textContent = "Skjul løsning";
+}
+document.getElementById("sol").addEventListener("click", e => solToggle(e.target, 3, SOL));
+document.getElementById("sol4").addEventListener("click", e => solToggle(e.target, 4, SOL4));
+
+// ---------- forklaring ----------
+const WHY_PARAS = [
+  String.raw`## Spændingsdeleren`,
+  String.raw`NTC-resistoren og den faste resistor $R$ sidder i serie, og voltmeteret måler over NTC-resistoren. Spændingsdelerformlen giver $$U_{\text{NTC}} = \frac{R_{\text{NTC}}}{R + R_{\text{NTC}}}\cdot U.$$ Når temperaturen stiger, falder $R_{\text{NTC}}$, og så falder $U_{\text{NTC}}$ også.`,
+  String.raw`## Følsomheden ved 37 °C`,
+  String.raw`Aflæst på grafen er $R_{\text{NTC}} = 20{,}0\ \text{k}\Omega$ ved $37\ ^\circ\text{C}$ og $R_{\text{NTC}} = 19{,}2\ \text{k}\Omega$ ved $38\ ^\circ\text{C}$. For termometer B med $R = 20\ \text{k}\Omega$ er $$\begin{aligned} U_{37} &= \frac{20{,}0\ \text{k}\Omega}{20\ \text{k}\Omega + 20{,}0\ \text{k}\Omega}\cdot 5{,}0\ \text{V} = 2{,}5000\ \text{V} \\[4pt] U_{38} &= \frac{19{,}2\ \text{k}\Omega}{20\ \text{k}\Omega + 19{,}2\ \text{k}\Omega}\cdot 5{,}0\ \text{V} = 2{,}4495\ \text{V} \end{aligned}$$ Spændingen falder altså $2{,}5000\ \text{V} - 2{,}4495\ \text{V} = 0{,}0505\ \text{V} = 50{,}5\ \text{mV}$, når temperaturen stiger $1\ ^\circ\text{C}$.`,
+  String.raw`Regner man på samme måde for A og C, får man: $$\begin{aligned} \text{A } (R = 2\ \text{k}\Omega)&: \quad 4{,}5455\ \text{V} - 4{,}5285\ \text{V} = 17{,}0\ \text{mV} \\ \text{C } (R = 200\ \text{k}\Omega)&: \quad 0{,}4545\ \text{V} - 0{,}4381\ \text{V} = 16{,}4\ \text{mV} \end{aligned}$$ B er altså omkring tre gange så følsomt som A og C.`,
+  String.raw`## Hvorfor er B bedst?`,
+  String.raw`Se på de to yderpunkter. Hvis $R$ er *meget lille* i forhold til $R_{\text{NTC}}$, ligger næsten hele spændingen over NTC-resistoren, uanset temperaturen. Voltmeteret viser næsten $5\ \text{V}$ hele tiden og ændrer sig kun lidt. Hvis $R$ er *meget stor*, ligger næsten ingen spænding over NTC-resistoren, og voltmeteret viser næsten $0\ \text{V}$ hele tiden. I begge tilfælde er termometeret ufølsomt. Et sted imellem må følsomheden være størst, og det er, når $R = R_{\text{NTC}}$. Så deler de to resistorer spændingen ligeligt, og voltmeteret viser $2{,}5\ \text{V}$.`,
+  String.raw`Det kan ses på grafen for $U_{\text{NTC}}$ som funktion af $R$. Den viser to kurver: en hvid ved $32\ ^\circ\text{C}$ og en rød ved $42\ ^\circ\text{C}$, altså $5\ ^\circ\text{C}$ på hver side af $37\ ^\circ\text{C}$. Afstanden mellem kurverne viser, hvor meget spændingen ændrer sig, når temperaturen stiger $10\ ^\circ\text{C}$. Ude til venstre ligger begge kurver tæt ved $5\ \text{V}$, og ude til højre ligger begge tæt ved $0\ \text{V}$. Afstanden er størst i midten, ved $R = R_{\text{NTC}} = 20\ \text{k}\Omega$: Her er den $0{,}51\ \text{V}$, mens den kun er $0{,}17\ \text{V}$ for både A og C. Grafen for følsomheden som funktion af $R$ viser det samme som én kurve med toppen ved $20\ \text{k}\Omega$.`,
+  String.raw`## Saunaen ved 80 °C`,
+  String.raw`Ved $80\ ^\circ\text{C}$ er NTC-resistorens resistans kun ca. $4{,}3\ \text{k}\Omega$. Nu er det A med $R = 2\ \text{k}\Omega$, der ligger tættest på, og A bliver det mest følsomme termometer med $33{,}9\ \text{mV}$ pr. $^\circ\text{C}$. B giver $22{,}6\ \text{mV}$ og C kun $3{,}2\ \text{mV}$. På grafen for følsomheden som funktion af $R$ kan man se toppen flytte sig ned til $4{,}3\ \text{k}\Omega$. Den bedste faste resistor afhænger altså af, hvilken temperatur man vil måle.`,
+  String.raw`## Bemærkninger`,
+  String.raw`NTC-resistoren er beskrevet med modellen $$R_{\text{NTC}} = 20\ \text{k}\Omega\cdot e^{\,3900\ \text{K}\cdot\left(\frac{1}{T} - \frac{1}{310\ \text{K}}\right)},$$ hvor $T$ er den absolutte temperatur. Den beskriver en typisk NTC-resistor med $20\ \text{k}\Omega$ ved $37\ ^\circ\text{C}$.`,
+  String.raw`Voltmeteret regnes for ideelt, så det ikke trækker strøm.`,
+  String.raw`## Hvorfor $R = R_{\text{NTC}}$ giver størst følsomhed <span class="adv">Avanceret</span>`,
+  String.raw`Når temperaturen stiger lidt, falder $R_{\text{NTC}}$ med et lille stykke $\Delta R_{\text{NTC}}$, og spændingen ændrer sig med $$\Delta U_{\text{NTC}} \approx U\cdot\frac{R\cdot R_{\text{NTC}}}{(R + R_{\text{NTC}})^2}\cdot\frac{\Delta R_{\text{NTC}}}{R_{\text{NTC}}}.$$ (Udledningen står i næste afsnit.) Den sidste brøk er den samme for alle tre termometre, fordi de har ens NTC-resistorer. Det er altså brøken i midten, $$f = \frac{R\cdot R_{\text{NTC}}}{(R + R_{\text{NTC}})^2},$$ der afgør, hvor følsomt termometeret er. Vi skal vælge den faste resistor $R$, så $f$ bliver størst, mens $R_{\text{NTC}}$ er fast ved den temperatur, vi vil måle. Derfor differentierer vi $f$ med hensyn til $R$: $$\frac{df}{dR} = R_{\text{NTC}}\cdot\frac{R_{\text{NTC}} - R}{(R + R_{\text{NTC}})^3}.$$ Den er nul, når $R = R_{\text{NTC}}$, positiv for mindre $R$ og negativ for større. Der er altså et maksimum netop dér, og den største værdi er $f = \tfrac14$.`,
+  String.raw`## Hvorfor er A og C næsten lige følsomme? <span class="adv">Avanceret</span>`,
+  String.raw`Når temperaturen ændrer sig, er det $R_{\text{NTC}}$, der ændrer sig. Den faste resistor $R$ ligger fast. Derfor differentierer vi $U_{\text{NTC}}$ med hensyn til $R_{\text{NTC}}$: $$\frac{dU_{\text{NTC}}}{dR_{\text{NTC}}} = U\cdot\frac{R}{(R + R_{\text{NTC}})^2}.$$ For en lille ændring $\Delta R_{\text{NTC}}$ er ændringen i spændingen derfor $$\Delta U_{\text{NTC}} \approx U\cdot\frac{R}{(R + R_{\text{NTC}})^2}\cdot \Delta R_{\text{NTC}} = U\cdot\frac{R\cdot R_{\text{NTC}}}{(R + R_{\text{NTC}})^2}\cdot\frac{\Delta R_{\text{NTC}}}{R_{\text{NTC}}},$$ hvor vi til sidst har forlænget med $R_{\text{NTC}}$. Med $R_{\text{NTC}} = 20\ \text{k}\Omega$ er brøken i midten $$\begin{aligned} \text{A}&: \frac{2\cdot 20}{22^2} = 0{,}083, &\quad \text{B}&: \frac{20\cdot 20}{40^2} = 0{,}25, &\quad \text{C}&: \frac{200\cdot 20}{220^2} = 0{,}083. \end{aligned}$$ Brøken er symmetrisk: At gøre $R$ ti gange mindre end $R_{\text{NTC}}$ er lige så dårligt som at gøre den ti gange større. Derfor er følsomhedskurven symmetrisk omkring toppen, når $R$-aksen er logaritmisk. At A og C ikke giver præcis det samme ($17{,}0\ \text{mV}$ og $16{,}4\ \text{mV}$), skyldes, at en ændring på $1\ ^\circ\text{C}$ ikke er helt lille. Læg mærke til, at de to differentiationer svarer på hver sit spørgsmål: Den her handler om, hvad der sker, når temperaturen ændrer sig. Den i afsnittet ovenfor handler om, hvilken fast resistor vi skal vælge.`
+];
+function mdToHtml(s){ return s.replace(/\*([^*$]+)\*/g, "<em>$1</em>"); }
+const modal = document.getElementById("modal"), whyBody = document.getElementById("whyBody");
+whyBody.innerHTML = WHY_PARAS.map(p => p.startsWith("## ") ? `<h3>${p.slice(3)}</h3>` : `<p>${mdToHtml(p)}</p>`).join("");
+let mathRendered = false;
+btnWhy.addEventListener("click", () => {
+  modal.classList.add("open");
+  if (!mathRendered && window.renderMathInElement){
+    renderMathInElement(whyBody, { delimiters: [{left:"$$", right:"$$", display:true}, {left:"$", right:"$", display:false}], throwOnError:false });
+    mathRendered = true;
+  }
+});
+document.getElementById("close").addEventListener("click", () => modal.classList.remove("open"));
+modal.addEventListener("click", e => { if (e.target === modal) modal.classList.remove("open"); });
+document.addEventListener("keydown", e => { if (e.key === "Escape") modal.classList.remove("open"); });
+document.getElementById("copy").addEventListener("click", async (e) => {
+  const text = "Hvad gør et termometer følsomt?\n\n" + WHY_PARAS.map(p => p.replace(/^## /, "").replace(/\s*<span class="adv">([^<]*)<\/span>/, " ($1)")).join("\n\n");
+  try { await navigator.clipboard.writeText(text); e.target.textContent = "Kopieret ✓"; }
+  catch { e.target.textContent = "Kunne ikke kopiere"; }
+  setTimeout(() => e.target.textContent = "Kopiér tekst", 1600);
+});
+
+// ---------- løkke ----------
+const RATE = 1.0;          // °C pr. sekund ved tempo 1
+let last = null;
+function frame(ms){
+  const now = ms/1000;
+  if (last === null) last = now;
+  const dt = Math.min(0.05, now - last); last = now;
+  const S = st[step];
+  if (S.running){
+    S.T = Math.min(STEPS[step].to, S.T + RATE*tempo*dt);
+    if (S.T >= STEPS[step].to) finish();
+  }
+  drawScene(); drawStepGraph(); drawGraph();
+  requestAnimationFrame(frame);
+}
+// På lave skærme foldes indledningen sammen, så spørgsmålet og grafen kan ses samtidig.
+if (window.innerHeight < 800) document.getElementById("intro").open = false;
+document.getElementById("intro").addEventListener("toggle", () => layout());
+renderStep();
+window.addEventListener("resize", layout);
+if (window.ResizeObserver){ const ro = new ResizeObserver(() => layout()); ro.observe(cv); ro.observe(gv); ro.observe(sg); }
+if (document.fonts){
+  document.fonts.load(`16px ${SERIF}`).catch(() => {});
+  document.fonts.load(`italic 16px ${MATH}`).catch(() => {});
+}
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>
