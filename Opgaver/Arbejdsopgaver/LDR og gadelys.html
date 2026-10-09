@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hvornår tænder gadelyset?</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<style>
+:root{
+  --bg:#000000; --fg:#EEEEEE; --dim:#CFCFCF; --border:#6A6A6A;
+  --blue:#58C4DD; --yellow:#F4D345; --green:#83C167; --red:#FC6255; --teal:#5CD0B3;
+  --serif:"KaTeX_Main","Latin Modern Roman","CMU Serif",Georgia,"Times New Roman",serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--serif)}
+body{padding:18px 16px 48px}
+.wrap{max-width:1100px;margin:0 auto}
+h1{font-weight:normal;font-size:2.1rem;margin:0 0 6px;letter-spacing:.01em}
+.sub{color:var(--dim);font-size:1.12rem;margin:0 0 10px;line-height:1.45}
+canvas{display:block;width:100%;background:var(--bg)}
+.row{display:flex;flex-wrap:wrap;gap:10px 24px;align-items:center;margin:10px 0}
+.group{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.label{color:var(--dim);font-size:1.08rem}
+.q{font-size:1.2rem}
+i.sym{font-family:"KaTeX_Math","KaTeX_Main",Georgia,serif;font-style:italic}
+button{
+  font-family:var(--serif);font-size:1.05rem;font-weight:bold;color:var(--fg);
+  background:transparent;border:1.5px solid var(--border);border-radius:6px;
+  padding:5px 13px;cursor:pointer;transition:border-color .15s,background .15s
+}
+button:hover:not(:disabled){border-color:var(--fg)}
+button:disabled{opacity:.38;cursor:default}
+button.pred.sel, button.tog.on, button.step.on{background:#EEEEEE;border-color:#EEEEEE;color:#000;opacity:1}
+button.primary{border-color:var(--green)}
+button.step{font-weight:normal}
+select{
+  font-family:var(--serif);font-size:1.05rem;color:var(--fg);background:#111;
+  border:1.5px solid var(--border);border-radius:6px;padding:5px 8px
+}
+input[type=range]{-webkit-appearance:none;appearance:none;width:200px;height:22px;background:transparent;cursor:pointer}
+input[type=range]::-webkit-slider-runnable-track{height:4px;background:#5a5a5a;border-radius:2px}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:18px;height:18px;border-radius:50%;background:#EEEEEE;border:none;margin-top:-7px}
+input[type=range]::-moz-range-track{height:4px;background:#5a5a5a;border-radius:2px}
+input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:#EEEEEE;border:none}
+.val{min-width:4.2em;font-size:1.08rem}
+.result{min-height:1.6em;font-size:1.18rem;line-height:1.55;margin:6px 0 12px}
+.cA{color:var(--blue)} .cB{color:var(--yellow)} .cS{color:var(--teal)}
+.hint{color:var(--dim);font-style:italic}
+.sep{height:1px;background:#2a2a2a;margin:18px 0 10px}
+.task{font-size:1.12rem;line-height:1.55;margin:8px 0 4px;padding:6px 14px 10px;border-left:3px solid #5CD0B3;background:#0d0d0d}
+.task ol{margin:6px 0 8px;padding-left:1.4em}
+.task li{margin:6px 0}
+.task .inp{display:inline-flex;align-items:center;gap:6px;margin-left:6px;white-space:nowrap}
+.task input{font-family:var(--serif);font-size:1.08rem;width:5.5em;background:#111;color:var(--fg);border:1.5px solid var(--border);border-radius:6px;padding:3px 8px}
+.task button{font-size:.98rem;padding:3px 10px}
+.fb{display:block;color:var(--dim);font-style:italic;margin-top:2px}
+.fb.ok{color:var(--green);font-style:normal}
+.dirq{display:inline-flex;gap:8px;margin-left:8px;vertical-align:1px}
+.dirq button{font-size:.98rem;padding:3px 12px}
+.dirq button.sel{background:#EEEEEE;border-color:#EEEEEE;color:#000}
+#dirfb{font-size:1.05rem;margin-top:6px}
+#dirfb.flash{animation:fbflash .5s ease-out}
+@keyframes fbflash{from{opacity:.15;transform:translateX(-5px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){#dirfb.flash{animation:none}}
+#solbody{padding-top:10px}
+#solbody .katex-display{overflow-x:auto;overflow-y:hidden;padding:2px 0}
+a{color:var(--teal)}
+#graf{cursor:crosshair;touch-action:pan-y}
+.steptext{font-size:1.12rem;line-height:1.5;margin:8px 0 2px;padding:8px 14px;border-left:3px solid #6A6A6A;background:#0d0d0d}
+/* modal */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.78);display:none;align-items:flex-start;justify-content:center;padding:40px 16px;overflow:auto;z-index:10}
+.modal.open{display:flex}
+.panel{position:relative;background:#0b0b0b;border:1.5px solid var(--border);border-radius:10px;max-width:780px;width:100%;padding:26px 30px 22px}
+.panel h2{font-weight:normal;font-size:1.7rem;margin:0 0 14px;padding-right:130px}
+.panel h3{font-weight:normal;font-size:1.35rem;color:var(--blue);margin:22px 0 10px}
+.panel p{font-size:1.15rem;line-height:1.6;margin:0 0 14px}
+.panel .katex-display{overflow-x:auto;overflow-y:hidden;padding:2px 0}
+.panel .top{position:absolute;top:16px;right:16px;display:flex;gap:8px}
+.panel .top button{font-size:.95rem;padding:4px 10px}
+@media (max-width:600px){
+  .panel{padding:22px 16px 18px}
+  .panel h2{padding-right:0;margin-top:34px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Hvornår tænder gadelyset?</h1>
+  <p class="sub">En lysfølsom resistor (LDR) bruges til at tænde og slukke gadebelysningen alt efter, hvor lyst der er. Man udnytter, at LDR'ens resistans <i class="sym">R</i><sub>LDR</sub> afhænger af belysningsstyrken. <a href="#grafrow" id="togr">Scroll ned til grafen</a> for at se, hvordan <i class="sym">R</i><sub>LDR</sub> afhænger af belysningsstyrken <i class="sym">E</i>. LDR'en sidder i serie med en resistor <i class="sym">R</i> = 6,3 kΩ og er tilsluttet en spændingskilde med <i class="sym">U</i> = 50 V. Når spændingsfaldet <i class="sym">U</i><sub>ud</sub> over <i class="sym">R</i> er under 14,0 V, er gadebelysningen tændt, og når det er over 14,0 V, er den slukket.</p>
+  <p class="sub"><b>Belysningsstyrken</b> <i class="sym">E</i> angiver, hvor meget lys der rammer en flade, sådan som det menneskelige øje opfatter det. Den måles i enheden <b>lux</b>. Dagslys giver titusindvis af lux, en oplyst stue et par hundrede lux, og en nat med fuldmåne under 1 lux.</p>
+
+  <div class="row" style="margin-bottom:4px">
+    <span class="group">
+      <button class="step" data-s="1">1 · Spændingen</button>
+      <button class="step" data-s="2">2 · Større <i class="sym">R</i></button>
+      <button class="step" data-s="3">3 · LDR uden skærm</button>
+      <button class="step" data-s="4">4 · Opgave</button>
+    </span>
+  </div>
+
+  <div id="steptext" class="steptext"></div>
+  <div id="task" class="task" hidden>
+    <ol type="a">
+      <li>Aflæs på grafen for <i class="sym">R</i><sub>LDR</sub> nederst på siden, hvor stor LDR'ens resistans er ved 50 lux.
+        <span class="inp"><span><i class="sym">R</i><sub>LDR</sub> =</span> <input id="ta" type="text" inputmode="decimal"> kΩ <button id="ca">Tjek</button></span>
+        <span id="fa" class="fb"></span></li>
+      <li>Beregn, hvor stor resistansen <i class="sym">R</i> skal være, for at lampen tænder ved 50 lux.
+        <span class="inp"><span><i class="sym">R</i> =</span> <input id="tb" type="text" inputmode="decimal"> kΩ <button id="cb">Tjek</button></span>
+        <span id="fbb" class="fb"></span></li>
+      <li>Test din resistor: tryk på «Test din <i class="sym">R</i>» og kør aftenen. Tænder lampen ved 50 lux?</li>
+    </ol>
+    <button id="sol" hidden>Vis løsning</button>
+  </div>
+  <div class="row">
+    <span class="q" id="question"></span>
+    <span class="group" id="preds"></span>
+    <button id="start" class="primary" disabled>▶ Start aftenen</button>
+    <span id="hint" class="hint"></span>
+  </div>
+
+  <canvas id="scene"></canvas>
+
+  <div id="result" class="result"></div>
+  <div id="solbody" class="task" hidden></div>
+
+  <div class="row">
+    <button id="reset">↺ Nulstil</button>
+    <span class="group"><span class="label">Tempo</span>
+      <select id="tempo">
+        <option value="2">2×</option>
+        <option value="1" selected>1×</option>
+        <option value="0.5">½×</option>
+      </select>
+    </span>
+    <span class="group" id="grpRB"><span class="label"><i class="sym">R</i> i <span class="cB">B</span></span>
+      <input type="range" id="rb" min="1" max="20" step="0.5" value="12">
+      <span class="val" id="rbval">12,0 kΩ</span>
+    </span>
+    <span class="group" id="grpUT"><span class="label">Tænd under</span>
+      <input type="range" id="ut" min="5" max="30" step="0.5" value="14">
+      <span class="val" id="utval">14,0 V</span>
+    </span>
+  </div>
+
+  <div class="sep"></div>
+
+  <div class="row" id="grafrow">
+    <span class="group"><span class="label">Graf</span>
+      <button class="tog on" data-g="R"><i class="sym">R</i><sub>LDR</sub> som funktion af belysningsstyrke</button>
+      <button class="tog" data-g="U"><i class="sym">U</i><sub>ud</sub> som funktion af belysningsstyrke</button>
+    </span>
+    <button id="why" disabled>Hvorfor?</button>
+    <span class="hint">Klik på grafen, og træk til siden for at følge kurven.</span>
+  </div>
+  <canvas id="graf"></canvas>
+</div>
+
+<div class="modal" id="modal">
+  <div class="panel">
+    <div class="top"><button id="copy">Kopiér tekst</button><button id="close">✕</button></div>
+    <h2>Hvorfor tænder gadelyset, når det gør?</h2>
+    <div id="whyBody"></div>
+  </div>
+</div>
+
+<script>
+"use strict";
+// ================= PHYSICS-START =================
+// Spændingsdeler: U_ud = R/(R + R_LDR) · U. Voltmeter og styring trækker ingen strøm.
+// LDR tilpasset en typisk LDR-kurve:  R_LDR = 74 kΩ / sqrt(E / lux).
+// Skumring (forenklet): E halveres hvert 10. minut fra 40 000 lux kl. 19.00.
+const U0 = 50;            // V
+const RA = 6.3;           // kΩ
+const A_LDR = 74;         // kΩ
+const E0 = 40000;         // lux kl. 19.00
+const HALF = 10;          // min, halveringstid for belysningsstyrken
+const T_END = 180;        // min efter 19.00, dvs. kl. 22.00
+const E_LAMP = 15;        // lux fra lampen på en uskærmet LDR (bonus)
+
+const Rldr = E => A_LDR/Math.sqrt(E);                        // kΩ
+const Esky = t => E0*Math.pow(0.5, t/HALF);                   // lux, t i min efter 19.00
+const Uud = (R, E) => R/(R + Rldr(E))*U0;                     // V
+const RldrOn = (R, Ut) => R*(U0 - Ut)/Ut;                      // kΩ, hvor U_ud = Ut
+const EOn = (R, Ut) => Math.pow(A_LDR/RldrOn(R, Ut), 2);       // lux
+const tOfE = E => HALF*Math.log2(E0/E);                        // min efter 19.00
+// ================= PHYSICS-END =================
+
+const COL = { A:"#58C4DD", B:"#F4D345", C:"#5CD0B3", S:"#5CD0B3", fg:"#EEEEEE", dim:"#CFCFCF", green:"#83C167", red:"#FC6255" };
+const SERIF = '"KaTeX_Main","Latin Modern Roman","CMU Serif",Georgia,serif';
+const MATH  = '"KaTeX_Math","KaTeX_Main",Georgia,serif';
+const DELAY = 0.3;        // s: styringens reaktionstid (vises kun i bonus)
+
+const fmt = (v, n) => v.toFixed(n).replace(".", ",").replace(/^-(0,0*)$/, "$1");
+const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+const smooth = u => { u = clamp(u, 0, 1); return u*u*(3 - 2*u); };
+function clock(t){ const m = Math.round(19*60 + t); return `${Math.floor(m/60)}.${String(m % 60).padStart(2, "0")}`; }
+function fmtE(E){ return E >= 1000 ? String(Math.round(E/100)*100) : E >= 100 ? fmt(E, 0) : E >= 10 ? fmt(E, 1) : fmt(E, 2); }
+function fmtR(R){ return R >= 100 ? fmt(R, 0) : R >= 10 ? fmt(R, 1) : fmt(R, 2); }
+
+// Tidsforløbet går langsomt i skumringen, hvor det interessante sker (min pr. sekund).
+function rate(E){
+  const hi = smooth((Math.log(E) - Math.log(60))/(Math.log(400) - Math.log(60)));
+  const lo = 1 - smooth((Math.log(E) - Math.log(0.8))/(Math.log(3) - Math.log(0.8)));
+  return 3.5 + 18.5*Math.max(hi, lo);
+}
+
+// ---------- tilstand ----------
+let RB = 12, UT = 14, tempo = 1, graphMode = "R";
+let step = 1, unlocked = 1;
+const STEPS = {
+  1: { text: "Aftenen starter kl. 19.00 i fuldt dagslys. Efterhånden som solen går ned, falder belysningsstyrken <i class=\"sym\">E</i>, og LDR'ens resistans ændrer sig. Hold øje med voltmeteret, der måler <i class=\"sym\">U</i><sub>ud</sub> over den faste resistor <i class=\"sym\">R</i>.",
+       q: "Solen går ned. Hvad sker der med <i class=\"sym\">U</i><sub>ud</sub>?",
+       opts: [["S", "Stiger"], ["F", "Falder"], ["U", "Uændret"]] },
+  2: { text: "Nu sammenligner vi to gadelygter, der oplever den samme aften. LDR'en, spændingskilden på 50 V og styringen (tænd under 14,0 V) er de samme. Den eneste forskel er den faste resistor: I <span class=\"cA\">A</span> er <i class=\"sym\">R</i> = 6,3 kΩ som før. I <span class=\"cB\">B</span> er den udskiftet med en større resistor, <i class=\"sym\">R</i> = __RB__.",
+       q: "Tænder lampen i <span class=\"cB\">B</span> tidligere eller senere på aftenen end lampen i <span class=\"cA\">A</span>?",
+       opts: [["T", "Tidligere"], ["L", "Senere"], ["S", "Samtidig"]] },
+  3: { text: "Indtil nu har LDR'en siddet i en lille skål på toppen af pælen. Skålen vender opad, så lyset fra himlen kan komme ind, mens lyset fra lampen, der kastes tilbage fra vejen, bliver skærmet af. Nu fjerner vi skålen. Når lampen er tændt, rammer en del af dens lys altså også LDR'en. Kredsløbet er det samme som i trin 1.",
+       q: "Hvad sker der med lampen, når det bliver mørkt?",
+       opts: [["F", "Tænder som før"], ["L", "Tænder senere"], ["B", "Blinker"]] },
+  4: { text: "Kommunen ønsker, at gadelyset tænder tidligere på aftenen, allerede når belysningsstyrken falder under <b>50 lux</b>. LDR'en, spændingskilden på 50 V og styringen (tænd under 14,0 V) er de samme som før. Du skal finde den faste resistor <i class=\"sym\">R</i>, der opfylder kravet.",
+       q: "", opts: [] }
+};
+let RT = null;              // elevens R i opgaven (kΩ)
+const st = { 1: {}, 2: {}, 3: {}, 4: {} };
+for (const k of [1, 2, 3, 4]) Object.assign(st[k], { pred: null, running: false, done: false, t: 0, bands: [] });
+
+function makeBands(s){
+  if (s === 1) return [{ key: "A", R: RA, shield: true }];
+  if (s === 2) return [{ key: "A", R: RA, shield: true }, { key: "B", R: RB, shield: true }];
+  if (s === 3) return [{ key: "A", R: RA, shield: false }];
+  return [{ key: "C", R: RT || RA, shield: true }];
+}
+function initRun(s){
+  const S = st[s];
+  S.t = 0; S.running = false; S.done = false;
+  S.bands = makeBands(s).map(b => Object.assign(b, { lamp: false, pend: 0, ons: 0, firstOn: null, lastOn: null, U0: Uud(b.R, Esky(0)) }));
+}
+[1, 2, 3, 4].forEach(initRun);
+
+// ---------- DOM ----------
+const cv = document.getElementById("scene"), ctx = cv.getContext("2d");
+const gv = document.getElementById("graf"), gtx = gv.getContext("2d");
+const btnStart = document.getElementById("start"), hint = document.getElementById("hint");
+const resultEl = document.getElementById("result"), btnWhy = document.getElementById("why");
+const qEl = document.getElementById("question"), predsEl = document.getElementById("preds");
+const stepBtns = [...document.querySelectorAll("button.step")];
+
+let W = 900, H = 400, GW = 800, GH = 300, narrow = false, bandH = 200;
+function layout(){
+  const dpr = window.devicePixelRatio || 1;
+  W = cv.clientWidth || 900;
+  narrow = W < 640;
+  const n = step === 2 ? 2 : 1;
+  bandH = narrow ? 350 : (n === 2 ? 195 : 250);
+  H = bandH*n + (n - 1)*10;
+  cv.style.height = H + "px";
+  cv.width = Math.round(W*dpr); cv.height = Math.round(H*dpr);
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  GW = gv.clientWidth || 800;
+  GH = Math.max(250, Math.min(330, GW*0.34));
+  gv.style.height = GH + "px";
+  gv.width = Math.round(GW*dpr); gv.height = Math.round(GH*dpr);
+  gtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+
+// ---------- tegnehjælp ----------
+function rich(c, parts, x, y, align, size, color, outline){
+  const fontOf = p => (p[1] ? `italic ${size}px ${MATH}` : `${p[2] ? Math.round(size*0.72) : size}px ${SERIF}`);
+  let w = 0;
+  for (const p of parts){ c.font = fontOf(p); w += c.measureText(p[0]).width; }
+  let x0 = align === "right" ? x - w : align === "center" ? x - w/2 : x;
+  c.textBaseline = "alphabetic"; c.textAlign = "left";
+  for (const p of parts){
+    c.font = fontOf(p);
+    const yy = p[2] ? y + size*0.25 : y;
+    if (outline){ c.lineWidth = 3; c.strokeStyle = "rgba(0,0,0,.6)"; c.lineJoin = "round"; c.strokeText(p[0], x0, yy); }
+    c.fillStyle = color; c.fillText(p[0], x0, yy);
+    x0 += c.measureText(p[0]).width;
+  }
+  return w;
+}
+const hex = h => [1,3,5].map(i => parseInt(h.substr(i, 2), 16));
+const mix = (a, b, t) => "rgb(" + a.map((v, i) => Math.round(v + (b[i] - v)*t)).join(",") + ")";
+
+// ---------- gadescene ----------
+function drawStreet(x, y, w, h, b, t, lab){
+  const E = Esky(t);
+  const day = clamp(Math.log10(E)/4.6, 0, 1);          // 0 = nat, 1 = dag
+  ctx.save();
+  ctx.beginPath(); ctx.rect(x, y, w, h); ctx.clip();
+  const gy = y + h*0.74;
+  const sky = ctx.createLinearGradient(0, y, 0, gy);
+  sky.addColorStop(0, mix(hex("#02040B"), hex("#2F5F9A"), day));
+  sky.addColorStop(1, mix(hex("#07091A"), day > 0.55 ? hex("#9CC0E0") : hex("#D9824A"), Math.min(1, day*1.25)));
+  ctx.fillStyle = sky; ctx.fillRect(x, y, w, gy - y);
+  // sol der går ned
+  const sunY = gy - (h*0.45)*clamp((Math.log10(E) - 2)/2.6, -0.2, 1);
+  if (E > 30){
+    ctx.fillStyle = mix(hex("#FF8A3A"), hex("#FFF2B0"), day);
+    ctx.beginPath(); ctx.arc(x + w*0.3, sunY, 13, 0, 2*Math.PI); ctx.fill();
+  }
+  // stjerner
+  if (E < 20){
+    const a = clamp((Math.log10(20) - Math.log10(E))/1.5, 0, 1)*0.8;
+    ctx.fillStyle = `rgba(230,235,255,${a})`;
+    let s = 7;
+    for (let i = 0; i < 26; i++){
+      s = (s*9301 + 49297) % 233280; const px = x + (s/233280)*w;
+      s = (s*9301 + 49297) % 233280; const py = y + (s/233280)*(gy - y)*0.8;
+      ctx.fillRect(px, py, 1.6, 1.6);
+    }
+  }
+  // jord og vej
+  ctx.fillStyle = mix(hex("#050505"), hex("#3B3F36"), day); ctx.fillRect(x, gy, w, y + h - gy);
+  ctx.fillStyle = mix(hex("#0B0B0B"), hex("#55575A"), day); ctx.fillRect(x, gy + (y + h - gy)*0.35, w, (y + h - gy)*0.4);
+
+  // lygtepæl
+  const px = x + w*0.56, top = y + h*0.24, arm = w*0.13;
+  const hx = px - arm, hy = top + 8;
+  if (b.lamp){
+    const cone = ctx.createLinearGradient(0, hy, 0, gy + 20);
+    cone.addColorStop(0, "rgba(255,226,150,0.55)"); cone.addColorStop(1, "rgba(255,210,120,0.12)");
+    ctx.fillStyle = cone;
+    ctx.beginPath(); ctx.moveTo(hx - 9, hy + 4); ctx.lineTo(hx + 9, hy + 4); ctx.lineTo(hx + 70, gy + 16); ctx.lineTo(hx - 70, gy + 16); ctx.closePath(); ctx.fill();
+    const pool = ctx.createRadialGradient(hx, gy + 12, 4, hx, gy + 12, 80);
+    pool.addColorStop(0, "rgba(255,225,150,0.55)"); pool.addColorStop(1, "rgba(255,225,150,0)");
+    ctx.fillStyle = pool; ctx.beginPath(); ctx.ellipse(hx, gy + 12, 85, 20, 0, 0, 2*Math.PI); ctx.fill();
+  }
+  ctx.strokeStyle = "#8A8F96"; ctx.lineWidth = 4; ctx.lineCap = "round";
+  ctx.beginPath(); ctx.moveTo(px, gy + 6); ctx.lineTo(px, top); ctx.lineTo(hx, top); ctx.stroke();
+  ctx.fillStyle = "#8A8F96"; ctx.beginPath(); ctx.moveTo(hx - 12, hy - 5); ctx.lineTo(hx + 12, hy - 5); ctx.lineTo(hx + 8, hy + 4); ctx.lineTo(hx - 8, hy + 4); ctx.closePath(); ctx.fill();
+  ctx.fillStyle = b.lamp ? "#FFF3C4" : "#3A3A3A";
+  ctx.beginPath(); ctx.ellipse(hx, hy + 5, 8, 3.5, 0, 0, 2*Math.PI); ctx.fill();
+  if (b.lamp){
+    const g = ctx.createRadialGradient(hx, hy + 5, 1, hx, hy + 5, 26);
+    g.addColorStop(0, "rgba(255,240,190,0.9)"); g.addColorStop(1, "rgba(255,240,190,0)");
+    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(hx, hy + 5, 26, 0, 2*Math.PI); ctx.fill();
+  }
+  // LDR på toppen af pælen, i en skål der vender opad
+  const lx = px, ly = top - 13;
+  ctx.strokeStyle = "#8A8F96"; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(px, top); ctx.lineTo(px, ly + 4); ctx.stroke();
+  if (!b.shield && b.lamp){
+    ctx.setLineDash([3, 4]); ctx.strokeStyle = "rgba(255,230,150,0.85)"; ctx.lineWidth = 1.5;
+    for (const dx of [-40, -5, 30]){
+      ctx.beginPath(); ctx.moveTo(hx + dx, gy + 8); ctx.lineTo(lx + (dx < 0 ? -3 : 3), ly + 3); ctx.stroke();
+    }
+    ctx.setLineDash([]);
+  }
+  ctx.fillStyle = "#E04848"; ctx.beginPath(); ctx.arc(lx, ly, 5, 0, 2*Math.PI); ctx.fill();
+  if (b.shield){
+    ctx.fillStyle = "#B8BDC4";
+    ctx.beginPath();
+    ctx.moveTo(lx - 11, ly - 5); ctx.lineTo(lx - 11, ly + 2); ctx.quadraticCurveTo(lx - 11, ly + 10, lx, ly + 10);
+    ctx.quadraticCurveTo(lx + 11, ly + 10, lx + 11, ly + 2); ctx.lineTo(lx + 11, ly - 5);
+    ctx.lineTo(lx + 8, ly - 5); ctx.lineTo(lx + 8, ly + 2); ctx.quadraticCurveTo(lx + 8, ly + 7, lx, ly + 7);
+    ctx.quadraticCurveTo(lx - 8, ly + 7, lx - 8, ly + 2); ctx.lineTo(lx - 8, ly - 5); ctx.closePath();
+    ctx.fill();
+  }
+  rich(ctx, [["LDR", false]], lx + 15, ly + 5, "left", 13, COL.fg, true);
+  ctx.restore();
+
+  // mærkat og ur
+  const col = COL[b.key];
+  ctx.strokeStyle = col; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.arc(x + 20, y + 20, 13, 0, 2*Math.PI); ctx.stroke();
+  ctx.fillStyle = col; ctx.font = `17px ${SERIF}`; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+  ctx.fillText(b.key === "C" ? "?" : b.key, x + 20, y + 21);
+  if (lab) rich(ctx, [[lab, false]], x + 40, y + 26, "left", 15, col, true);
+  rich(ctx, [[`kl. ${clock(t)}`, false]], x + w - 8, y + 24, "right", 17, COL.fg, true);
+  rich(ctx, [["E", true], [` = ${fmtE(E)} lux`, false]], x + w - 8, y + 46, "right", 16, COL.fg, true);
+  ctx.strokeStyle = "#333"; ctx.lineWidth = 1; ctx.strokeRect(x + 0.5, y + 0.5, w - 1, h - 1);
+}
+
+// ---------- kredsløb ----------
+function drawCircuit(x, y, w, h, b, t){
+  const Es = Esky(t), E = Es + (!b.shield && b.lamp ? E_LAMP : 0);
+  const Rl = Rldr(E), U = Uud(b.R, E);
+  const fs = narrow ? 13 : 16;
+  const span = narrow ? 74 + 54 + 80 + 146 : 76 + 96 + 128 + 190;
+  const off = Math.max(0, (w - span)/2);
+  const xb = x + off + (narrow ? 74 : 76), xn = xb + (narrow ? 54 : 96), xo = xn + (narrow ? 80 : 128);
+  const yT = y + 22, yB = y + h - 18, yM = (yT + yB)/2;
+  ctx.strokeStyle = COL.fg; ctx.lineWidth = 2; ctx.lineCap = "round"; ctx.lineJoin = "round";
+  // ledninger
+  ctx.beginPath();
+  ctx.moveTo(xb, yM - 8); ctx.lineTo(xb, yT); ctx.lineTo(xn, yT); ctx.lineTo(xn, yB); ctx.lineTo(xb, yB); ctx.lineTo(xb, yM + 8);
+  ctx.moveTo(xn, yM); ctx.lineTo(xo, yM); ctx.moveTo(xn, yB); ctx.lineTo(xo, yB);
+  ctx.stroke();
+  ctx.fillStyle = COL.fg;
+  for (const [px, py] of [[xn, yM], [xn, yB]]){ ctx.beginPath(); ctx.arc(px, py, 3.5, 0, 2*Math.PI); ctx.fill(); }
+  // batteri
+  ctx.fillStyle = "#000"; ctx.fillRect(xb - 18, yM - 8, 36, 16);
+  ctx.lineCap = "butt";
+  ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(xb - 15, yM - 5); ctx.lineTo(xb + 15, yM - 5); ctx.stroke();
+  ctx.lineWidth = 5; ctx.beginPath(); ctx.moveTo(xb - 7, yM + 5); ctx.lineTo(xb + 7, yM + 5); ctx.stroke();
+  ctx.lineCap = "round";
+  rich(ctx, [["U", true], [` = ${U0} V`, false]], xb - 20, yM + 5, "right", fs, COL.fg);
+  // modstande
+  const segT = (yT + yM)/2, segB = (yM + yB)/2, rh = Math.min(30, (yM - yT)*0.5), rw = 11;
+  for (const cy of [segT, segB]){
+    ctx.fillStyle = "#000"; ctx.fillRect(xn - rw/2, cy - rh/2, rw, rh);
+    ctx.strokeStyle = COL.fg; ctx.lineWidth = 2; ctx.strokeRect(xn - rw/2, cy - rh/2, rw, rh);
+  }
+  // LDR-symbol: cirkel og pile
+  const cr = rh*0.72;
+  ctx.beginPath(); ctx.arc(xn, segT, cr, 0, 2*Math.PI); ctx.stroke();
+  for (const d of [-7, 5]){
+    const ax = xn - cr - 16 + d, ay = segT - cr - 10 + d*0.2;
+    ctx.beginPath(); ctx.moveTo(ax - 9, ay - 9); ctx.lineTo(ax, ay); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(ax - 5, ay - 1); ctx.moveTo(ax, ay); ctx.lineTo(ax - 1, ay - 5); ctx.stroke();
+  }
+  rich(ctx, [["R", true], ["LDR", false, true], [` = ${fmtR(Rl)} kΩ`, false]], xn + cr + 8, segT + 5, "left", fs, COL.fg);
+  rich(ctx, [["R", true], [b.key === "C" && !RT ? " = ?" : ` = ${fmt(b.R, 1)} kΩ`, false]], xn + 14, segB + 5, "left", fs, COL.fg);
+  // udgang og voltmeter
+  for (const py of [yM, yB]){ ctx.fillStyle = "#000"; ctx.beginPath(); ctx.arc(xo, py, 4, 0, 2*Math.PI); ctx.fill(); ctx.stroke(); }
+  // voltmeter mellem udgangens klemmer
+  const vx = xo + 22, vy = (yM + yB)/2, vr = 12;
+  ctx.strokeStyle = COL.fg; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(xo + 4, yM); ctx.lineTo(vx, yM); ctx.lineTo(vx, vy - vr); ctx.moveTo(vx, vy + vr); ctx.lineTo(vx, yB); ctx.lineTo(xo + 4, yB); ctx.stroke();
+  ctx.fillStyle = "#000"; ctx.beginPath(); ctx.arc(vx, vy, vr, 0, 2*Math.PI); ctx.fill(); ctx.stroke();
+  ctx.fillStyle = COL.fg; ctx.font = `${fs}px ${SERIF}`; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText("V", vx, vy + 1);
+  const bx = vx + vr + 14;
+  rich(ctx, [["U", true], ["ud", false, true], [` = ${fmt(U, 1)} V`, false]], bx, yM + 4, "left", narrow ? fs + 1 : fs + 3, COL.fg);
+  rich(ctx, [["tænd under ", false], [`${fmt(UT, 1)} V`, false]], bx, yM + 26, "left", fs - 1, COL.dim);
+  // lampe-indikator
+  const iy = yB + 4;
+  ctx.fillStyle = b.lamp ? "#FFE9A0" : "#1a1a1a"; ctx.strokeStyle = COL.fg; ctx.lineWidth = 1.6;
+  ctx.beginPath(); ctx.arc(bx + 8, iy - 6, 7, 0, 2*Math.PI); ctx.fill(); ctx.stroke();
+  rich(ctx, [[narrow ? (b.lamp ? "tændt" : "slukket") : (b.lamp ? "lampen er tændt" : "lampen er slukket"), false]], bx + 22, iy - 1, "left", fs - 1, b.lamp ? "#FFE9A0" : COL.dim);
+}
+
+function drawScene(){
+  ctx.clearRect(0, 0, W, H);
+  const S = st[step];
+  S.bands.forEach((b, i) => {
+    const y = i*(bandH + 10);
+    const lab = step === 3 ? "uden skærm" : step === 4 ? (RT ? `din lygte, R = ${fmt(b.R, 2)} kΩ` : "din lygte") : `R = ${fmt(b.R, 1)} kΩ`;
+    if (narrow){
+      drawStreet(0, y, W, 150, b, S.t, lab);
+      drawCircuit(0, y + 158, W, bandH - 158, b, S.t);
+    } else {
+      const sw = Math.min(420, W*0.42);
+      drawStreet(0, y, sw, bandH, b, S.t, lab);
+      drawCircuit(sw + 10, y, W - sw - 10, bandH, b, S.t);
+    }
+  });
+}
+
+// ---------- graf ----------
+function drawGraph(){
+  const c = gtx, Wg = GW, Hg = GH, nar = Wg < 560;
+  const mL = nar ? 48 : 64, mR = 16, mT = 38, mB = 52;
+  const pw = Wg - mL - mR, ph = Hg - mT - mB;
+  const EMAX = 100, yMax = graphMode === "R" ? 50 : 50, yStep = 10;
+  const X = E => mL + pw*E/EMAX, Y = v => mT + ph*(1 - v/yMax);
+  gGeom = { mL, mT, pw, ph, EMAX, yMax };
+  c.clearRect(0, 0, Wg, Hg);
+  c.lineWidth = 1; c.strokeStyle = "#262626"; c.font = `15px ${SERIF}`; c.fillStyle = COL.fg;
+  c.textAlign = "center"; c.textBaseline = "top";
+  for (let E = 0; E <= EMAX; E += 10){ c.beginPath(); c.moveTo(X(E), mT); c.lineTo(X(E), mT + ph); c.stroke(); c.fillText(String(E), X(E), mT + ph + 7); }
+  c.textAlign = "right"; c.textBaseline = "middle";
+  for (let v = 0; v <= yMax; v += yStep){ c.beginPath(); c.moveTo(mL, Y(v)); c.lineTo(mL + pw, Y(v)); c.stroke(); c.fillText(String(v), mL - 8, Y(v)); }
+  c.strokeStyle = COL.fg; c.lineWidth = 1.8;
+  c.beginPath(); c.moveTo(mL, mT); c.lineTo(mL, mT + ph); c.lineTo(mL + pw, mT + ph); c.stroke();
+  rich(c, [["E", true], [" / lux", false]], mL + pw, mT + ph + 42, "right", 17, COL.fg);
+  if (graphMode === "R") rich(c, [["R", true], ["LDR", false, true], [" / kΩ", false]], mL - 8, mT - 14, "left", 17, COL.fg);
+  else rich(c, [["U", true], ["ud", false, true], [" / V", false]], mL - 8, mT - 14, "left", 17, COL.fg);
+
+  const S = st[step];
+  const bands = S.bands;
+  const curve = (f, col, w) => {
+    c.strokeStyle = col; c.lineWidth = w; c.beginPath();
+    let first = true;
+    for (let i = 0; i <= 400; i++){
+      const E = 1 + (EMAX - 1)*i/400, v = f(E);
+      if (v > yMax){ first = true; continue; }
+      first ? c.moveTo(X(E), Y(v)) : c.lineTo(X(E), Y(v)); first = false;
+    }
+    c.stroke();
+  };
+  c.save(); c.beginPath(); c.rect(mL, mT - 2, pw, ph + 4); c.clip();
+  // Tænd-markørerne er svaret på trinnet, så de kommer først frem, når det er kørt.
+  const reveal = S.done;
+  if (graphMode === "R"){
+    curve(Rldr, COL.fg, 2.4);
+    if (reveal) for (const b of bands){
+      const Rt = RldrOn(b.R, UT), Et = EOn(b.R, UT), col = COL[b.key];
+      c.setLineDash([5, 6]); c.strokeStyle = col; c.lineWidth = 1.4;
+      c.beginPath(); c.moveTo(mL, Y(Rt)); c.lineTo(X(Et), Y(Rt)); c.lineTo(X(Et), mT + ph); c.stroke(); c.setLineDash([]);
+    }
+  } else {
+    c.setLineDash([5, 6]); c.strokeStyle = COL.red; c.lineWidth = 1.5;
+    c.beginPath(); c.moveTo(mL, Y(UT)); c.lineTo(mL + pw, Y(UT)); c.stroke(); c.setLineDash([]);
+    for (const b of bands){
+      curve(E => Uud(b.R, E), COL[b.key], 2.4);
+      if (!reveal) continue;
+      const Et = EOn(b.R, UT);
+      c.setLineDash([3, 5]); c.strokeStyle = COL[b.key]; c.lineWidth = 1.2;
+      c.beginPath(); c.moveTo(X(Et), Y(UT)); c.lineTo(X(Et), mT + ph); c.stroke(); c.setLineDash([]);
+    }
+  }
+  // markør for himlens lys
+  const Es = Esky(S.t);
+  if (S.t > 0 && Es <= EMAX){
+    for (const b of bands){
+      const E = Es + (!b.shield && b.lamp ? E_LAMP : 0);
+      const v = graphMode === "R" ? Rldr(E) : Uud(b.R, E);
+      if (v <= yMax && E <= EMAX){
+        c.fillStyle = graphMode === "R" ? COL[b.key] : COL[b.key];
+        c.beginPath(); c.arc(X(E), Y(v), 5.5, 0, 2*Math.PI); c.fill();
+      }
+    }
+  }
+  // aflæsning fra klik
+  const mcol = mark && mark.key ? COL[mark.key] : COL.S;
+  if (mark && mark.mode === graphMode){
+    const px = X(mark.E), py = Y(mark.v);
+    c.setLineDash([4, 4]); c.strokeStyle = mcol; c.lineWidth = 1.4;
+    c.beginPath(); c.moveTo(px, mT + ph); c.lineTo(px, py); c.lineTo(mL, py); c.stroke(); c.setLineDash([]);
+    c.fillStyle = mcol; c.beginPath(); c.arc(px, py, 5.5, 0, 2*Math.PI); c.fill();
+    c.strokeStyle = "#000"; c.lineWidth = 1.5; c.beginPath(); c.arc(px, py, 5.5, 0, 2*Math.PI); c.stroke();
+  }
+  c.restore();
+  if (mark && mark.mode === graphMode){
+    const px = X(mark.E), py = Y(mark.v);
+    const parts = graphMode === "R"
+      ? [["E", true], [` = ${fmt(mark.E, 1)} lux,  `, false], ["R", true], ["LDR", false, true], [` = ${fmt(mark.v, 1)} kΩ`, false]]
+      : [["E", true], [` = ${fmt(mark.E, 1)} lux,  `, false], ["U", true], ["ud", false, true], [` = ${fmt(mark.v, 1)} V`, false]];
+    c.font = `16px ${SERIF}`;
+    const right = px > mL + pw*0.6;
+    const ty = py < mT + 40 ? py + 26 : py - 12;
+    c.fillStyle = "rgba(0,0,0,.75)";
+    rich(c, parts, right ? px - 10 : px + 10, ty, right ? "right" : "left", 16, mcol, true);
+  }
+  if (graphMode === "U"){
+    c.fillStyle = COL.red; c.font = `15px ${SERIF}`; c.textAlign = "right"; c.textBaseline = "bottom";
+    c.fillText(`tænd under ${fmt(UT, 1)} V`, mL + pw - 4, Y(UT) - 3);
+  }
+  // belysningsstyrke ved tænding
+  if (reveal) bands.forEach((b, i) => {
+    const Et = EOn(b.R, UT);
+    if (Et <= EMAX) rich(c, [["E", true], [` = ${fmt(Et, 1)} lux`, false]], X(Et) + 6, mT + 16 + 20*i, "left", 15, COL[b.key]);
+  });
+}
+
+// Klik på grafen: markøren hopper hen på kurven og kan trækkes langs den.
+let mark = null, gGeom = null, dragging = false;
+function snapMark(x, y){
+  const { mL, mT, pw, ph, EMAX, yMax } = gGeom;
+  // Nedre grænse for E: dér hvor kurven kommer ind under toppen af koordinatsystemet.
+  const Emin = graphMode === "R" ? Math.pow(A_LDR/yMax, 2) : 1;
+  const E = clamp((x - mL)/pw*EMAX, Emin, EMAX);
+  if (graphMode === "R") return { mode: "R", E, v: Rldr(E), key: null };
+  // Flere kurver: vi snapper til den, der ligger nærmest musen.
+  const vRaw = (1 - (y - mT)/ph)*yMax;
+  let best = null;
+  for (const b of st[step].bands){
+    const v = Uud(b.R, E), d = Math.abs(v - vRaw);
+    if (!best || d < best.d) best = { d, v, key: b.key };
+  }
+  return { mode: "U", E, v: best.v, key: best.key };
+}
+gv.addEventListener("pointerdown", e => {
+  if (!gGeom) return;
+  const r = gv.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top;
+  const { mL, mT, pw, ph } = gGeom;
+  if (x < mL - 12 || x > mL + pw + 12 || y < mT - 12 || y > mT + ph + 12){ mark = null; return; }
+  dragging = true;
+  try { gv.setPointerCapture(e.pointerId); } catch {}
+  mark = snapMark(x, y);
+});
+gv.addEventListener("pointermove", e => {
+  if (!dragging || !gGeom) return;
+  e.preventDefault();
+  const r = gv.getBoundingClientRect();
+  mark = snapMark(e.clientX - r.left, e.clientY - r.top);
+});
+const endDrag = e => {
+  if (!dragging) return;
+  dragging = false;
+  try { gv.releasePointerCapture(e.pointerId); } catch {}
+};
+gv.addEventListener("pointerup", endDrag);
+gv.addEventListener("pointercancel", endDrag);
+document.getElementById("togr").addEventListener("click", e => {
+  e.preventDefault();
+  graphMode = "R"; togs.forEach(u => u.classList.toggle("on", u.dataset.g === "R"));
+  document.getElementById("grafrow").scrollIntoView({ behavior: "smooth", block: "start" });
+});
+
+// ---------- styring ----------
+function answer(s){
+  if (s === 1) return "F";
+  if (s === 2){ const d = EOn(RB, UT) - EOn(RA, UT); return Math.abs(d) < 1e-9 ? "S" : (d < 0 ? "L" : "T"); }
+  return "B";
+}
+function optName(s, k){ return STEPS[s].opts.find(o => o[0] === k)[1].toLowerCase(); }
+
+function setStepText(){
+  document.getElementById("steptext").innerHTML = STEPS[step].text.replace("__RB__", fmt(RB, 1) + " kΩ").replace("14,0 V", fmt(UT, 1) + " V");
+}
+function renderStep(){
+  const S = st[step];
+  if (step === 4 && UT !== 14){ UT = 14; utIn.value = 14; utVal.textContent = "14,0 V"; initRun(4); }
+  document.getElementById("task").hidden = step !== 4;
+  if (step !== 4){ solBody.hidden = true; document.getElementById("sol").textContent = "Vis løsning"; }
+  document.getElementById("grpRB").style.display = step === 2 ? "" : "none";
+  document.getElementById("grpUT").style.display = step === 4 ? "none" : "";
+  setStepText();
+  qEl.innerHTML = STEPS[step].q;
+  qEl.style.display = predsEl.style.display = STEPS[step].q ? "" : "none";
+  predsEl.innerHTML = STEPS[step].opts.map(([k, t]) => `<button class="pred" data-p="${k}">${t}</button>`).join("");
+  predsEl.querySelectorAll("button.pred").forEach(b => b.addEventListener("click", () => { st[step].pred = b.dataset.p; updateUI(); }));
+  resultEl.innerHTML = S.verdict || "";
+  layout(); updateUI();
+}
+
+function updateUI(){
+  const S = st[step];
+  stepBtns.forEach(b => { const s = +b.dataset.s; b.disabled = s > unlocked; b.classList.toggle("on", s === step); });
+  predsEl.querySelectorAll("button.pred").forEach(b => {
+    b.disabled = S.running || S.done; b.classList.toggle("sel", S.pred === b.dataset.p);
+  });
+  btnStart.disabled = !S.pred;
+  const first = step === 4 ? "▶ Test din R" : "▶ Start aftenen";
+  btnStart.textContent = S.running ? "❚❚ Pause" : (S.done ? "▶ Kør igen" : S.t > 0 ? "▶ Fortsæt" : first);
+  hint.textContent = S.pred ? "" : (step === 4 ? "Skriv først din værdi af R i b." : "Vælg din forudsigelse først.");
+  btnWhy.disabled = !st[1].done;
+}
+
+function finish(){
+  const S = st[step];
+  S.done = true; S.running = false;
+  let txt;
+  const pn = step === 4 ? "" : optName(step, S.pred);
+  if (step === 1){
+    const b = S.bands[0], Et = EOn(b.R, UT);
+    txt = `<i class="sym">U</i><sub>ud</sub> <b>faldt</b> fra ${fmt(b.U0, 1)} V kl. 19.00 til ${fmt(Uud(b.R, Esky(T_END)), 1)} V kl. 22.00. ` +
+          `Lampen tændte kl. ${clock(tOfE(Et))}, da belysningsstyrken var ${fmt(Et, 1)} lux og <i class="sym">R</i><sub>LDR</sub> = ${fmt(RldrOn(b.R, UT), 1)} kΩ. Du forudsagde ${pn}.`;
+  } else if (step === 2){
+    const [a, b] = S.bands, tA = tOfE(EOn(a.R, UT)), tB = tOfE(EOn(b.R, UT)), d = Math.round(tB) - Math.round(tA);
+    const how = Math.abs(d) < 1 ? "samtidig med" : d > 0 ? `${d} minutter senere end` : `${-d} minutter tidligere end`;
+    txt = `Lampen i <span class="cB">B</span> tændte kl. ${clock(tB)}, ${how} <span class="cA">A</span> (kl. ${clock(tA)}). ` +
+          `B tænder ved ${fmt(EOn(b.R, UT), 1)} lux og A ved ${fmt(EOn(a.R, UT), 1)} lux. Du forudsagde ${pn}.`;
+  } else if (step === 4){
+    const b = S.bands[0], Et = EOn(b.R, UT);
+    txt = `Med <i class="sym">R</i> = ${fmt(b.R, 2)} kΩ tændte lampen kl. ${clock(tOfE(Et))}, da belysningsstyrken var ${fmt(Et, 1)} lux. `;
+    if (Math.abs(Et - 50) <= 3){ txt += `<span style="color:var(--green)">Det opfylder kommunens krav om 50 lux.</span>`; needDir = null; }
+    else {
+      txt += Et < 50 ? `Det er for sent: lampen skulle tænde allerede ved 50 lux. ` : `Det er for tidligt: lampen skulle først tænde ved 50 lux. `;
+      needDir = Et < 50 ? "ned" : "op";
+      txt += `Skal <i class="sym">R</i> være større eller mindre?` +
+             `<span class="group dirq"><button data-dir="op">Større</button><button data-dir="ned">Mindre</button></span>` +
+             `<span id="dirfb" class="fb"></span>`;
+    }
+    document.getElementById("sol").hidden = false;
+  } else {
+    const b = S.bands[0], tFirst = tOfE(EOn(b.R, UT)), Est = EOn(b.R, UT) - E_LAMP;
+    const tStable = Est > 0 ? tOfE(Est) : null;
+    txt = `Lampen <b>blinkede</b>: den tændte ${b.ons} gange` +
+          (tStable !== null ? ` mellem kl. ${clock(tFirst)} og kl. ${clock(tStable)}. Først da himlen var nede på ${fmt(Est, 1)} lux, blev lampen ved med at lyse.` : `, hele aftenen.`) +
+          ` Du forudsagde ${pn}.`;
+  }
+  S.verdict = txt;
+  resultEl.innerHTML = txt;
+  if (unlocked < 4 && step === unlocked) unlocked = step + 1;
+  updateUI();
+}
+
+// Svarknapperne «Større / Mindre» i resultatteksten. Delegeret, så de virker,
+// selvom teksten skrives om, når man skifter trin.
+let needDir = null;
+resultEl.addEventListener("click", e => {
+  const b = e.target.closest("button[data-dir]");
+  if (!b || !needDir) return;
+  resultEl.querySelectorAll("button[data-dir]").forEach(x => x.classList.toggle("sel", x === b));
+  const fb = document.getElementById("dirfb");
+  if (!fb) return;
+  const right = b.dataset.dir === needDir;
+  fb.className = "fb" + (right ? " ok" : "");
+  fb.innerHTML = right
+    ? (needDir === "ned"
+        ? `Rigtigt: <i class="sym">R</i> skal være <b>mindre</b>. Jo mindre <i class="sym">R</i> er, jo mindre bliver <i class="sym">U</i><sub>ud</sub> ved samme belysningsstyrke, så spændingen kommer under ${fmt(UT, 1)} V, mens der stadig er mere lys. Ret din værdi i b, og test igen.`
+        : `Rigtigt: <i class="sym">R</i> skal være <b>større</b>. Jo større <i class="sym">R</i> er, jo større bliver <i class="sym">U</i><sub>ud</sub> ved samme belysningsstyrke, så der skal blive mørkere, før spændingen kommer under ${fmt(UT, 1)} V. Ret din værdi i b, og test igen.`)
+    : `Ikke helt. Se på spændingsdeleren: <i class="sym">U</i><sub>ud</sub> = <i class="sym">R</i>/(<i class="sym">R</i> + <i class="sym">R</i><sub>LDR</sub>) · <i class="sym">U</i>. Hvad sker der med <i class="sym">U</i><sub>ud</sub>, hvis du ændrer <i class="sym">R</i>?`;
+  void fb.offsetWidth; fb.classList.add("flash");
+  st[4].verdict = resultEl.innerHTML;
+});
+
+btnStart.addEventListener("click", () => {
+  const S = st[step];
+  if (!S.pred) return;
+  if (S.done){ initRun(step); S.verdict = S.verdict; }
+  S.running = !S.running;
+  updateUI();
+});
+document.getElementById("reset").addEventListener("click", () => {
+  initRun(step); st[step].pred = step === 4 && RT ? "T" : null; st[step].verdict = ""; resultEl.innerHTML = ""; updateUI();
+});
+stepBtns.forEach(b => b.addEventListener("click", () => {
+  const s = +b.dataset.s; if (s > unlocked) return;
+  st[step].running = false; step = s; renderStep();
+}));
+document.getElementById("tempo").addEventListener("change", e => { tempo = parseFloat(e.target.value); });
+const rbIn = document.getElementById("rb"), rbVal = document.getElementById("rbval");
+const utIn = document.getElementById("ut"), utVal = document.getElementById("utval");
+function paramChanged(){
+  RB = parseFloat(rbIn.value); UT = parseFloat(utIn.value);
+  rbVal.textContent = fmt(RB, 1) + " kΩ"; utVal.textContent = fmt(UT, 1) + " V";
+  setStepText();
+  initRun(step); st[step].pred = null; st[step].verdict = ""; resultEl.innerHTML = ""; updateUI();
+}
+rbIn.addEventListener("input", paramChanged);
+utIn.addEventListener("input", paramChanged);
+const togs = [...document.querySelectorAll("button.tog")];
+togs.forEach(t => t.addEventListener("click", () => { graphMode = t.dataset.g; togs.forEach(u => u.classList.toggle("on", u === t)); }));
+
+// ---------- opgave ----------
+const R50 = Rldr(50);                       // kΩ, model
+const num = v => parseFloat(String(v).replace(",", ".").trim());
+const taIn = document.getElementById("ta"), tbIn = document.getElementById("tb");
+const fa = document.getElementById("fa"), fbb = document.getElementById("fbb");
+function say(el, ok, html){ el.className = "fb" + (ok ? " ok" : ""); el.innerHTML = html; }
+document.getElementById("ca").addEventListener("click", () => {
+  const a = num(taIn.value);
+  if (!isFinite(a)) return say(fa, false, "Skriv et tal, fx 12,3.");
+  if (Math.abs(a - R50) <= 0.8) say(fa, true, `Godt aflæst. Kurven giver ${fmt(R50, 1)} kΩ ved 50 lux.`);
+  else if (Math.abs(a - R50) <= 3) say(fa, false, "Tæt på, men aflæs igen: find 50 lux på den vandrette akse, gå lodret op til kurven og vandret over til den lodrette akse.");
+  else say(fa, false, "Det passer ikke. Husk at bruge grafen for R<sub>LDR</sub> (vælg den over grafen) og aflæse ved 50 lux.");
+});
+document.getElementById("cb").addEventListener("click", () => {
+  const b = num(tbIn.value), a = num(taIn.value);
+  const Rtrue = R50*UT/(U0 - UT);
+  const Rown = isFinite(a) ? a*UT/(U0 - UT) : NaN;
+  if (!isFinite(b)) return say(fbb, false, "Skriv et tal, fx 5,2.");
+  if (Math.abs(b - Rtrue)/Rtrue <= 0.06 || (isFinite(Rown) && Math.abs(a - R50) <= 0.8 && Math.abs(b - Rown)/Rown <= 0.03))
+    say(fbb, true, "Rigtigt. Test den nu i animationen.");
+  else if (isFinite(a) && Math.abs(b - a*(U0 - UT)/UT)/(a*(U0 - UT)/UT) <= 0.05)
+    say(fbb, false, "Du har vist byttet om på de to spændingsfald. Når lampen tænder, er der 14,0 V over <i>R</i> og 36,0 V over LDR'en.");
+  else say(fbb, false, "Prøv igen. Hvor stort er spændingsfaldet over LDR'en, når lampen tænder? Strømstyrken er den samme i LDR'en og i <i>R</i>.");
+});
+tbIn.addEventListener("input", () => {
+  const b = num(tbIn.value);
+  RT = isFinite(b) && b >= 0.5 && b <= 50 ? b : null;
+  initRun(4); st[4].pred = RT ? "T" : null; st[4].verdict = "";
+  if (step === 4){ resultEl.innerHTML = ""; updateUI(); }
+});
+const SOL = String.raw`<p><b>a)</b> Ved $50\ \text{lux}$ aflæses $R_{\text{LDR}} \approx 10{,}5\ \text{k}\Omega$.</p>
+<p><b>b)</b> Lampen skal tænde, når $U_{\text{ud}} = 14{,}0\ \text{V}$. Så er spændingsfaldet over LDR'en $50\ \text{V} - 14{,}0\ \text{V} = 36{,}0\ \text{V}$. Strømstyrken er den samme i begge resistorer: $$I = \frac{36{,}0\ \text{V}}{10{,}5\ \text{k}\Omega} = 3{,}43\ \text{mA}.$$ Dermed er $$R = \frac{U_{\text{ud}}}{I} = \frac{14{,}0\ \text{V}}{3{,}43\ \text{mA}} = 4{,}08\ \text{k}\Omega.$$</p>
+<p><b>c)</b> Med $R = 4{,}1\ \text{k}\Omega$ tænder lampen ved ca. $50\ \text{lux}$. Den mindre resistor får lampen til at tænde tidligere end med $6{,}3\ \text{k}\Omega$, præcis som trin 2 viste.</p>`;
+const solBody = document.getElementById("solbody");
+document.getElementById("sol").addEventListener("click", () => {
+  solBody.hidden = !solBody.hidden;
+  if (!solBody.hidden && !solBody.dataset.done){
+    solBody.innerHTML = SOL;
+    if (window.renderMathInElement) renderMathInElement(solBody, { delimiters: [{left:"$$", right:"$$", display:true}, {left:"$", right:"$", display:false}], throwOnError:false });
+    solBody.dataset.done = "1";
+  }
+  document.getElementById("sol").textContent = solBody.hidden ? "Vis løsning" : "Skjul løsning";
+});
+
+// ---------- forklaring ----------
+const WHY_PARAS = [
+  String.raw`## Belysningsstyrke`,
+  String.raw`Belysningsstyrken $E$ angiver, hvor meget lys der rammer en flade, vægtet efter hvor følsomt det menneskelige øje er over for de forskellige farver. Enheden er lux. Direkte sollys giver op til ca. $100\,000\ \text{lux}$, en overskyet dag nogle tusinde lux, en oplyst stue et par hundrede lux, og en nat med fuldmåne under $1\ \text{lux}$.`,
+  String.raw`## Spændingsdeleren`,
+  String.raw`$R_{\text{LDR}}$ og $R$ sidder i serie, og $U_{\text{ud}}$ er spændingsfaldet over $R$. Spændingsdelerformlen giver $$U_{\text{ud}} = \frac{R}{R + R_{\text{LDR}}}\cdot U.$$ Voltmeteret og styringen regnes for ideelle, så de trækker ingen strøm.`,
+  String.raw`## Hvorfor falder $U_{\text{ud}}$, når det bliver mørkt?`,
+  String.raw`Når lyset aftager, bliver $R_{\text{LDR}}$ *større*. Så bliver nævneren $R + R_{\text{LDR}}$ i spændingsdelerformlen større, og brøken foran $U$ bliver mindre. $U_{\text{ud}}$ falder altså. Man kan også se det sådan: strømstyrken $$I = \frac{U}{R + R_{\text{LDR}}}$$ bliver mindre, og derfor bliver $U_{\text{ud}} = R\cdot I$ mindre. Spændingen over LDR'en stiger, men $U_{\text{ud}}$ måles over den faste resistor.`,
+  String.raw`## Fuldt dagslys`,
+  String.raw`Måler man i fuldt dagslys, er strømstyrken gennem $R$ ca. $I = 7{,}5\ \text{mA}$. Effekten i $R$ er $$P = R\cdot I^2 = 6{,}3\cdot 10^{3}\ \Omega\cdot(7{,}5\cdot 10^{-3}\ \text{A})^2 = 0{,}354\ \text{W}.$$ Spændingsfaldet over $R$ er $U_{\text{ud}} = R\cdot I = 6{,}3\ \text{k}\Omega\cdot 7{,}5\ \text{mA} = 47{,}25\ \text{V}$, så der er $50\ \text{V} - 47{,}25\ \text{V} = 2{,}75\ \text{V}$ tilbage over LDR'en. Dens resistans er $$R_{\text{LDR}} = \frac{2{,}75\ \text{V}}{7{,}5\ \text{mA}} = 0{,}367\ \text{k}\Omega.$$ Aflæst på grafen for $R_{\text{LDR}}$ svarer det til ca. $40\,000\ \text{lux}$, og det er startværdien i animationen.`,
+  String.raw`## Hvornår tænder lampen?`,
+  String.raw`Lampen tænder, når $U_{\text{ud}} = 14{,}0\ \text{V}$. Så er strømstyrken $$I = \frac{U_{\text{ud}}}{R} = \frac{14{,}0\ \text{V}}{6{,}3\ \text{k}\Omega} = 2{,}222\ \text{mA},$$ og spændingsfaldet over LDR'en er $50\ \text{V} - 14{,}0\ \text{V} = 36{,}0\ \text{V}$. Dermed er $$R_{\text{LDR}} = \frac{36{,}0\ \text{V}}{2{,}222\ \text{mA}} = 16{,}2\ \text{k}\Omega.$$ Aflæst på grafen for $R_{\text{LDR}}$ svarer det til en belysningsstyrke på $20{,}9\ \text{lux}$. Lampen tænder altså, når belysningsstyrken falder under ca. $21\ \text{lux}$.`,
+  String.raw`## En større $R$ tænder senere`,
+  String.raw`Regner vi som ovenfor, men med en vilkårlig $R$, er strømstyrken $I = 14{,}0\ \text{V}/R$, når lampen tænder. Så er $$R_{\text{LDR}} = \frac{36{,}0\ \text{V}}{I} = \frac{36{,}0\ \text{V}}{14{,}0\ \text{V}}\cdot R = 2{,}571\cdot R.$$ Den resistans, LDR'en skal op på, er altså *proportional* med $R$. Med $R = 12\ \text{k}\Omega$ skal LDR'en op på $2{,}571\cdot 12\ \text{k}\Omega = 30{,}9\ \text{k}\Omega$ i stedet for $16{,}2\ \text{k}\Omega$. En større $R_{\text{LDR}}$ kræver mindre lys, så det skal være mørkere: $5{,}8\ \text{lux}$ i stedet for $20{,}9\ \text{lux}$. Lampen i B tænder derfor senere.`,
+  String.raw`I animationen halveres belysningsstyrken hvert 10. minut. Fra $20{,}9\ \text{lux}$ til $5{,}8\ \text{lux}$ er der $20{,}9/5{,}8 = 3{,}6$ gange mindre lys, og $2^{1{,}86} = 3{,}6$. Det tager altså $1{,}86$ halveringer, dvs. ca. $19$ minutter.`,
+  String.raw`## LDR uden skærm: lampen kan se sig selv`,
+  String.raw`Uden skærm rammes LDR'en også af lys fra lampen, som kastes tilbage fra vejen. Det lægger ca. $15\ \text{lux}$ oven i himlens lys. Når lampen tænder ved $20{,}9\ \text{lux}$, rammes LDR'en pludselig af $20{,}9\ \text{lux} + 15\ \text{lux} = 35{,}9\ \text{lux}$. Så falder $R_{\text{LDR}}$, $U_{\text{ud}}$ stiger over $14{,}0\ \text{V}$, og lampen slukker igen. Så bliver det mørkere, og lampen tænder igen, og sådan fortsætter det. Først når himlen alene er nede på $20{,}9\ \text{lux} - 15\ \text{lux} = 5{,}9\ \text{lux}$, er det mørkt nok til, at lampen bliver ved med at lyse. Hvor hurtigt lampen blinker, afhænger af, hvor hurtigt styringen reagerer. I animationen er reaktionstiden sat til $0{,}3\ \text{s}$.`,
+  String.raw`Løsningen er en skærm, fx en skål, der vender opad, så LDR'en kun ser himlen. Rigtige styringer har desuden to tærskler, fx tænd under $14\ \text{V}$ og sluk først over $20\ \text{V}$. Det er samme idé som termostaten i køleskabet, der starter kompressoren ved én resistans og stopper den ved en anden.`,
+  String.raw`## Bemærkninger`,
+  String.raw`LDR'en er beskrevet med $$R_{\text{LDR}} = \frac{74\ \text{k}\Omega}{\sqrt{E/\text{lux}}},$$ som passer med en typisk LDR. Ved meget lave belysningsstyrker, under ca. $3\ \text{lux}$, er det en forlængelse af kurven.`,
+  String.raw`Skumringen er forenklet: belysningsstyrken starter på $40\,000\ \text{lux}$ kl. 19.00 og halveres hvert 10. minut. Animationen går langsommere, mens det er skumring, så man kan se, hvornår lampen tænder.`,
+  String.raw`Voltmeteret og styringen regnes for ideelle, så de ikke trækker strøm. Ellers ville de ændre spændingsdeleren.`
+];
+function mdToHtml(s){ return s.replace(/\*([^*$]+)\*/g, "<em>$1</em>"); }
+const modal = document.getElementById("modal"), whyBody = document.getElementById("whyBody");
+whyBody.innerHTML = WHY_PARAS.map(p => p.startsWith("## ") ? `<h3>${p.slice(3)}</h3>` : `<p>${mdToHtml(p)}</p>`).join("");
+let mathRendered = false;
+btnWhy.addEventListener("click", () => {
+  modal.classList.add("open");
+  if (!mathRendered && window.renderMathInElement){
+    renderMathInElement(whyBody, { delimiters: [{left:"$$", right:"$$", display:true}, {left:"$", right:"$", display:false}], throwOnError:false });
+    mathRendered = true;
+  }
+});
+document.getElementById("close").addEventListener("click", () => modal.classList.remove("open"));
+modal.addEventListener("click", e => { if (e.target === modal) modal.classList.remove("open"); });
+document.addEventListener("keydown", e => { if (e.key === "Escape") modal.classList.remove("open"); });
+document.getElementById("copy").addEventListener("click", async (e) => {
+  const text = "Hvorfor tænder gadelyset, når det gør?\n\n" + WHY_PARAS.map(p => p.replace(/^## /, "")).join("\n\n");
+  try { await navigator.clipboard.writeText(text); e.target.textContent = "Kopieret ✓"; }
+  catch { e.target.textContent = "Kunne ikke kopiere"; }
+  setTimeout(() => e.target.textContent = "Kopiér tekst", 1600);
+});
+
+// ---------- løkke ----------
+function advance(S, dt){
+  S.t = Math.min(T_END, S.t + rate(Esky(S.t))*tempo*dt);
+  for (const b of S.bands){
+    const E = Esky(S.t) + (!b.shield && b.lamp ? E_LAMP : 0);
+    const want = Uud(b.R, E) < UT;
+    if (want !== b.lamp){
+      b.pend += dt;
+      if (b.shield || b.pend >= DELAY){
+        b.lamp = want; b.pend = 0;
+        if (want){ b.ons++; if (b.firstOn === null) b.firstOn = S.t; b.lastOn = S.t; }
+      }
+    } else b.pend = 0;
+  }
+  if (S.t >= T_END) finish();
+}
+let last = null;
+function frame(ms){
+  const now = ms/1000;
+  if (last === null) last = now;
+  const dt = Math.min(0.05, now - last); last = now;
+  const S = st[step];
+  if (S.running) advance(S, dt);
+  drawScene(); drawGraph();
+  requestAnimationFrame(frame);
+}
+
+renderStep();
+window.addEventListener("resize", layout);
+if (window.ResizeObserver){ const ro = new ResizeObserver(() => layout()); ro.observe(cv); ro.observe(gv); }
+if (document.fonts){
+  document.fonts.load(`16px ${SERIF}`).catch(() => {});
+  document.fonts.load(`italic 16px ${MATH}`).catch(() => {});
+}
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>
