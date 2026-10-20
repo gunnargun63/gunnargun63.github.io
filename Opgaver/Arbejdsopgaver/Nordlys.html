@@ -312,6 +312,32 @@ dl.data dd b{color:var(--yellow);font-weight:normal}
     </div>
   </section>
 
+  <section class="opg" id="opg8">
+    <h3><span class="nr">8</span> &middot; <span style="color:var(--yellow)">&#9733; Udfordring:</span> Hvor langt når atomet, før det lyser rødt?</h3>
+    <p>I opgave 3 fandt du, at oxygenatomet udsender den røde foton, når det springer fra <i class="sym">E</i><sub>1</sub> ned til grundtilstanden. Men atomet har ikke travlt: i gennemsnit går der <b>110 s</b>, fra det kommer op i <i class="sym">E</i><sub>1</sub>, til det udsender fotonen. Imens bevæger det sig rundt mellem de andre partikler i atmosfæren.</p>
+    <p>I 250 km&#39;s højde, hvor det røde nordlys er kraftigst, er temperaturen ca. <b>1000 K</b>. Atomerne i en gas har en gennemsnitlig kinetisk energi, der kun afhænger af gassens temperatur.</p>
+    <p><b>a)</b> Find selv et udtryk for den gennemsnitlige kinetiske energi af et atom i en gas med temperaturen <i class="sym">T</i>. Beregn derefter farten af et oxygenatom i 250 km&#39;s højde. Et oxygenatom har massen 16 u, og 1 u = 1,661 &middot; 10<sup>&minus;27</sup> kg.</p>
+    <div class="felt">
+      <span class="navn"><i class="sym">v</i> =</span>
+      <input id="f11" type="text" autocomplete="off" spellcheck="false">
+      <span class="enhed">m/s</span>
+      <button class="tjek" data-f="11">Tjek</button>
+    </div>
+    <div class="fb" id="fb11"></div>
+    <p style="margin-top:14px"><b>b)</b> Hvor langt ville atomet nå at bevæge sig på 110 s, hvis det fløj lige ud?</p>
+    <div class="felt">
+      <span class="navn"><i class="sym">s</i> =</span>
+      <input id="f12" type="text" autocomplete="off" spellcheck="false">
+      <span class="enhed">km</span>
+      <button class="tjek" data-f="12">Tjek</button>
+    </div>
+    <div class="fb" id="fb12"></div>
+    <div class="loesRow">
+      <button class="visOpg" data-o="8" disabled>Vis løsning til opgave 8</button>
+      <span class="laas" id="laas8"></span>
+    </div>
+  </section>
+
   <div class="status">
     <div class="row" style="margin:0">
       <span class="tal" id="statusTxt">Ingen svar tjekket endnu.</span>
@@ -351,6 +377,11 @@ const LAM_N = 427.8e-9;        // N2+ (blåviolet), målt, m
 const EN_OEVRE = 3.168;        // N2+: exciteret niveau, eV (over grundtilstanden)
 const EN_NEDRE = 0.270;        // N2+: vibrationsniveau lige over grundtilstanden, eV
 const EKIN_KEV = 5.00;         // elektronens kinetiske energi, keV
+const K_B = 1.381e-23;         // Boltzmanns konstant, J/K (eleverne skal selv finde den)
+const U_KG = 1.661e-27;        // atomar masseenhed, kg
+const M_O = 16 * U_KG;         // oxygenatomets masse, kg
+const T_LUFT = 1000;           // temperatur i 250 km's højde, K
+const TAU_ROED = 110;          // middellevetid af E1 (rødt), s
 
 const D = (() => {
   const Eg = HC / LAM_G, Er = HC / LAM_R, En = HC / LAM_N;   // J
@@ -363,7 +394,10 @@ const D = (() => {
   const EkJ = EkEV * EV;
   const dEN = EN_OEVRE - EN_NEDRE;                           // eV
   const lamN = HC / (dEN * EV);                              // m
-  return { Eg, Er, En, EgEV, ErEV, EnEV, E1, E2, E2J, lamUV, dEN, lamN,
+  const EkO = 1.5 * K_B * T_LUFT;                            // J
+  const vO = Math.sqrt(2 * EkO / M_O);                       // m/s (kvadratisk middelfart)
+  const sO = vO * TAU_ROED;                                  // m
+  return { Eg, Er, En, EgEV, ErEV, EnEV, E1, E2, E2J, lamUV, dEN, lamN, EkO, vO, sO,
            EkEV, EkJ, N: EkEV / E2, v: Math.sqrt(2 * EkJ / ME) };
 })();
 // ================= FYSIK-END =================
@@ -417,9 +451,9 @@ function parseTal(raw){
 const taet = (a, b, tol) => isFinite(a) && isFinite(b) && b !== 0 && Math.abs(a - b) <= tol * Math.abs(b);
 
 // ---------- tilstand ----------
-const OPG_FELTER = [[0,1],[2,3],[4,5],[6],[7],[8],[9]];
+const OPG_FELTER = [[0,1],[2,3],[4,5],[6],[7],[8],[9],[10,11]];
 const ANTAL_OPG = OPG_FELTER.length;
-const ANTAL_FELT = 10;
+const ANTAL_FELT = 12;
 const ny = (v) => Array(ANTAL_FELT).fill(v);
 let svar = ny(null), forsoeg = ny(0), kvalitet = ny(null);
 let loesningSet = Array(ANTAL_OPG).fill(false);
@@ -430,10 +464,10 @@ const felter = [...Array(ANTAL_FELT)].map((_, i) => document.getElementById("f" 
 const fbEl   = [...Array(ANTAL_FELT)].map((_, i) => document.getElementById("fb" + (i + 1)));
 
 function facit(i){
-  return [D.Eg, D.EgEV, D.Er, D.ErEV, D.E1, D.E2, D.lamUV * 1e9, D.lamN * 1e9, D.N, D.v][i];
+  return [D.Eg, D.EgEV, D.Er, D.ErEV, D.E1, D.E2, D.lamUV * 1e9, D.lamN * 1e9, D.N, D.v, D.vO, D.sO / 1e3][i];
 }
 function tolerance(i){
-  return [0.02, 0.02, 0.02, 0.02, 0.02, 0.02, 0.015, 0.02, 0.02, 0.02][i];
+  return [0.02, 0.02, 0.02, 0.02, 0.02, 0.02, 0.015, 0.02, 0.02, 0.02, 0.02, 0.02][i];
 }
 
 // ---------- typiske fejl ----------
@@ -524,6 +558,25 @@ function diagnose(i, v){
     push(v >= C, "Det er hurtigere end lyset, og det kan en elektron ikke. Tjek enhederne.");
     push(v > 0 && v < 1e5, "Svaret er alt for lille. Tjek, at energien er regnet om til joule.");
   }
+  if (i === 10){
+    const kT = K_B * T_LUFT;
+    push(taet(v, Math.sqrt(2 * kT / M_O), 0.02), "Du har brugt <i class='sym'>E</i><sub>kin</sub> = <i class='sym'>k</i>&middot;<i class='sym'>T</i>. For et atom i en gas er den gennemsnitlige kinetiske energi <i>3/2</i> gange så stor.");
+    push(taet(v, Math.sqrt(kT / M_O), 0.02), "Du har brugt <i class='sym'>E</i><sub>kin</sub> = &frac12;&middot;<i class='sym'>k</i>&middot;<i class='sym'>T</i>. Det gælder for én retning ad gangen; et atom kan bevæge sig i tre retninger.");
+    push(taet(v, Math.sqrt(1.5 * kT / M_O), 0.02), "Enten mangler 2-tallet, når farten isoleres af <i class='sym'>E</i><sub>kin</sub> = &frac12;&middot;<i class='sym'>m</i>&middot;<i class='sym'>v</i><sup>2</sup>, eller også har du brugt massen af et O<sub>2</sub>-molekyle. Heroppe er oxygen atomart, så massen er 16 u.");
+    push(taet(v, 3 * kT / M_O, 0.03), "Det er <i class='sym'>v</i><sup>2</sup>. Tag kvadratroden.");
+    push(taet(v, Math.sqrt(3 * K_B * (T_LUFT + 273.15) / M_O), 0.02), "Temperaturen er allerede i kelvin: 1000 K skal ikke omregnes.");
+    push(taet(v, Math.sqrt(3 * K_B * (T_LUFT - 273.15) / M_O), 0.02), "Temperaturen er opgivet i kelvin og skal bruges, som den er: <i class='sym'>T</i> = 1000 K.");
+    push(taet(v, Math.sqrt(3 * kT / U_KG), 0.02), "Du har brugt massen 1 u. Et oxygenatom vejer 16 u.");
+    push(v > 0 && v < 1e-3, "Svaret er alt for lille. Har du husket at regne massen om til kg med 1 u = 1,661&middot;10<sup>&minus;27</sup> kg?");
+    push(v > 1e5, "Svaret er alt for stort. Et atom i en gas på 1000 K bevæger sig med en fart på størrelse med en pistolkugle.");
+  }
+  if (i === 11){
+    push(taet(v, D.sO, 0.03), "Det er strækningen i meter. Feltet vil have km.");
+    push(taet(v, D.vO / TAU_ROED, 0.03) || taet(v, D.vO / TAU_ROED / 1e3, 0.03), "Du har divideret med tiden. Strækningen er fart gange tid: <i class='sym'>s</i> = <i class='sym'>v</i>&middot;<i class='sym'>t</i>.");
+    push(taet(v, D.vO * TAU_ROED / 3.6 / 1e3, 0.03) || taet(v, D.vO * TAU_ROED * 3.6 / 1e3, 0.03), "Pas på omregningen. Med <i class='sym'>v</i> i m/s og <i class='sym'>t</i> i s får du <i class='sym'>s</i> i meter, og 1 km = 1000 m.");
+    const vEget = svar[10] === true ? parseTal(felter[10].value) : null;
+    push(!vEget && v > 0, "Brug farten fra a), og gang med tiden.");
+  }
   return tip;
 }
 
@@ -580,6 +633,8 @@ function tjek(i){
     if (i === 6) txt += " Det er ultraviolet lys, kortere end de ca. 380 nm, øjet kan se. Springet er tilføjet i diagrammet ovenfor.";
     if (i === 7){ txt += " Den målte værdi er 427,8 nm – forskellen skyldes afrunding af niveauernes energi."; opdaterN2(); }
     if (i === 9) txt += ` Det er ${Math.round(100 * D.v / C)} % af lysets fart.`;
+    if (i === 10) txt += ` Det er ca. ${Math.round(D.vO * 3.6 / 100) * 100} km/h.`;
+    if (i === 11) txt += " Mere end højden af hele det røde nordlys. Se løsningen for, hvorfor det alligevel ikke sker.";
     fbEl[i].innerHTML = txt;
   } else {
     const tip = diagnose(i, v);
@@ -1442,6 +1497,21 @@ function byg7(){
     String.raw`Sammenlignet med lysets fart: $$\frac{v}{c} = \frac{${sciTex(D.v, 4)}\ \text{m/s}}{${cTex}} = ${sigTex(D.v / C, 3)},$$ altså ${Math.round(100 * D.v / C)} % af lysets fart. Med den fart når elektronen fra Månen til Jorden på under ti sekunder.`
   ];
 }
+function byg8(){
+  const kT = K_B * T_LUFT;
+  return [
+    String.raw`## 8. Hvor langt når atomet, før det lyser rødt?`,
+    String.raw`*a)* For en gas med temperaturen $T$ (målt i kelvin) er den gennemsnitlige kinetiske energi af ét atom $$E_{\text{kin}} = \frac{3}{2}\cdot k\cdot T,$$ hvor $k = 1{,}381\cdot 10^{-23}\ \text{J/K}$ er Boltzmanns konstant. I 250 km's højde er $$E_{\text{kin}} = \frac{3}{2}\cdot 1{,}381\cdot 10^{-23}\ \text{J/K}\cdot 1000\ \text{K} = ${sciTex(D.EkO, 4)}\ \text{J}.$$ Kelvin forkorter, og der står joule tilbage.`,
+    String.raw`Atomets masse i kg: $$m = 16\ \text{u} = 16\cdot 1{,}661\cdot 10^{-27}\ \text{kg} = ${sciTex(M_O, 4)}\ \text{kg}.$$`,
+    String.raw`Farten isoleres som i opgave 7: af $E_{\text{kin}} = \frac{1}{2}\cdot m\cdot v^2$ fås $$v = \sqrt{\frac{2\cdot E_{\text{kin}}}{m}} = \sqrt{\frac{2\cdot ${sciTex(D.EkO, 4)}\ \text{J}}{${sciTex(M_O, 4)}\ \text{kg}}} = \sqrt{${sciTex(2 * D.EkO / M_O, 4)}\ \text{m}^2/\text{s}^2} = ${sciTex(D.vO, 3)}\ \text{m/s}.$$ Det er ca. ${Math.round(D.vO * 3.6 / 100) * 100} km/h &ndash; hurtigere end en pistolkugle.`,
+    String.raw`*b)* Hvis atomet fløj lige ud med konstant fart, ville det på 110 s nå $$s = v\cdot t = ${sciTex(D.vO, 4)}\ \text{m/s}\cdot 110\ \text{s} = ${sciTex(D.sO, 3)}\ \text{m} = ${sigTex(D.sO / 1e3, 3)}\ \text{km}.$$ Sekunderne forkorter, og der står meter tilbage.`,
+    String.raw`*Hvad betyder det?* Atomet flyver ikke lige ud. Selv i 250 km's højde støder det ind i en anden partikel cirka hvert andet sekund og skifter retning. Det når derfor at støde ind i noget mange gange, før det udsender den røde foton, og det er grunden til, at det røde lys kun overlever højt oppe: længere nede er stødene så hyppige, at et af dem næsten sikkert tager energien, før atomet når at lyse. Atomet bevæger sig dog stadig flere km rundt, mens det venter, så det røde lys bliver mere udtværet end det grønne. Det grønne udsendes efter under et sekund, hvor atomet kun når et par hundrede meter.`,
+    String.raw`*Hvorfor er det så varmt deroppe?* Over ca. 90 km begynder *termosfæren*. Her absorberes Solens ekstreme ultraviolette lys og røntgenstråling, som splitter O$_2$-molekylerne og ioniserer atomerne. Den overskydende energi bliver til bevægelsesenergi, altså varme. Der er meget få partikler, så selv lidt energi giver hver partikel en stor fart, og atomart oxygen kan næsten ikke komme af med varmen ved at udstråle den. Temperaturen svinger med Solens aktivitet, fra ca. 700 K til over 1500 K.`,
+    String.raw`*Ville man brænde sig?* Nej. Temperaturen fortæller, hvor hurtigt partiklerne bevæger sig, men der er så få af dem, at de næsten ikke kan overføre varme. En astronaut heroppe ville tværtimod miste varme ved at udstråle den og blive kold.`,
+    String.raw`*Giver temperatur mening så højt oppe?* Ja, i 250 km's højde. Atomerne støder sammen ofte nok til, at farterne fordeler sig som i en almindelig gas, og temperaturen kan endda måles ud fra, hvor bred den røde linje er. Men over ca. 500&ndash;700 km støder partiklerne næsten aldrig sammen, og så holder temperaturbegrebet op med at give mening.`,
+    String.raw`*Hvilken fart er det?* Farten fra $E_{\text{kin}} = \frac{3}{2}\cdot k\cdot T$ er en slags gennemsnit. Atomerne i gassen har mange forskellige farter, nogle hurtigere og nogle langsommere.`
+  ];
+}
 function bygBemaerk(){
   return [
     String.raw`## Bemærkninger`,
@@ -1454,7 +1524,7 @@ function bygBemaerk(){
   ];
 }
 function loesningsAfsnit(){
-  return [].concat(byg1(), byg2(), byg3(), byg4(), byg5(), byg6(), byg7(), bygBemaerk());
+  return [].concat(byg1(), byg2(), byg3(), byg4(), byg5(), byg6(), byg7(), byg8(), bygBemaerk());
 }
 function mdTilHtml(s){ return s.replace(/\*([^*$]+)\*/g, "<em>$1</em>"); }
 
@@ -1540,7 +1610,7 @@ function afsnitFor(n){
   if (n === "formler") return formelSamling();
   if (n === "forklaring") return nordlysForklaring();
   if (n === null) return loesningsAfsnit();
-  return [byg1(), byg2(), byg3(), byg4(), byg5(), byg6(), byg7().concat(bygBemaerk())][n];
+  return [byg1(), byg2(), byg3(), byg4(), byg5(), byg6(), byg7(), byg8().concat(bygBemaerk())][n];
 }
 let visesNu = null;
 function aabn(n){
