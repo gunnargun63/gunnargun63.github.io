@@ -769,6 +769,9 @@ const ALT_TOP = 360, ALT_BOT = 50;      // km, højdeintervallet på tegningen
 const SPRITE_H = 256;
 const nyCanvas = () => document.createElement("canvas");
 const aur = nyCanvas(), atx = aur.getContext("2d");
+// råt, lodret nordlys tegnes her (lidt bredere end billedet); bagefter forskydes det til aur
+const raa = nyCanvas(), rtx = raa.getContext("2d", { willReadFrequently: true });
+let PADR = 0, utImg = null, skaevArr = null;
 const gloM = nyCanvas(), gmx = gloM.getContext("2d", { willReadFrequently: true });
 const gloB = nyCanvas(), gbx = gloB.getContext("2d");
 let gBuf = null, gTmp = null, gImgB = null;
@@ -861,6 +864,10 @@ function bygHimmel(){
   const horisont = Ha - 34 * sk;
   geo = { sk, horisont, yTop: 16, yBund: horisont - 4 };
   aur.width = Math.ceil(W / 2); aur.height = Math.ceil(Ha / 2);
+  PADR = Math.ceil(aur.width * 0.15);
+  raa.width = aur.width + 2 * PADR; raa.height = aur.height;
+  utImg = atx.createImageData(aur.width, aur.height);
+  skaevArr = new Float32Array(aur.width);
   gloM.width = gloB.width = Math.ceil(W / 4);
   gloM.height = gloB.height = Math.ceil(Ha / 4);
   gBuf = new Float32Array(gloM.width * gloM.height * 4);
@@ -884,26 +891,19 @@ function bygHimmel(){
 const TIDSFAKTOR = 1.6;                    // lidt hurtigere end referencen
 function tegnNordlys(tt){
   const t = tt * TIDSFAKTOR;
-  const c = atx, AW = aur.width, AH = aur.height;
+  const AW = aur.width, AH = aur.height, RW = raa.width;
+  const c = rtx;
   c.globalCompositeOperation = "source-over";
-  c.clearRect(0, 0, AW, AH);
+  c.clearRect(0, 0, RW, AH);
   c.globalCompositeOperation = "lighter";
   const bG = pletTilstand(PLET_G, t, 0);
   const bR = pletTilstand(PLET_R, t * 0.8, 1.7);
   // nordlyset blusser op i ny og næ; så kommer den lilla nitrogenkant frem
   const blus = Math.pow(Math.max(0, Math.sin(t * 0.1 + 1.0)), 4);
   const yR0 = yAlt(ALT_TOP) / 2, yR1 = yAlt(ALT_BOT) / 2;
-  // Hældning: hver søjle tegnes skævt (shear) om sin underkant. Hældningen varierer
-  // langsomt med vandret position og tid, så gardinerne nogle gange står lodret og
-  // nogle gange læner sig til den ene eller anden side.
-  const vipFase = 0.5 + 0.5 * Math.sin(t * 0.045 + 0.8);       // hvor meget det hele hælder lige nu
-  const SB = 3;                                               // strimlernes bredde i px; de overlapper, så der ikke opstår moiré
-  const PAD = Math.round(AW * 0.15);                           // tegn lidt uden for billedet, så skæve gardiner kan læne sig ind
-  for (let ax = -PAD; ax < AW + PAD; ax++){
-    const fx = (ax + 0.5) / AW, x = ax * 2;
-    const skaev = 0.42 * vipFase * (0.7 * Math.sin(fx * 2.1 + t * 0.06 + 0.7)
-                                  + 0.3 * Math.sin(fx * 3.3 - t * 0.09 + 2.1));
-    // uregelmæssige stråler, ikke faste striber
+  // 1) Nordlyset tegnes helt lodret, én søjle pr. pixel, lidt ud over billedets kanter.
+  for (let ax = -PADR; ax < AW + PADR; ax++){
+    const fx = (ax + 0.5) / AW, x = ax * 2, px = ax + PADR;
     // kun en svag antydning af stråler
     const st = 0.94 + 0.06 * Math.sin(x * 0.035 + 2.2 * Math.sin(fx * 5.3 + t * 0.21) + t * 0.4);
     // en lille tærskel, så der ikke ligger et svagt slør over hele himlen
@@ -913,32 +913,57 @@ function tegnNordlys(tt){
     if (Ig <= 0.008 && Ir <= 0.008) continue;
     const bund = 104 + 4 * Math.sin(fx * 9.4 + t * 0.17) + 4 * Math.sin(fx * 9.4 - t * 0.17)
                + 3 * Math.sin(fx * 4.6 + t * 0.09) + 7 * turb(fx * 0.3, t, 0.4);   // glat underkant, ingen takker
-    const yPiv = yAlt(bund) / 2;
-    // x' = x + skaev*(yPiv - y): uændret ved underkanten, forskudt opad
-    c.setTransform(1, 0, -skaev, 1, skaev * yPiv, 0);
     if (Ig > 0.008){
       const top = 252;                         // profilen er faset helt ud herunder, så toppen bliver blød
       const r0 = rowAlt(top), r1 = rowAlt(bund);
       const y0 = yAlt(top) / 2, y1 = yAlt(bund) / 2;
-      c.globalAlpha = Math.min(1, Ig) / SB;
-      c.drawImage(spG, 0, r0, 1, r1 - r0, ax - 1, y0, SB, y1 - y0);
-      c.drawImage(spGf, ax - 1, y1, SB, (yAlt(bund - 4) - yAlt(bund)) / 2);
+      c.globalAlpha = Math.min(1, Ig);
+      c.drawImage(spG, 0, r0, 1, r1 - r0, px, y0, 1, y1 - y0);
+      c.drawImage(spGf, px, y1, 1, (yAlt(bund - 4) - yAlt(bund)) / 2);
       const In = blus * Math.pow(Math.max(0, (Ig - 0.25) / 0.55), 1.1);
       if (In > 0.01){
-        c.globalAlpha = Math.min(1, 1.15 * In) / SB;
+        c.globalAlpha = Math.min(1, 1.15 * In);
         // starter 2 km inde i det grønne og fades ind, så farverne glider over i hinanden
         const yv = yAlt(bund + 2) / 2;
-        c.drawImage(spN, ax - 1, yv, SB, (yAlt(bund - 20) - yAlt(bund + 2)) / 2);
+        c.drawImage(spN, px, yv, 1, (yAlt(bund - 20) - yAlt(bund + 2)) / 2);
       }
     }
     if (Ir > 0.008){
-      c.globalAlpha = Math.min(1, Ir) / SB;
-      c.drawImage(spR, ax - 1, yR0, SB, yR1 - yR0);
+      c.globalAlpha = Math.min(1, Ir);
+      c.drawImage(spR, px, yR0, 1, yR1 - yR0);
     }
   }
-  c.setTransform(1, 0, 0, 1, 0, 0);
   c.globalAlpha = 1;
   c.globalCompositeOperation = "source-over";
+
+  // 2) Hældning: hver pixelrække forskydes sidelæns, mere jo højere oppe, med lineær
+  //    interpolation. Forskydningen varierer langsomt langs himlen og i tid, så
+  //    gardinerne nogle gange står lodret og nogle gange læner sig. Det gøres pixel
+  //    for pixel, så der ikke opstår moiré eller striber.
+  const vipFase = 0.5 + 0.5 * Math.sin(t * 0.045 + 0.8);       // hvor meget det hele hælder lige nu
+  for (let x = 0; x < AW; x++){
+    const fx = (x + 0.5) / AW;
+    skaevArr[x] = 0.42 * vipFase * (0.7 * Math.sin(fx * 2.1 + t * 0.06 + 0.7)
+                                  + 0.3 * Math.sin(fx * 3.3 - t * 0.09 + 2.1));
+  }
+  const src = c.getImageData(0, 0, RW, AH).data, dst = utImg.data;
+  const yPiv = yAlt(104) / 2;
+  for (let y = 0; y < AH; y++){
+    const dy = yPiv - y, rs = y * RW * 4, rd = y * AW * 4;
+    for (let x = 0; x < AW; x++){
+      let xs = x + PADR - skaevArr[x] * dy;
+      if (xs < 0) xs = 0; else if (xs > RW - 1.001) xs = RW - 1.001;
+      const i0 = xs | 0, f = xs - i0, g = 1 - f;
+      const k0 = rs + i0 * 4, k1 = k0 + 4, kd = rd + x * 4;
+      const a0 = src[k0 + 3] * g, a1 = src[k1 + 3] * f, a = a0 + a1;
+      if (a < 0.5){ dst[kd] = dst[kd + 1] = dst[kd + 2] = dst[kd + 3] = 0; continue; }
+      dst[kd]     = (src[k0] * a0 + src[k1] * a1) / a;
+      dst[kd + 1] = (src[k0 + 1] * a0 + src[k1 + 1] * a1) / a;
+      dst[kd + 2] = (src[k0 + 2] * a0 + src[k1 + 2] * a1) / a;
+      dst[kd + 3] = a;
+    }
+  }
+  atx.putImageData(utImg, 0, 0);
   lavGloed();
 }
 
