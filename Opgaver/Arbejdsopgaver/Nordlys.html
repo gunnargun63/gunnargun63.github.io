@@ -132,9 +132,10 @@ dl.data dd b{color:var(--yellow);font-weight:normal}
   <canvas id="himmel"></canvas>
   <div class="row">
     <button id="forklaring" class="primary">Hvordan opstår nordlys?</button>
+    <button id="visning">Vis set fra siden</button>
     <button id="pause">❚❚ Stop dansen</button>
   </div>
-  <p class="note">Tegningen er skematisk og set fra siden. Højderne er rigtige: lyset udsendes mellem ca. 90 og 300 km over jorden. Farverne er kraftigere end dem, øjet ser en almindelig nordlysaften.</p>
+  <p class="note" id="himmelNote"></p>
 
   <div class="fund">
     <div class="txt">
@@ -776,8 +777,10 @@ const gloM = nyCanvas(), gmx = gloM.getContext("2d", { willReadFrequently: true 
 const gloB = nyCanvas(), gbx = gloB.getContext("2d");
 let gBuf = null, gTmp = null, gImgB = null;
 const spG = nyCanvas(), spR = nyCanvas(), spN = nyCanvas(), spGf = nyCanvas();
+const spJG = nyCanvas(), spJR = nyCanvas();   // stråler i visningen fra jorden
 let geo = {}, stjerner = [], bjerge = [];
 let danser = true, tid = 0;
+let visning = "jord";             // "jord" (standard) eller "side"
 
 function yAlt(h){ return geo.yTop + (ALT_TOP - h) / (ALT_TOP - ALT_BOT) * (geo.yBund - geo.yTop); }
 const rowAlt = h => (ALT_TOP - h) / (ALT_TOP - ALT_BOT) * SPRITE_H;
@@ -809,6 +812,15 @@ function bygSprites(){
     const op = h < 240 ? 1 : Math.exp(-(h - 240) / 85);              // ebber langsomt ud opad
     return ind * ind * (3 - 2 * ind) * op;
   });
+  // Visningen fra jorden: én stråle, v = 0 ved underkanten og v = 1 i toppen.
+  // Grønt forneden med blød, men tydelig underkant; rødt ebber ud foroven.
+  lavSprite(spJG, [80, 255, 150], SPRITE_H, u => {
+    const v = 1 - u;
+    const ind = Math.min(1, v / 0.035);
+    const w = Math.min(1, v / 0.68);
+    return 0.7 * ind * Math.pow(Math.cos(0.5 * Math.PI * w), 1.2);
+  });
+  lavSprite(spJR, [255, 72, 72], SPRITE_H, u => { const v = 1 - u; return Math.exp(-Math.pow((v - 0.74) / 0.2, 2)); });
   // blød udfasning af det grønne under underkanten (u = 0 ved underkanten)
   lavSprite(spGf, [80, 255, 150], 32, u => 0.82 * Math.pow(1 - u, 2));
   // N2+: tynd kant lige under den grønne underkant (u = 0 ved underkanten)
@@ -867,6 +879,8 @@ function bygHimmel(){
   PADR = Math.ceil(aur.width * 0.15);
   raa.width = aur.width + 2 * PADR; raa.height = aur.height;
   utImg = atx.createImageData(aur.width, aur.height);
+  jAcc = new Float32Array(aur.width * aur.height * 3);
+  jImg = atx.createImageData(aur.width, aur.height);
   skaevArr = new Float32Array(aur.width);
   gloM.width = gloB.width = Math.ceil(W / 4);
   gloM.height = gloB.height = Math.ceil(Ha / 4);
@@ -967,6 +981,120 @@ function tegnNordlys(tt){
   lavGloed();
 }
 
+// ---------- nordlys set fra jorden ----------
+// Hvert bånd er et langt gardin, der set nedefra slynger sig hen over himlen.
+// Underkanten er en bugtet kurve (x(s), y(s)) med parameter s fra 0 til 1. Fra
+// hvert punkt på kurven udgår en lodret stråle. Den del af gardinet, der er tæt
+// på, står højt på himlen og har lange stråler; den del, der er langt væk, ligger
+// nede ved horisonten og har korte stråler (perspektiv). Lysstyrken langs båndet
+// styres af de samme gaussiske pletter som i visningen fra siden.
+const BAAND = [
+  { seed: 911,  gain: 1.00, f: 1.30, g: 0.85, ph: 0.4, elev: 0.55, eAmp: 0.32 },
+  { seed: 3301, gain: 0.70, f: 1.75, g: 1.20, ph: 2.6, elev: 0.30, eAmp: 0.22 },
+  { seed: 5807, gain: 0.45, f: 2.10, g: 1.55, ph: 4.9, elev: 0.12, eAmp: 0.09 }
+].map(b => ({ ...b, pl: lavPletter(9, b.seed, { amp: 0.06, pulse: 0.2, sMin: 0.03, sVar: 0.05 }),
+                    plR: lavPletter(5, b.seed + 17, { amp: 0.1, pulse: 0.1, sMin: 0.07, sVar: 0.09, taerskel: 0.3 }) }));
+const N_KURVE = 420;
+let jAcc = null, jImg = null;                 // akkumuleringsbuffer (RGB) og billede for visningen fra jorden
+const NP = 128, profG = new Float32Array(NP), profR = new Float32Array(NP);
+for (let k = 0; k < NP; k++){
+  const v = k / (NP - 1);
+  profG[k] = 0.7 * Math.min(1, v / 0.035) * Math.pow(Math.cos(0.5 * Math.PI * Math.min(1, v / 0.68)), 1.2);
+  // rødt overlapper toppen af det grønne og ebber langsomt ud opad
+  profR[k] = v < 0.62 ? Math.exp(-Math.pow((v - 0.62) / 0.2, 2)) : Math.exp(-Math.pow((v - 0.62) / 0.33, 2));
+}
+const kx = new Float32Array(N_KURVE + 1), ky = new Float32Array(N_KURVE + 1), ks = new Float32Array(N_KURVE + 1);
+
+// En stråle lægges direkte i bufferen og fordeles lineært på de to nærmeste
+// pixelsøjler. Så opstår der ingen moiré, uanset hvor tæt strålerne ligger.
+function straale(x, yb, L, Ig, Ir, In, AW, AH){
+  const x0 = Math.floor(x), f = x - x0, w0 = 1 - f, w1 = f;
+  const c0 = x0 >= 0 && x0 < AW, c1 = x0 + 1 >= 0 && x0 + 1 < AW;
+  if (!c0 && !c1) return;
+  const yTop = Math.max(0, Math.floor(yb - L)), yBot = Math.min(AH - 1, Math.ceil(yb + 0.06 * L));
+  for (let y = yTop; y <= yBot; y++){
+    const v = (yb - y) / L;
+    let r = 0, g = 0, bl = 0;
+    if (v >= 0 && v <= 1){
+      const k = (v * (NP - 1)) | 0;
+      const G = 1.2 * Ig * profG[k], R = 0.7 * Ir * profR[k];
+      r += 80 * G + 255 * R; g += 255 * G + 72 * R; bl += 150 * G + 72 * R;
+    }
+    if (In > 0.01){
+      // violet bånd lige omkring og under underkanten
+      const vv = (v + 0.06) / 0.1;
+      if (vv > 0 && vv < 1){ const N = 1.1 * In * Math.sin(Math.PI * vv); r += 195 * N; g += 120 * N; bl += 255 * N; }
+    }
+    if (r + g + bl === 0) continue;
+    const row = y * AW;
+    if (c0){ const i = (row + x0) * 3; jAcc[i] += r * w0; jAcc[i + 1] += g * w0; jAcc[i + 2] += bl * w0; }
+    if (c1){ const i = (row + x0 + 1) * 3; jAcc[i] += r * w1; jAcc[i + 1] += g * w1; jAcc[i + 2] += bl * w1; }
+  }
+}
+
+function tegnNordlysJord(tt){
+  const t = tt * TIDSFAKTOR;
+  const AW = aur.width, AH = aur.height;
+  jAcc.fill(0);
+  const hor = geo.horisont / 2, himmel = hor - geo.yTop / 2;     // halv opløsning
+  const blus = Math.pow(Math.max(0, Math.sin(t * 0.1 + 1.0)), 4);
+  const TRIN = 1;                                                 // én stråle pr. px buelængde
+  for (const b of BAAND){
+    const bl = pletTilstand(b.pl, t * 0.9, b.ph);
+    const blR = pletTilstand(b.plR, t * 0.7, b.ph + 1.3);
+    // båndets slyngning: amplituden vokser og aftager langsomt, så det nogle gange folder sig
+    const amp = 0.09 + 0.07 * Math.sin(t * 0.05 + b.ph);
+    const puls = 0.75 + 0.25 * Math.sin(t * 0.08 + 2 * b.ph);
+    for (let i = 0; i <= N_KURVE; i++){
+      const sv = i / N_KURVE;
+      kx[i] = AW * (-0.2 + 1.4 * sv + amp * Math.sin(2 * Math.PI * b.f * sv + t * 0.07 + b.ph)
+                    + 0.03 * Math.sin(2 * Math.PI * 3.1 * sv - t * 0.11 + 2 * b.ph)
+                    + 0.006 * turb(sv * 0.9, t * 0.5, b.ph + 3));
+      const e = b.elev + b.eAmp * Math.sin(2 * Math.PI * b.g * sv - t * 0.05 + 1.7 * b.ph)
+                       + 0.06 * Math.sin(2 * Math.PI * 2.7 * sv + t * 0.09 + b.ph);
+      ks[i] = Math.max(0.02, Math.min(0.95, e));                  // højde på himlen, 0 = horisont
+      // underkanten får små, uregelmæssige bugter og knæk, mest på den nære del af båndet
+      const ru = (0.012 + 0.02 * ks[i]) * himmel * (turb(sv * 1.3, t * 0.6, b.ph) + 0.5 * turb(sv * 0.45, t * 0.4, b.ph + 1));
+      ky[i] = hor - (0.05 + 0.6 * ks[i]) * himmel + ru;
+    }
+    // gå langs kurven og udsend en stråle for hver px buelængde
+    let rest = 0;
+    for (let i = 0; i < N_KURVE; i++){
+      const dx = kx[i + 1] - kx[i], dy = ky[i + 1] - ky[i];
+      const len = Math.hypot(dx, dy);
+      let pos = rest;
+      while (pos < len){
+        const f = pos / len, sv = (i + f) / N_KURVE;
+        const x = kx[i] + f * dx, y = ky[i] + f * dy, e = ks[i] + f * (ks[i + 1] - ks[i]);
+        if (x > -2 && x < AW + 2){
+          // uregelmæssig strålestruktur fra turbulensfunktionen
+          const st = Math.max(0.3, 0.86 + 0.45 * turb(sv * 4.2, t * 0.5, b.ph + 2) + 0.2 * turb(sv * 11, t * 0.8, b.ph + 5));
+          const Ig = b.gain * puls * Math.max(0, pletSum(bl, sv) - 0.05) * st * (0.55 + 0.45 * e);
+          if (Ig > 0.01){
+            const L = (0.22 + 0.42 * e) * himmel * (0.9 + 0.2 * turb(sv * 2.5, t * 0.4, b.ph + 7));
+            const Ir = pletSum(blR, sv) * (0.1 + 0.4 * Ig);        // rødt: svagere end grønt og kun i perioder
+            const In = blus * Math.pow(Math.max(0, (Ig - 0.3) / 0.5), 1.1);
+            straale(x, y, L, Ig, Ir, In, AW, AH);
+          }
+        }
+        pos += TRIN;
+      }
+      rest = pos - len;
+    }
+  }
+  // buffer -> billede (farven gemmes uden alfa-præmultiplikation)
+  const d = jImg.data;
+  for (let p = 0, q = 0; p < jAcc.length; p += 3, q += 4){
+    const r = jAcc[p], g = jAcc[p + 1], bb = jAcc[p + 2];
+    const m = r > g ? (r > bb ? r : bb) : (g > bb ? g : bb);
+    if (m < 0.5){ d[q + 3] = 0; continue; }
+    const a = m > 255 ? 255 : m, k = 255 / m;
+    d[q] = r * k; d[q + 1] = g * k; d[q + 2] = bb * k; d[q + 3] = a;
+  }
+  atx.putImageData(jImg, 0, 0);
+  lavGloed();
+}
+
 // Glød: aur skaleres ned til 1/4 og sløres med gentagne kassefiltre (tilnærmet
 // gaussisk). Det gøres i koden selv, så det ser ens ud i alle browsere.
 function boksH(a, b, w, h, r){
@@ -1042,7 +1170,7 @@ function tegnHimmel(){
     c.beginPath(); c.arc(s.x, s.y, s.s, 0, 2 * Math.PI); c.fill();
   }
 
-  tegnNordlys(tid);
+  if (visning === "jord") tegnNordlysJord(tid); else tegnNordlys(tid);
   c.save();
   c.globalCompositeOperation = "lighter";
   c.imageSmoothingEnabled = true;
@@ -1068,8 +1196,8 @@ function tegnHimmel(){
   bjerge.forEach(([x, y], k) => k ? c.lineTo(x, y) : c.moveTo(x, y));
   c.stroke();
 
-  // højdeskala
-  for (const h of [100, 200, 300]){
+  // højdeskala (kun i visningen fra siden)
+  if (visning === "side") for (const h of [100, 200, 300]){
     const y = yAlt(h);
     c.strokeStyle = "#B0B0B0"; c.lineWidth = 1.4;
     c.beginPath(); c.moveTo(0, y); c.lineTo(12, y); c.stroke();
@@ -1686,6 +1814,18 @@ felter.forEach((f, i) => f.addEventListener("keydown", e => {
   if (e.key === "Enter"){ e.preventDefault(); tjek(i); }
 }));
 document.getElementById("nulstil").addEventListener("click", nulstilSvar);
+const btnVis = document.getElementById("visning");
+const NOTER = {
+  jord: "Sådan ser nordlyset ud nedefra: lange gardiner, der slynger sig hen over himlen. Den del af gardinet, der er tæt på, står højt på himlen, og den del, der er langt væk, ligger nede ved horisonten. Farverne er kraftigere end dem, øjet ser en almindelig nordlysaften.",
+  side: "Tegningen er skematisk og set fra siden. Højderne er rigtige: lyset udsendes mellem ca. 90 og 300 km over jorden. Farverne er kraftigere end dem, øjet ser en almindelig nordlysaften."
+};
+function saetVisning(v){
+  visning = v;
+  btnVis.textContent = v === "jord" ? "Vis set fra siden" : "Vis set fra jorden";
+  document.getElementById("himmelNote").textContent = NOTER[v];
+  tegnHimmel();
+}
+btnVis.addEventListener("click", () => saetVisning(visning === "jord" ? "side" : "jord"));
 const btnPause = document.getElementById("pause");
 btnPause.addEventListener("click", () => {
   danser = !danser;
@@ -1704,6 +1844,7 @@ function frame(ms){
 
 // ---------- start ----------
 layout();
+saetVisning("jord");
 opdaterStatus();
 window.addEventListener("resize", layout);
 if (document.fonts){
