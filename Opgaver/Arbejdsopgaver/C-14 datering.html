@@ -95,6 +95,11 @@ input.nr:focus{outline:none;border-color:var(--yellow)}
 .fb.nej{color:var(--red)}
 .fb.delvis{color:var(--orange)}
 .fb .tip{color:var(--dim);display:block;margin-top:3px}
+/* udfordringen står uden for regnskabet og markeres derfor anderledes */
+.opg.udfordring{border-left-style:dashed}
+.maerke{color:var(--yellow);font-size:.95rem;border:1px solid var(--yellow);
+  border-radius:4px;padding:1px 7px;margin-left:8px;vertical-align:middle}
+.praemis{color:var(--blue)}
 .loesRow{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;margin:10px 0 0}
 .loesRow button{font-size:.98rem;padding:4px 12px}
 .laas{color:var(--dim);font-size:1rem}
@@ -106,6 +111,7 @@ input.nr:focus{outline:none;border-color:var(--yellow)}
 .status .noegle b{font-weight:normal}
 .prikker{display:inline-flex;gap:7px;margin-left:4px;vertical-align:-2px}
 .prik{width:13px;height:13px;border-radius:50%;border:1.6px solid var(--border)}
+.prikSkel{width:9px}   /* luft foran udfordringens to prikker */
 .prik.ok{background:var(--green);border-color:var(--green)}
 .prik.nej{background:var(--red);border-color:var(--red)}
 .prik.delvis{background:var(--orange);border-color:var(--orange)}
@@ -285,6 +291,36 @@ input.nr:focus{outline:none;border-color:var(--yellow)}
     </div>
   </section>
 
+  <section class="opg udfordring" id="opg6">
+    <h3><span class="nr">6</span> &middot; Hvor sikker er dateringen? <span class="maerke">udfordring</span></h3>
+    <p>Henfald sker tilfældigt. Tæller man det samme døgn om igen, får man ikke præcis det samme tal, og netop derfor har enhver datering en usikkerhed.</p>
+    <p>For tællinger gælder en enkel regel: <b>usikkerheden på et tælletal er kvadratroden af tælletallet selv.</b></p>
+    <p class="praemis"><i class="sym">A</i><sub>0</sub> er beregnet ud fra prøvens masse og ikke målt, så den regnes som eksakt. Usikkerheden kommer alene fra tællingerne i dag.</p>
+    <p><b>a)</b> Bestem usikkerheden &delta; på de <b id="dT3" style="color:var(--yellow);font-weight:normal">&ndash;</b> tællinger.</p>
+    <div class="felt">
+      <span class="navn"><i class="sym">&delta;</i> =</span>
+      <input id="f7" type="text" autocomplete="off" spellcheck="false">
+      <span class="enhed">tællinger</span>
+      <button class="tjek" data-f="7">Tjek</button>
+    </div>
+    <div class="fb" id="fb7"></div>
+    <p><b>b)</b> Bestem usikkerheden <i class="sym">&delta;t</i> på den alder, du fandt i opgave 5.</p>
+    <p class="note" style="margin:4px 0 0">Pas på afrundingen her: svaret er et lille tal, der kommer ud af store tal. Regn med mange cifre undervejs, og rund først af til sidst.</p>
+    <div class="felt">
+      <span class="navn"><i class="sym">&delta;t</i> =</span>
+      <input id="f8" type="text" autocomplete="off" spellcheck="false">
+      <span class="enhed">år</span>
+      <button class="tjek" data-f="8">Tjek</button>
+    </div>
+    <div class="fb" id="fb8"></div>
+    <div class="loesRow">
+      <button id="visVink">Vink til b)</button>
+      <button class="visOpg" data-o="6" disabled>Vis løsning til opgave 6</button>
+      <span class="laas" id="laas6"></span>
+    </div>
+    <p class="note" style="margin:8px 0 0">Vinket er frit &ndash; det noteres ingen steder, og udfordringen tæller ikke med i resultatet.</p>
+  </section>
+
   <div class="status">
     <div class="row" style="margin:0">
       <span class="tal" id="statusTxt">Ingen svar tjekket endnu.</span>
@@ -359,7 +395,14 @@ function opgaveData(nr){
   const taellinger = Math.round(aNuEksakt * eta);      // det tælleren viser, et helt tal
   const aMaalt = Math.round(taellinger / eta);         // aktiviteten efter omregning
   const tSvar = Math.log(a0Doegn / aMaalt) / kAar;          // facit, regnet af de viste tal
-  return { nr, m, alder, nC, n0, kAar, kSek, a0, a0Doegn, eta, taellinger, aMaalt, tSvar };
+  // Tællinger er en Poisson-proces: usikkerheden på et tælletal er kvadratroden af
+  // tælletallet. Udbyttet er eksakt, så den relative usikkerhed går uændret over i
+  // aktiviteten. A_0 er beregnet, ikke målt, og bidrager derfor ikke.
+  const dTael = Math.sqrt(taellinger);          // usikkerhed på tælletallet
+  const dRel  = 1 / Math.sqrt(taellinger);      // samme relative usikkerhed på A
+  const dtSvar = dRel / kAar;                   // usikkerhed på alderen, i år
+  return { nr, m, alder, nC, n0, kAar, kSek, a0, a0Doegn, eta, taellinger, aMaalt, tSvar,
+           dTael, dRel, dtSvar };
 }
 // ================= FYSIK-END =================
 
@@ -434,28 +477,30 @@ const taet = (a, b, tol) => isFinite(a) && isFinite(b) && b !== 0 && Math.abs(a 
 
 // ---------- opgavesættet ----------
 let D = null;                      // aktuelle data
-let svar = [null, null, null, null, null, null];   // true/false/null pr. felt
-let forsoeg = [0, 0, 0, 0, 0, 0];           // antal tjek pr. felt
-let loesningSet = [false, false, false, false, false];   // pr. opgave
+const N_FELT = 8;                  // 6 i opgave 1-5 og 2 i udfordringen
+const N_HOVED = 6;                 // felterne der tæller med i resultatet
+let svar = Array(N_FELT).fill(null);        // true/false/null pr. felt
+let forsoeg = Array(N_FELT).fill(0);        // antal tjek pr. felt
+let loesningSet = Array(6).fill(false);     // pr. opgave
 // Sættes i det øjeblik et svar bliver rigtigt, og ændres ikke bagefter: åbner man
 // løsningen efter at have svaret rigtigt, skal den grønne plet blive stående.
-let kvalitet = [null, null, null, null, null, null];   // "groen" | "gul" | "roed"
+let kvalitet = Array(N_FELT).fill(null);    // "groen" | "gul" | "roed"
 // Regnskabet følger opgavenummeret, så man ikke kan skifte nummer frem og tilbage
 // for at slette sporet efter en åbnet løsning.
 const historik = new Map();
-const OPG_FELTER = [[0], [1], [2], [3, 4], [5]];
+const OPG_FELTER = [[0], [1], [2], [3, 4], [5], [6, 7]];
 let visMaaling = 0;                // fremdrift 0-1 i måleanimationen
 let koerer = false;
 
-const felter = [1, 2, 3, 4, 5, 6].map(i => document.getElementById("f" + i));
-const fbEl   = [1, 2, 3, 4, 5, 6].map(i => document.getElementById("fb" + i));
+const felter = [1, 2, 3, 4, 5, 6, 7, 8].map(i => document.getElementById("f" + i));
+const fbEl   = [1, 2, 3, 4, 5, 6, 7, 8].map(i => document.getElementById("fb" + i));
 
 function facit(i){
-  return [D.aMaalt, D.n0, D.kSek, D.a0, D.a0Doegn, D.tSvar][i];
+  return [D.aMaalt, D.n0, D.kSek, D.a0, D.a0Doegn, D.tSvar, D.dTael, D.dtSvar][i];
 }
 function tolerance(i){
-  // alderen er sammensat af flere afrundede mellemresultater, så den får lidt mere plads
-  return i === 5 ? 0.04 : 0.02;
+  // alderen og dens usikkerhed er sammensat af flere afrundede mellemresultater
+  return i === 5 || i === 7 ? 0.04 : 0.02;
 }
 // Lige uden for tolerancen ligger et bånd, hvor svaret er tæt nok på til, at det
 // næsten altid skyldes afrunding undervejs og ikke en forkert metode.
@@ -467,9 +512,9 @@ function naerhed(i, v){
   const retning = v > f ? "højt" : "lavt";
   const pct = Math.round(tol * 100);
   const start = `Dit svar ligger lidt for ${retning}, men uden for de ${pct} %, der kræves. `;
-  return start + (i === 5
-    ? "Alderen er følsom over for afrunding, fordi forholdet mellem de to aktiviteter ligger tæt på 1. Brug mindst 4 betydende cifre i <i class='sym'>A</i>, <i class='sym'>A</i><sub>0</sub> og <i class='sym'>k</i>."
-    : "Det ligner en afrundingsfejl: regn videre med mindst 4 betydende cifre undervejs, og rund først af til sidst.");
+  if (i === 5) return start + "Alderen er følsom over for afrunding, fordi forholdet mellem de to aktiviteter ligger tæt på 1. Brug mindst 4 betydende cifre i <i class='sym'>A</i>, <i class='sym'>A</i><sub>0</sub> og <i class='sym'>k</i>.";
+  if (i === 7) return start + "Regner du dig frem til to aldre og trækker dem fra hinanden, trækker du to næsten lige store tal fra hinanden. Så betyder afrundingen meget: runder du de to aldre til 3 betydende cifre, kan svaret let blive 10 % forkert. Regn videre med alle cifrene og rund først af til sidst.";
+  return start + "Det ligner en afrundingsfejl: regn videre med mindst 4 betydende cifre undervejs, og rund først af til sidst.";
 }
 
 // Typiske fejl, med et målrettet tip. Rækkefølgen er vigtig: mest specifikke først.
@@ -520,6 +565,21 @@ function diagnose(i, v){
     push(taet(v, D.a0Doegn / D.aMaalt, 0.05), "Forholdet mellem de to tal er ikke alderen. Isolér <i class='sym'>t</i> i <i class='sym'>A</i> = <i class='sym'>A</i><sub>0</sub> &middot; e<sup>&minus;<i class='sym'>kt</i></sup>.");
     push(v > 50000, "Svaret er alt for stort. Et moselig fra jernalderen er nogle få tusind år gammelt.");
   }
+  if (i === 6){
+    push(taet(v, D.taellinger, 0.005), "Det er tælletallet selv. Usikkerheden er kvadratroden af det.");
+    push(taet(v, D.taellinger * D.taellinger, 0.03), "Du har kvadreret i stedet for at tage kvadratroden.");
+    push(taet(v, D.dRel, 0.03) || taet(v, D.dRel * 100, 0.03), "Det er den relative usikkerhed. Her spørges om usikkerheden på selve tælletallet, i antal tællinger.");
+    push(taet(v, D.aMaalt, 0.02) || taet(v, Math.sqrt(D.aMaalt), 0.02), "Tag kvadratroden af tælletallet, ikke af aktiviteten. Det er tællingerne, der er den tilfældige størrelse.");
+  }
+  if (i === 7){
+    push(taet(v, D.dRel, 0.04) || taet(v, D.dRel * 100, 0.04), "Det er den relative usikkerhed på aktiviteten. Den skal omsættes til år &ndash; husk, at <i class='sym'>k</i> har enheden år⁻¹.");
+    push(taet(v, D.dtSvar * Math.SQRT2, 0.03), "Pænt tænkt &ndash; men du har regnet med usikkerhed på begge aktiviteter og lagt dem sammen kvadratisk. <i class='sym'>A</i><sub>0</sub> er beregnet ud fra prøvens masse og ikke målt, så den bidrager ikke her.");
+    push(taet(v, D.dtSvar * 2, 0.03), "Du er en faktor 2 for højt oppe. Enten har du talt begge aktiviteter med, eller også har du angivet hele intervallets bredde. Usikkerheden er den halve forskel mellem yderpunkterne.");
+    push(taet(v, D.dtSvar * S_PR_AAR, 0.05), "Det er usikkerheden i sekunder. Brug <i class='sym'>k</i> i år⁻¹, så kommer svaret i år.");
+    push(taet(v, D.dTael, 0.03), "Det er usikkerheden på tælletallet fra a). Den skal først gøres relativ og derefter omsættes til år.");
+    push(taet(v, Math.sqrt(D.tSvar), 0.03), "Kvadratrodsreglen gælder tælletal, ikke alderen. Alderen er ikke noget, der er talt.");
+    push(v > D.tSvar, "Usikkerheden kan ikke være større end alderen selv &ndash; så var dateringen værdiløs.");
+  }
   return t[0] || null;
 }
 
@@ -555,6 +615,7 @@ function tjek(i){
       : kvalitet[i] === "gul" ? `Rigtigt \u2013 det tog ${forsoeg[i]} forsøg.`
       : "Rigtigt \u2013 men løsningen var set først.";
     if (i === 5) txt += ` Lyngmosemanden døde for ca. ${Math.round(D.tSvar / 10) * 10} år siden, alts\u00e5 omkring ${doedsaar(D.tSvar)}`;
+    if (i === 7) txt += ` Dateringen er alts\u00e5 ${Math.round(D.tSvar)} \u00b1 ${Math.round(D.dtSvar)} \u00e5r.`;
     fbEl[i].innerHTML = txt;
   } else {
     // En konkret diagnose er et bedre vink end "tæt på", så den kommer først
@@ -572,6 +633,7 @@ function tjek(i){
     sek.classList.add(felterI.some(j => kvalitet[j] === "roed") ? "nej"
                     : felterI.some(j => kvalitet[j] === "gul") ? "delvis" : "ok");
   if (i === 5) visGraf();
+  if (i === 7) tegnGraf();      // usikkerhedsbåndet kommer på, når udfordringen er løst
   gemHistorik();
   opdaterStatus();
 }
@@ -603,22 +665,28 @@ function listeOver(tal){
 }
 
 function opdaterStatus(){
+  const hoved = svar.slice(0, N_HOVED), udfordring = svar.slice(N_HOVED);
   const tjekket = svar.filter(x => x !== null).length;
-  const rigtige = svar.filter(x => x === true).length;
-  const sete = [1, 2, 3, 4, 5].filter(n => loesningSet[n - 1]);
-  const seje = kvalitet.filter(k => k === "gul").length;
+  const rigtige = hoved.filter(x => x === true).length;
+  const sete = [1, 2, 3, 4, 5, 6].filter(n => loesningSet[n - 1]);
+  const seje = kvalitet.slice(0, N_HOVED).filter(k => k === "gul").length;
   const st = document.getElementById("statusTxt");
   let txt = tjekket === 0 && !sete.length
     ? "Ingen svar tjekket endnu."
-    : `${rigtige} af 6 rigtige.`;
+    : `${rigtige} af ${N_HOVED} rigtige.`;
   if (seje) txt += ` ${seje === 1 ? "Et af dem tog" : seje + " af dem tog"} mere end ${FORSOEG_KRAEVET} forsøg.`;
+  // Udfordringen står uden for regnskabet og nævnes kun, når den er rørt ved
+  if (udfordring.every(x => x === true)) txt += " Udfordringen er løst.";
+  else if (udfordring.some(x => x !== null))
+    txt += ` Udfordringen: ${udfordring.filter(x => x === true).length} af 2 rigtige.`;
   if (sete.length) txt += ` Løsning set til opgave ${listeOver(sete)}.`;
   st.innerHTML = txt;
   const p = document.getElementById("prikker");
   p.innerHTML = svar.map((s, i) =>
+    (i === N_HOVED ? `<span class="prikSkel"></span>` : "") +
     `<span class="prik ${s === true ? KLASSE[kvalitet[i]] : s === false ? "nej" : ""}"></span>`).join("");
-  document.getElementById("visLoes").disabled = rigtige < 6;
-  for (let n = 0; n < 5; n++){
+  document.getElementById("visLoes").disabled = rigtige < N_HOVED;
+  for (let n = 0; n < 6; n++){
     const b = document.querySelector(`button.visOpg[data-o="${n + 1}"]`);
     b.disabled = !(foersteUloeste(n) === 0 && (opgaveRigtig(n) || nokForsoeg(n)));
     document.getElementById("laas" + (n + 1)).textContent = b.disabled || loesningSet[n] ? laaseTekst(n) : "";
@@ -627,11 +695,11 @@ function opdaterStatus(){
 
 // Rydder svarene, men ikke forsøg og sete løsninger: regnskabet skal stå ved magt.
 function nulstilSvar(){
-  svar = [null, null, null, null, null, null];
-  kvalitet = [null, null, null, null, null, null];
+  svar = Array(N_FELT).fill(null);
+  kvalitet = Array(N_FELT).fill(null);
   felter.forEach(f => { f.value = ""; f.classList.remove("ok", "nej", "delvis"); });
   fbEl.forEach(f => { f.className = "fb"; f.innerHTML = ""; });
-  ["opg1","opg2","opg3","opg4","opg5"].forEach(id => document.getElementById(id).classList.remove("ok","nej","delvis"));
+  ["opg1","opg2","opg3","opg4","opg5","opg6"].forEach(id => document.getElementById(id).classList.remove("ok","nej","delvis"));
   document.getElementById("grafBoks").style.display = "none";
   opdaterStatus();
 }
@@ -644,6 +712,7 @@ function saetOpgave(nr){
   document.getElementById("dT").textContent = String(D.taellinger);
   document.getElementById("dE").textContent = fmt(D.eta * 100, 2) + " %";
   document.getElementById("dT2").textContent = String(D.taellinger);
+  document.getElementById("dT3").textContent = String(D.taellinger);
   document.getElementById("dE2").textContent = fmt(D.eta * 100, 2) + " %";
   document.getElementById("rM").textContent = fmt(D.m, 1) + " g";
   document.getElementById("rT").textContent = String(D.taellinger);
@@ -651,9 +720,9 @@ function saetOpgave(nr){
   document.getElementById("rNote").textContent = "Kør målingen, eller regn videre med tallene ovenfor.";
   if (location.hash.slice(1) !== String(nr)) history.replaceState(null, "", "#" + nr);
   const h = historik.get(nr);
-  forsoeg = h ? h.forsoeg.slice() : [0, 0, 0, 0, 0, 0];
-  loesningSet = h ? h.loesningSet.slice() : [false, false, false, false, false];
-  kvalitet = h ? h.kvalitet.slice() : [null, null, null, null, null, null];
+  forsoeg = h ? h.forsoeg.slice() : Array(N_FELT).fill(0);
+  loesningSet = h ? h.loesningSet.slice() : Array(6).fill(false);
+  kvalitet = h ? h.kvalitet.slice() : Array(N_FELT).fill(null);
   nulstilSvar();
   visMaaling = 0; koerer = false;
   document.getElementById("koer").textContent = "▶ Kør målingen";
@@ -885,6 +954,16 @@ function tegnGraf(){
   }
   c.stroke();
 
+  // usikkerhedsbånd, først når udfordringen er løst
+  if (svar[7] === true){
+    const tA = Math.max(0, D.tSvar - D.dtSvar), tB = Math.min(T_AKSE, D.tSvar + D.dtSvar);
+    c.fillStyle = "rgba(244,211,69,0.16)";
+    c.fillRect(X(tA), mT, X(tB) - X(tA), ph);
+    c.font = `14px ${SERIF}`; c.fillStyle = COL.yellow;
+    c.textAlign = "center"; c.textBaseline = "top";
+    c.fillText(`± ${Math.round(D.dtSvar)} år`, X(D.tSvar), mT + 4);
+  }
+
   // laboratoriets måling
   c.setLineDash([5, 6]); c.strokeStyle = COL.red; c.lineWidth = 1.6;
   c.beginPath(); c.moveTo(mL, Y(D.aMaalt)); c.lineTo(X(D.tSvar), Y(D.aMaalt)); c.stroke();
@@ -941,6 +1020,21 @@ function byg5(){
     `Lyngmosemanden døde altså for ca. ${Math.round(D.tSvar / 10) * 10} år siden, det vil sige omkring ${doedsaar(D.tSvar)} \u2013 midt i den danske jernalder, samme periode som Tollundmanden og Grauballemanden.`
   ];
 }
+function byg6(){
+  const tHoej = Math.log(D.a0Doegn / (D.aMaalt * (1 - D.dRel))) / D.kAar;
+  const tLav  = Math.log(D.a0Doegn / (D.aMaalt * (1 + D.dRel))) / D.kAar;
+  return [
+    `## 6. Usikkerheden på dateringen`,
+    String.raw`*a)* Henfald sker uafhængigt af hinanden og med samme sandsynlighed hele tiden. For den slags tælleforsøg er usikkerheden på et tælletal kvadratroden af tælletallet: $$\delta = \sqrt{${D.taellinger}} = ${kommaTex(D.dTael.toFixed(2))}.$$ Læg mærke til, hvad det betyder: tæller man fire gange så længe, bliver usikkerheden dobbelt så stor i antal, men kun halvt så stor i forhold til tælletallet. Det er den relative usikkerhed, der tæller.`,
+    String.raw`*b)* Den relative usikkerhed på tælletallet er $$\frac{\delta}{${D.taellinger}} = \frac{${kommaTex(D.dTael.toFixed(2))}}{${D.taellinger}} = ${kommaTex((D.dRel * 100).toFixed(2))}\ \%.$$ Aktiviteten findes ved at dividere tælletallet med udbyttet, og udbyttet er et eksakt tal. En multiplikation med en eksakt faktor ændrer ikke den relative usikkerhed, så aktiviteten $A$ har præcis samme relative usikkerhed: $$\delta A = ${kommaTex((D.dRel * 100).toFixed(2))}\ \%\ \text{af}\ ${D.aMaalt}\ \text{døgn}^{-1} = ${kommaTex((D.aMaalt * D.dRel).toFixed(0))}\ \text{døgn}^{-1}.$$`,
+    String.raw`Nu regnes alderen igennem igen, én gang med en aktivitet, der er $\delta A$ for stor, og én gang med en, der er $\delta A$ for lille. Jo mindre aktiviteten er, jo ældre bliver prøven, så den lille aktivitet giver den høje alder: $$t_{\text{høj}} = \frac{1}{k}\cdot\ln\!\left(\frac{${kommaTex(D.a0Doegn.toFixed(0))}}{${kommaTex((D.aMaalt * (1 - D.dRel)).toFixed(0))}}\right) = ${kommaTex(tHoej.toFixed(0))}\ \text{år}$$ $$t_{\text{lav}} = \frac{1}{k}\cdot\ln\!\left(\frac{${kommaTex(D.a0Doegn.toFixed(0))}}{${kommaTex((D.aMaalt * (1 + D.dRel)).toFixed(0))}}\right) = ${kommaTex(tLav.toFixed(0))}\ \text{år}$$`,
+    String.raw`De to aldre ligger tæt på hinanden, og det er netop deres forskel, vi skal bruge. Derfor skal de regnes med mange cifre: runder man dem til 3 betydende cifre, før man trækker fra, kan resultatet blive 10 % forkert. Det er en generel faldgrube, når man trækker to næsten lige store tal fra hinanden.`,
+    String.raw`Usikkerheden er den *halve* forskel mellem de to yderpunkter, for alderen ligger midt imellem dem: $$\delta t = \frac{${kommaTex(tHoej.toFixed(0))}\ \text{år} - ${kommaTex(tLav.toFixed(0))}\ \text{år}}{2} = ${kommaTex(D.dtSvar.toFixed(0))}\ \text{år}.$$ Resultatet skrives $$t = ${kommaTex(D.tSvar.toFixed(0))} \pm ${kommaTex(D.dtSvar.toFixed(0))}\ \text{år}.$$`,
+    String.raw`*Den korte vej.* Kan man differentiere, går det hurtigere. I udtrykket $t = \frac{1}{k}\ln(A_0) - \frac{1}{k}\ln(A)$ afhænger kun det sidste led af $A$, og $\ln$ differentieret giver $1/A$: $$\delta t = \frac{1}{k}\cdot\frac{\delta A}{A} = \frac{${kommaTex((D.dRel * 100).toFixed(2))}\ \%}{${sciTex(D.kAar, 5)}\ \text{år}^{-1}} = ${kommaTex(D.dtSvar.toFixed(0))}\ \text{år},$$ altså præcis det samme. Bemærk, at $A_0$ falder ud af regnestykket – det er endnu en måde at se, at kun målingen i dag bidrager.`,
+    `*Hvorfor tæller man et helt døgn?* Usikkerheden går som 1 divideret med kvadratroden af tælletallet, og tælletallet er proportionalt med måletiden. Fordobler man måletiden, falder usikkerheden kun med en faktor √2. Havde man nøjedes med en time i stedet for et døgn, ville usikkerheden på alderen være knap fem gange større, altså ca. ${Math.round(D.dtSvar * Math.sqrt(24) / 10) * 10} år. Det er derfor, man er tålmodig.`,
+    `*En pointe til sidst.* Forurening med nyere kulstof fra mosevandet ville typisk flytte alderen nogle få tiår. Det er mindre end de ${Math.round(D.dtSvar)} år, tællestatistikken alene giver, så med denne måletid kan man ikke se forskel på en ren og en let forurenet prøve.`
+  ];
+}
 function bygBemaerk(){
   return [
     `## Bemærkninger`,
@@ -951,7 +1045,17 @@ function bygBemaerk(){
   ];
 }
 function loesningsAfsnit(){
-  return [].concat(byg1(), byg2(), byg3(), byg4(), byg5(), bygBemaerk());
+  return [].concat(byg1(), byg2(), byg3(), byg4(), byg5(), byg6(), bygBemaerk());
+}
+// Frit vink til udfordringen. Det noteres ingen steder, på linje med formelsamlingen.
+function bygVink(){
+  return [
+    `## Vink til opgave 6 b)`,
+    String.raw`Du kender nu usikkerheden på tælletallet. Gør den først *relativ*: hvor stor en brøkdel af tælletallet udgør den? Den brøkdel gælder også for aktiviteten $A$, fordi udbyttet er et eksakt tal, og en multiplikation med en eksakt faktor ikke ændrer en relativ usikkerhed.`,
+    String.raw`Herfra er én vej at regne alderen igennem to gange med den samme formel som i opgave 5: én gang med en aktivitet, der er $\delta A$ for stor, og én gang med en, der er $\delta A$ for lille. De to svar spænder om den rigtige alder. Overvej til sidst, om usikkerheden er hele spændet eller det halve.`,
+    String.raw`Pas på afrundingen på den vej. De to aldre ligger tæt på hinanden, og du skal bruge deres *forskel*. Runder du dem til 3 betydende cifre, før du trækker fra, kan du let ramme 10 % ved siden af. Behold alle cifrene hele vejen.`,
+    `Kan du differentiere, findes der en kortere vej. Den står i løsningen.`
+  ];
 }
 function mdTilHtml(s){ return s.replace(/\*([^*$]+)\*/g, "<em>$1</em>"); }
 
@@ -999,7 +1103,12 @@ function texTekst(raa){
       } else if (cmd === "text"){
         let a; [a, i] = texGruppe(t, i);
         ud += a;
+      } else if (cmd === "sqrt"){
+        let a; [a, i] = texGruppe(t, i);
+        ud += "√" + texPak(texTekst(a));
       } else if (cmd === "cdot") ud += "·";
+      else if (cmd === "pm") ud += "±";
+      else if (cmd === "delta") ud += "δ";
       else if (cmd === "ln") ud += "ln";
       else if (cmd === "Delta") ud += "Δ";
       else if (cmd === "Longleftrightarrow") ud += "  ⟺  ";
@@ -1056,22 +1165,37 @@ function formelSamling(){
     String.raw`## At løse en eksponentiel ligning`,
     String.raw`En ligning af formen $$A_0\cdot e^{-k\cdot t} = A$$ løses enten med CAS eller i hånden ved at tage $\ln$ på begge sider. Divider først med $A_0$: $$\frac{A}{A_0} = e^{-k\cdot t} \quad\Longrightarrow\quad \ln\!\left(\frac{A}{A_0}\right) = -k\cdot t \quad\Longrightarrow\quad t = \frac{1}{k}\cdot\ln\!\left(\frac{A_0}{A}\right)$$ De to aktiviteter skal have samme enhed, så brøken bliver et rent tal. Bruges $k$ i $\text{år}^{-1}$, kommer $t$ direkte ud i år.`,
     String.raw`## Fra tællinger til aktivitet`,
-    String.raw`En detektor registrerer kun en kendt brøkdel af henfaldene, *udbyttet*. Prøvens aktivitet er derfor $$A = \frac{\text{antal tællinger}}{\text{udbytte}}$$`
+    String.raw`En detektor registrerer kun en kendt brøkdel af henfaldene, *udbyttet*. Prøvens aktivitet er derfor $$A = \frac{\text{antal tællinger}}{\text{udbytte}}$$`,
+    String.raw`## Usikkerhed`,
+    String.raw`Tæller man uafhængige begivenheder, er usikkerheden på tælletallet kvadratroden af tælletallet selv: $$\delta = \sqrt{\text{antal tællinger}}$$ Den *relative* usikkerhed er $\delta$ divideret med tælletallet, altså $1/\sqrt{\text{antal tællinger}}$. Jo længere man tæller, jo mindre bliver den.`,
+    String.raw`Ganges eller divideres en størrelse med et *eksakt* tal, er den relative usikkerhed uændret. Er et tal derimod *beregnet* og ikke målt, bidrager det ikke med nogen usikkerhed overhovedet.`,
+    String.raw`Usikkerheden på et resultat, der er regnet ud af en målt størrelse, kan findes på to måder. Enten regnes resultatet igennem i begge yderpunkter af den målte størrelse, og usikkerheden er den *halve* forskel mellem de to svar. Eller man differentierer udtrykket med hensyn til den målte størrelse og ganger med dens usikkerhed.`,
+    String.raw`Den første vej kræver omtanke med afrundingen: de to yderpunkter ligger tæt på hinanden, og det er deres *forskel*, man skal bruge. Trækker man to næsten lige store tal fra hinanden, forsvinder de første betydende cifre, og afrundingsfejlen fylder pludselig meget. Behold alle cifre i mellemregningerne, og rund først af til allersidst.`
   ];
 }
 
-// n = 0..3 for en enkelt opgave, null for hele gennemregningen, "formler" for formelsamlingen
+// n = 0..5 for en enkelt opgave, null for hele gennemregningen,
+// "formler" for formelsamlingen og "vink" for det frie vink til udfordringen
 function afsnitFor(n){
   if (n === "formler") return formelSamling();
-  if (n === null) return loesningsAfsnit();
-  return [byg1(), byg2(), byg3(), byg4(), byg5().concat(bygBemaerk())][n];
+  if (n === "vink") return bygVink();
+  // Den samlede løsning må ikke afsløre udfordringen for den, der ikke har
+  // forsøgt sig med den: opgave 6 kommer kun med, når den selv er låst op.
+  if (n === null) return [].concat(byg1(), byg2(), byg3(), byg4(), byg5(),
+    udfordringAaben() ? byg6() : [], bygBemaerk());
+  return [byg1(), byg2(), byg3(), byg4(), byg5().concat(bygBemaerk()), byg6()][n];
+}
+function udfordringAaben(){
+  return foersteUloeste(5) === 0 && (opgaveRigtig(5) || nokForsoeg(5));
 }
 let visesNu = null;
 function aabnLoesning(n){
   visesNu = n;
-  if (n !== null && n !== "formler" && !loesningSet[n]){ loesningSet[n] = true; gemHistorik(); }
+  // Vinket og formelsamlingen registreres ikke – kun en åbnet løsning tæller
+  if (typeof n === "number" && !loesningSet[n]){ loesningSet[n] = true; gemHistorik(); }
   document.getElementById("loesTitel").textContent =
     n === "formler" ? "Relevante formler"
+    : n === "vink" ? "Vink til opgave 6"
     : n === null ? `Løsning \u2013 opgave nr. ${D.nr}`
     : `Løsning til opgave ${n + 1} \u2013 opgave nr. ${D.nr}`;
   const body = document.getElementById("loesBody");
@@ -1091,15 +1215,17 @@ document.querySelectorAll("button.visOpg").forEach(b =>
   b.addEventListener("click", () => aabnLoesning(parseInt(b.dataset.o, 10) - 1)));
 document.getElementById("visLoes").addEventListener("click", () => aabnLoesning(null));
 document.getElementById("visFormler").addEventListener("click", () => aabnLoesning("formler"));
+document.getElementById("visVink").addEventListener("click", () => aabnLoesning("vink"));
 
 document.getElementById("luk").addEventListener("click", () => modal.classList.remove("open"));
 modal.addEventListener("click", e => { if (e.target === modal) modal.classList.remove("open"); });
 document.addEventListener("keydown", e => { if (e.key === "Escape") modal.classList.remove("open"); });
 document.getElementById("kopier").addEventListener("click", async e => {
   const hoved = visesNu === "formler" ? "Relevante formler"
+    : visesNu === "vink" ? "Vink til opgave 6"
     : visesNu === null ? `Løsning \u2013 Hvor gammel er Lyngmosemanden? Opgave nr. ${D.nr}`
     : `Løsning til opgave ${visesNu + 1} \u2013 Hvor gammel er Lyngmosemanden? Opgave nr. ${D.nr}`;
-  const data = visesNu === "formler" ? ""
+  const data = visesNu === "formler" || visesNu === "vink" ? ""
     : `m = ${fmt(D.m, 1)} g kulstof, ${D.taellinger} t\u00e6llinger p\u00e5 et d\u00f8gn, udbytte ${fmt(D.eta * 100, 2)} %\n`;
   const txt = hoved + "\n" + data
     + afsnitFor(visesNu).map(afsnitTilTekst).join("\n") + "\n";
