@@ -1,0 +1,1468 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Et år i Olkiluoto 3</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<style>
+:root{
+  --bg:#000000;
+  --fg:#EEEEEE;
+  --dim:#CFCFCF;
+  --border:#6A6A6A;
+  --blue:#58C4DD;
+  --yellow:#F4D345;
+  --green:#83C167;
+  --red:#FC6255;
+  --teal:#5CD0B3;
+  --orange:#F2A93B;
+  --serif:"KaTeX_Main","Latin Modern Roman","CMU Serif",Georgia,"Times New Roman",serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--serif)}
+body{padding:18px 16px 60px}
+.wrap{max-width:1100px;margin:0 auto}
+h1{font-weight:normal;font-size:2.1rem;margin:0 0 6px;letter-spacing:.01em}
+.sub{color:var(--dim);font-size:1.12rem;margin:0 0 16px;line-height:1.5}
+h2{font-weight:normal;font-size:1.5rem;color:var(--blue);margin:22px 0 10px}
+h3{font-weight:normal;font-size:1.28rem;margin:0 0 8px}
+p{font-size:1.12rem;line-height:1.55;margin:0 0 12px}
+i.sym{font-family:"KaTeX_Math","KaTeX_Main",Georgia,serif;font-style:italic}
+canvas{display:block;width:100%;background:var(--bg)}
+.sep{height:1px;background:#2a2a2a;margin:26px 0 4px}
+.note{color:var(--dim);font-size:1rem;line-height:1.5;margin:8px 0 0}
+b.gul{color:var(--yellow);font-weight:normal}
+
+/* kernesymbol med nukleontal over ladningstal */
+.nuk{white-space:nowrap}
+.nuk .iz{display:inline-flex;flex-direction:column;align-items:flex-end;vertical-align:0.62em;
+  font-size:.64em;line-height:1.12;margin-right:1px}
+.nuk .iz span{display:block}
+
+button{
+  font-family:var(--serif);font-size:1.06rem;font-weight:bold;color:var(--fg);
+  background:transparent;border:1.5px solid var(--border);border-radius:6px;
+  padding:6px 16px;cursor:pointer;transition:border-color .15s,background .15s
+}
+button:hover:not(:disabled){border-color:var(--fg)}
+button:disabled{opacity:.38;cursor:default}
+button.primary{border-color:var(--green)}
+.row{display:flex;flex-wrap:wrap;gap:10px 20px;align-items:center;margin:12px 0}
+
+/* ---------- fundkort ---------- */
+.fund{display:flex;gap:26px;align-items:flex-start;flex-wrap:wrap;
+  border:1.5px solid var(--border);border-radius:10px;background:#0b0b0b;padding:20px 22px}
+.fund figure{margin:0;flex:0 0 330px;max-width:330px}
+.fund figure img{width:100%;display:block;border-radius:6px;border:1px solid #333}
+.fund figcaption{color:var(--dim);font-size:.95rem;line-height:1.45;margin-top:8px}
+.fund .txt{flex:1 1 340px;min-width:280px}
+dl.data{display:grid;grid-template-columns:auto 1fr;gap:7px 16px;margin:12px 0 0;font-size:1.12rem}
+dl.data dt{color:var(--dim)}
+dl.data dd{margin:0}
+dl.data dd b{color:var(--yellow);font-weight:normal}
+.nrline{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 4px}
+.nrline label{color:var(--dim);font-size:1.08rem}
+input.nr{font-family:var(--serif);font-size:1.15rem;width:5.4em;color:var(--yellow);
+  background:#141414;border:1.5px solid var(--border);border-radius:6px;padding:4px 8px;text-align:center}
+input.nr:focus{outline:none;border-color:var(--yellow)}
+.reak{font-size:1.22rem;margin:10px 0 0}
+.blaa{color:var(--blue)}
+
+/* ---------- resultatlinje ---------- */
+.resultat{display:flex;flex-wrap:wrap;gap:8px 28px;align-items:baseline;
+  border:1.5px solid #333;border-radius:10px;padding:12px 20px;margin:12px 0 0;font-size:1.15rem}
+.resultat b{color:var(--yellow);font-weight:normal}
+.resultat .dim{color:var(--dim);font-size:1rem}
+
+/* ---------- konstanter ---------- */
+.konst{border:1.5px solid #333;border-radius:10px;padding:12px 20px;margin:14px 0 0}
+.konst .kol{display:flex;flex-wrap:wrap;gap:6px 40px;align-items:flex-start}
+.konst table{border-collapse:collapse;font-size:1.06rem;margin:6px 0 4px}
+.konst td{padding:2px 14px 2px 0}
+.konst td.m{text-align:right;font-variant-numeric:tabular-nums}
+.konst ul{margin:6px 0 0;padding-left:22px}
+.konst li{font-size:1.06rem;line-height:1.6}
+.opgHoved{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 16px}
+.opgHoved h2{margin-right:6px}
+
+/* ---------- opgaver ---------- */
+.opg{border-left:3px solid #333;padding:2px 0 2px 18px;margin:0 0 26px}
+.opg.ok{border-left-color:var(--green)}
+.opg.nej{border-left-color:var(--red)}
+.opg.delvis{border-left-color:var(--orange)}
+.opg h3 span.nr{color:var(--blue)}
+.felt{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;margin:10px 0 0}
+.felt .navn{font-size:1.15rem;min-width:2.6em}
+.felt input{font-family:var(--serif);font-size:1.12rem;width:11em;color:var(--fg);
+  background:#141414;border:1.5px solid var(--border);border-radius:6px;padding:6px 10px}
+.felt input:focus{outline:none;border-color:var(--blue)}
+.felt input.ok{border-color:var(--green)}
+.felt input.nej{border-color:var(--red)}
+.felt input.delvis{border-color:var(--orange)}
+.felt .enhed{color:var(--dim);font-size:1.06rem;min-width:5.5em}
+.fb{font-size:1.06rem;line-height:1.5;margin:8px 0 0;min-height:1.3em}
+.fb.ok{color:var(--green)}
+.fb.nej{color:var(--red)}
+.fb.delvis{color:var(--orange)}
+.fb .tip{color:var(--dim);display:block;margin-top:3px}
+/* udfordringen står uden for regnskabet og markeres derfor anderledes */
+.opg.udfordring{border-left-style:dashed}
+.maerke{color:var(--yellow);font-size:.95rem;border:1px solid var(--yellow);
+  border-radius:4px;padding:1px 7px;margin-left:8px;vertical-align:middle}
+.praemis{color:var(--blue)}
+.loesRow{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;margin:10px 0 0}
+.loesRow button{font-size:.98rem;padding:4px 12px}
+.laas{color:var(--dim);font-size:1rem}
+
+/* ---------- status ---------- */
+.status{border:1.5px solid var(--border);border-radius:10px;background:#0b0b0b;padding:16px 22px;margin:22px 0 0}
+.status .tal{font-size:1.35rem}
+.status .noegle{color:var(--dim);font-size:.98rem;margin:10px 0 0;line-height:1.5}
+.status .noegle b{font-weight:normal}
+.prikker{display:inline-flex;gap:7px;margin-left:4px;vertical-align:-2px;flex-wrap:wrap}
+.prik{width:13px;height:13px;border-radius:50%;border:1.6px solid var(--border)}
+.prikSkel{width:9px}   /* luft foran udfordringens prikker */
+.prik.ok{background:var(--green);border-color:var(--green)}
+.prik.nej{background:var(--red);border-color:var(--red)}
+.prik.delvis{background:var(--orange);border-color:var(--orange)}
+
+/* ---------- modal ---------- */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.8);display:none;align-items:flex-start;
+  justify-content:center;padding:40px 16px;overflow:auto;z-index:10}
+.modal.open{display:flex}
+.panel{position:relative;background:#0b0b0b;border:1.5px solid var(--border);border-radius:10px;
+  max-width:820px;width:100%;padding:26px 30px 22px}
+.panel h2{font-weight:normal;font-size:1.7rem;color:var(--fg);margin:0 0 14px;padding-right:150px}
+.panel h3{font-weight:normal;font-size:1.32rem;color:var(--blue);margin:24px 0 10px}
+.panel p{font-size:1.12rem;line-height:1.6;margin:0 0 14px}
+.panel .katex-display{overflow-x:auto;overflow-y:hidden;padding:2px 0}
+.panel .top{position:absolute;top:16px;right:16px;display:flex;gap:8px}
+.panel .top button{font-size:.95rem;padding:4px 10px}
+
+@media (max-width:620px){
+  body{padding:16px 16px 48px}
+  h1{font-size:1.72rem}
+  .fund{padding:16px;gap:18px}
+  .fund figure{flex:1 1 100%;max-width:none}
+  .fund figure img{max-height:200px;object-fit:cover;object-position:center 55%}
+  .fund .txt{min-width:0}
+  .felt .enhed{min-width:0}
+  .felt input{width:9.5em}
+  .panel{padding:22px 18px 18px}
+  .panel h2{padding-right:0;margin-top:34px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>Et år i Olkiluoto 3</h1>
+  <p class="sub">Olkiluoto 3 på Finlands vestkyst kom i kommerciel drift i 2023 og er en af verdens kraftigste reaktorer. Varmen kommer fra fission af U&#8209;235. Her følger du energien hele vejen fra den enkelte kerne til et helt års elproduktion.</p>
+
+  <div class="fund">
+    <figure id="fotoFig">
+      <img id="foto" alt="Olkiluoto-værket set fra vandet med de tre reaktorbygninger"
+           src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f5/Olkiluoto_Nuclear_Power_Plant_2015-07-21_001_%28cropped%29.jpg/960px-Olkiluoto_Nuclear_Power_Plant_2015-07-21_001_%28cropped%29.jpg">
+      <figcaption>Olkiluoto i Eurajoki. Olkiluoto 3 er bygningen med den hvide kuppel længst til venstre; de to store bygninger til højre er de ældre reaktorer 1 og 2. Foto: Hannu Huovila / TVO, Wikimedia Commons (CC BY 3.0).</figcaption>
+    </figure>
+
+    <div class="txt">
+      <div class="nrline">
+        <label for="nrInput">Dit opgavenummer</label>
+        <input class="nr" id="nrInput" type="text" inputmode="numeric" maxlength="4" value="4719">
+        <button id="nytNr">↺ Nyt nummer</button>
+      </div>
+      <p class="note">Hvert nummer giver sit eget datasæt. Skriv dit ned &ndash; samme nummer giver samme tal igen.</p>
+
+      <h3 style="margin-top:16px">Olkiluoto 3</h3>
+      <p class="blaa" style="margin:0">Effekterne er værkets rigtige data. Årsproduktionen og berigningen er realistiske, men varierer fra opgavenummer til opgavenummer.</p>
+      <dl class="data">
+        <dt>Reaktortype</dt><dd>trykvandsreaktor (EPR)</dd>
+        <dt>Termisk effekt</dt><dd><i class="sym">P</i><sub>th</sub> = 4300 MW</dd>
+        <dt>Elektrisk nettoeffekt</dt><dd><i class="sym">P</i><sub>el</sub> = 1600 MW</dd>
+        <dt>Elproduktion i året</dt><dd><i class="sym">E</i><sub>el</sub> = <b id="dE">&ndash;</b></dd>
+        <dt>Brændslets berigning</dt><dd><b id="dB">&ndash;</b> U&#8209;235</dd>
+      </dl>
+    </div>
+  </div>
+
+  <div class="row">
+    <button id="koer" class="primary">▶ Kør fissionen</button>
+    <button id="spring">⏭ Spring til slut</button>
+  </div>
+  <canvas id="maaling"></canvas>
+  <p class="note" id="maalNote">En langsom neutron rammer en U&#8209;235&#8209;kerne og bliver absorberet. Den nye kerne, U&#8209;236, er exciteret og spaltes straks i to fragmenter og nogle frie neutroner. Kernerne er tegnet som kugler af protoner (røde) og neutroner (grå). Fragmenterne bevæger sig fra hinanden med stor fart og bremses inde i brændslet, hvor deres bevægelsesenergi bliver til varme. Varmen ledes ud til vandet omkring brændselsstavene. De frie neutroner slipper ud af brændslet og bremses af vandet, så de kan spalte nye U&#8209;235&#8209;kerner.</p>
+
+  <div class="resultat" id="resultat">
+    <span>Fissionen: <span id="reak2"></span></span>
+    <span><i class="sym">E</i><sub>el</sub> = <b id="rE">&ndash;</b></span>
+    <span>berigning <b id="rB">&ndash;</b></span>
+    <span class="dim" id="rNote">Kør fissionen, eller regn videre med tallene ovenfor.</span>
+  </div>
+
+  <div class="konst">
+    <h3>Det skal du bruge</h3>
+    <div class="kol">
+      <div>
+        <table id="masseTab"></table>
+      </div>
+      <ul>
+        <li>1 u = 1,66054 &middot; 10<sup>&minus;27</sup> kg</li>
+        <li>1 u &middot; <i class="sym">c</i><sup>2</sup> = 931,5 MeV</li>
+        <li>1 MeV = 1,602 &middot; 10<sup>&minus;13</sup> J</li>
+        <li>1 TWh = 3,6 &middot; 10<sup>15</sup> J</li>
+        <li>1 år regnes som 365 &middot; 24 &middot; 3600 s</li>
+        <li>Brændværdi for stenkul (typisk værdi): 25 MJ/kg</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="opgHoved">
+    <h2>Opgaver</h2>
+    <button id="visFormler">Relevante formler</button>
+    <span class="note" style="margin:0">Kig så meget du vil &ndash; det noteres ingen steder.</span>
+  </div>
+  <p class="sub" style="margin-bottom:18px">Svar med mindst 3 betydende cifre, og regn med flere undervejs. Tierpotenser skrives fx <span style="color:var(--fg)">6,63e&minus;34</span> eller <span style="color:var(--fg)">6,63&middot;10^&minus;34</span>.</p>
+
+  <section class="opg" id="opg1">
+    <h3><span class="nr">1</span> &middot; Det manglende fragment</h3>
+    <p>I fissionen ovenfor mangler nukleontallet for det ene fragment. Brug bevarelsen af nukleontal til at bestemme det, og tjek, at ladningstallet også er bevaret.</p>
+    <div class="felt">
+      <span class="navn">Nukleontal =</span>
+      <input id="f1" type="text" autocomplete="off" spellcheck="false">
+      <span class="enhed"></span>
+      <button class="tjek" data-f="1">Tjek</button>
+    </div>
+    <div class="fb" id="fb1"></div>
+    <div class="loesRow">
+      <button class="visOpg" data-o="1" disabled>Vis løsning til opgave 1</button>
+      <span class="laas" id="laas1"></span>
+    </div>
+  </section>
+
+  <section class="opg" id="opg2">
+    <h3><span class="nr">2</span> &middot; Massetilvæksten</h3>
+    <p>Beregn massetilvæksten &Delta;<i class="sym">m</i> = <i class="sym">m</i><sub>efter</sub> &minus; <i class="sym">m</i><sub>før</sub> for processen. Du kan bruge atommasser, fordi der er lige mange elektroner før og efter. Find den rigtige isotop i tabellen ud fra dit svar i opgave 1.</p>
+    <div class="felt">
+      <span class="navn">&Delta;<i class="sym">m</i> =</span>
+      <input id="f2" type="text" autocomplete="off" spellcheck="false">
+      <span class="enhed">u</span>
+      <button class="tjek" data-f="2">Tjek</button>
+    </div>
+    <div class="fb" id="fb2"></div>
+    <div class="loesRow">
+      <button class="visOpg" data-o="2" disabled>Vis løsning til opgave 2</button>
+      <span class="laas" id="laas2"></span>
+    </div>
+  </section>
+
+  <section class="opg" id="opg3">
+    <h3><span class="nr">3</span> &middot; Energien fra én fission</h3>
+    <p>Beregn processens <i class="sym">Q</i>&#8209;værdi, først i MeV og derefter i J.</p>
+    <div class="felt">
+      <span class="navn"><i class="sym">Q</i> =</span>
+      <input id="f3" type="text" autocomplete="off" spellcheck="false">
+      <span class="enhed">MeV</span>
+      <button class="tjek" data-f="3">Tjek</button>
+    </div>
+    <div class="fb" id="fb3"></div>
+    <div class="felt">
+      <span class="navn"><i class="sym">Q</i> =</span>
+      <input id="f4" type="text" autocomplete="off" spellcheck="false">
+      <span class="enhed">J</span>
+      <button class="tjek" data-f="4">Tjek</button>
+    </div>
+    <div class="fb" id="fb4"></div>
+    <div class="loesRow">
+      <button class="visOpg" data-o="3" disabled>Vis løsning til opgave 3</button>
+      <span class="laas" id="laas3"></span>
+    </div>
+  </section>
+
+  <section class="opg" id="opg4">
+    <h3><span class="nr">4</span> &middot; Fra elproduktion til fissioner</h3>
+    <p>Kun en del af reaktorens varme bliver til elektricitet. Resten afgives til havet gennem kondensatoren. I det år, du regner på, producerede værket <b class="gul" id="dE2">&ndash;</b> el.</p>
+    <p><b>a)</b> Beregn, hvor meget termisk energi reaktoren frigav i løbet af året, i J.</p>
+    <div class="felt">
+      <span class="navn"><i class="sym">E</i><sub>th</sub> =</span>
+      <input id="f5" type="text" autocomplete="off" spellcheck="false">
+      <span class="enhed">J</span>
+      <button class="tjek" data-f="5">Tjek</button>
+    </div>
+    <div class="fb" id="fb5"></div>
+    <p style="margin-top:12px"><b>b)</b> Antag, at alle fissioner i reaktoren giver den <i class="sym">Q</i>&#8209;værdi, du fandt i opgave 3. Beregn, hvor mange fissioner der skete i løbet af året.</p>
+    <div class="felt">
+      <span class="navn">Antal =</span>
+      <input id="f6" type="text" autocomplete="off" spellcheck="false">
+      <span class="enhed">fissioner</span>
+      <button class="tjek" data-f="6">Tjek</button>
+    </div>
+    <div class="fb" id="fb6"></div>
+    <div class="loesRow">
+      <button class="visOpg" data-o="4" disabled>Vis løsning til opgave 4</button>
+      <span class="laas" id="laas4"></span>
+    </div>
+  </section>
+
+  <section class="opg" id="opg5">
+    <h3><span class="nr">5</span> &middot; Brændslet</h3>
+    <p><b>a)</b> Beregn massen af den U&#8209;235, der blev spaltet i løbet af året, i kg.</p>
+    <div class="felt">
+      <span class="navn"><i class="sym">m</i> =</span>
+      <input id="f7" type="text" autocomplete="off" spellcheck="false">
+      <span class="enhed">kg</span>
+      <button class="tjek" data-f="7">Tjek</button>
+    </div>
+    <div class="fb" id="fb7"></div>
+    <p style="margin-top:12px"><b>b)</b> Brændslet er beriget til <b class="gul" id="dB2">&ndash;</b> U&#8209;235, så kun en lille del af uranet er U&#8209;235. Beregn, hvor meget beriget uran der indeholder den mængde U&#8209;235, i ton.</p>
+    <div class="felt">
+      <span class="navn"><i class="sym">m</i> =</span>
+      <input id="f8" type="text" autocomplete="off" spellcheck="false">
+      <span class="enhed">ton</span>
+      <button class="tjek" data-f="8">Tjek</button>
+    </div>
+    <div class="fb" id="fb8"></div>
+    <div class="loesRow">
+      <button class="visOpg" data-o="5" disabled>Vis løsning til opgave 5</button>
+      <span class="laas" id="laas5"></span>
+    </div>
+  </section>
+
+  <section class="opg" id="opg6">
+    <h3><span class="nr">6</span> &middot; Hvad med kul?</h3>
+    <p>Beregn, hvor meget stenkul der skulle brændes af for at frigive den samme termiske energi som reaktoren på et år, i ton.</p>
+    <div class="felt">
+      <span class="navn"><i class="sym">m</i><sub>kul</sub> =</span>
+      <input id="f9" type="text" autocomplete="off" spellcheck="false">
+      <span class="enhed">ton</span>
+      <button class="tjek" data-f="9">Tjek</button>
+    </div>
+    <div class="fb" id="fb9"></div>
+    <div class="loesRow">
+      <button class="visOpg" data-o="6" disabled>Vis løsning til opgave 6</button>
+      <span class="laas" id="laas6"></span>
+    </div>
+  </section>
+
+  <section class="opg udfordring" id="opg7">
+    <h3><span class="nr">7</span> &middot; Affaldet <span class="maerke">udfordring</span></h3>
+    <p>Fissionsprodukterne bliver i brændslet, og mange af dem er radioaktive i årtier. Det vigtigste af dem på lang sigt er Cs&#8209;137, som henfalder med halveringstiden <i class="sym">T</i><sub>1/2</sub> = 30,1 år.</p>
+    <p class="praemis">I gennemsnit over alle fissionskanaler dannes der Cs&#8209;137 i 6,2 % af fissionerne.</p>
+    <p class="praemis">Regn med, at fissionerne er jævnt fordelt over året.</p>
+    <p><b>a)</b> Hvor mange Cs&#8209;137&#8209;kerner er der i brændslet ved årets udgang?</p>
+    <div class="felt">
+      <span class="navn"><i class="sym">N</i> =</span>
+      <input id="f10" type="text" autocomplete="off" spellcheck="false">
+      <span class="enhed">kerner</span>
+      <button class="tjek" data-f="10">Tjek</button>
+    </div>
+    <div class="fb" id="fb10"></div>
+    <p style="margin-top:12px"><b>b)</b> Beregn deres samlede aktivitet ved årets udgang, i Bq.</p>
+    <div class="felt">
+      <span class="navn"><i class="sym">A</i> =</span>
+      <input id="f11" type="text" autocomplete="off" spellcheck="false">
+      <span class="enhed">Bq</span>
+      <button class="tjek" data-f="11">Tjek</button>
+    </div>
+    <div class="fb" id="fb11"></div>
+    <p style="margin-top:12px"><b>c)</b> Hvor længe går der derefter, før aktiviteten af denne Cs&#8209;137 er faldet til en tusindedel?</p>
+    <div class="felt">
+      <span class="navn"><i class="sym">t</i> =</span>
+      <input id="f12" type="text" autocomplete="off" spellcheck="false">
+      <span class="enhed">år</span>
+      <button class="tjek" data-f="12">Tjek</button>
+    </div>
+    <div class="fb" id="fb12"></div>
+    <div class="loesRow">
+      <button id="visVink">Vink</button>
+      <button class="visOpg" data-o="7" disabled>Vis løsning til opgave 7</button>
+      <span class="laas" id="laas7"></span>
+    </div>
+    <p class="note" style="margin:8px 0 0">Vinket er frit &ndash; det noteres ingen steder, og udfordringen tæller ikke med i resultatet.</p>
+  </section>
+
+  <div class="status">
+    <div class="row" style="margin:0">
+      <span class="tal" id="statusTxt">Ingen svar tjekket endnu.</span>
+      <span class="prikker" id="prikker"></span>
+    </div>
+    <p class="noegle"><b style="color:var(--green)">&#9679;</b> rigtigt inden for 3 forsøg &nbsp;
+      <b style="color:var(--orange)">&#9679;</b> rigtigt, men det tog flere forsøg &nbsp;
+      <b style="color:var(--red)">&#9679;</b> forkert, eller rigtigt efter at løsningen var set</p>
+    <div class="row" style="margin:14px 0 0">
+      <button id="visLoes" disabled>Vis hele løsningen</button>
+      <button id="nulstil">↺ Nulstil svar</button>
+    </div>
+  </div>
+
+  <div id="grafBoks" style="display:none">
+    <div class="sep"></div>
+    <h2>Et års brændsel</h2>
+    <p class="sub">Søjlerne viser, hvor mange ton der går til på et år. Aksen er logaritmisk: hvert trin er en faktor 10.</p>
+    <canvas id="graf"></canvas>
+  </div>
+  <div id="grafBoks2" style="display:none">
+    <div class="sep"></div>
+    <h2>Cs&#8209;137 i det brugte brændsel</h2>
+    <p class="sub">Kurven viser aktiviteten af årets Cs&#8209;137 som brøkdel af aktiviteten ved årets udgang. Den lodrette akse er logaritmisk.</p>
+    <canvas id="graf2"></canvas>
+  </div>
+
+</div>
+
+<div class="modal" id="modal">
+  <div class="panel">
+    <div class="top"><button id="kopier">Kopiér tekst</button><button id="luk">✕</button></div>
+    <h2 id="loesTitel">Løsning</h2>
+    <div id="loesBody"></div>
+  </div>
+</div>
+
+<script>
+"use strict";
+// ================= FYSIK-START =================
+// Fission af U-235 i Olkiluoto 3. Atommasser fra atommassetabellen (AME), i u.
+const U_KG     = 1.66054e-27;       // masse af 1 u, i kg
+const UC2      = 931.5;             // 1 u * c^2 i MeV
+const MEV_J    = 1.602e-13;         // 1 MeV i J
+const TWH_J    = 3.6e15;            // 1 TWh i J
+const P_TH     = 4300;              // termisk effekt, MW
+const P_EL     = 1600;              // elektrisk nettoeffekt, MW
+const H_KUL    = 25e6;              // brændværdi for stenkul, J/kg
+const M_N      = 1.008665;          // neutronens masse, u
+const M_U235   = 235.043928;        // atommasse af U-235, u
+const S_PR_AAR = 365 * 24 * 3600;   // 3,1536e7 s
+const CS_ANDEL = 0.062;             // Cs-137 dannes i 6,2 % af fissionerne
+const CS_THALV = 30.1;              // halveringstid for Cs-137, år
+const BROEKDEL  = 1000;              // aktiviteten skal falde til 1/1000
+
+const GRUND = {
+  Ba: { Z: 56, navn: "barium",     m: { 141: 140.914404 } },
+  Xe: { Z: 54, navn: "xenon",      m: { 139: 138.918792 } },
+  Te: { Z: 52, navn: "tellur",     m: { 137: 136.925599 } },
+  La: { Z: 57, navn: "lanthan",    m: { 147: 146.928418 } },
+  Sn: { Z: 50, navn: "tin",        m: { 132: 131.917824 } },
+  Ce: { Z: 58, navn: "cerium",     m: { 145: 144.917270 } },
+  Kr: { Z: 36, navn: "krypton",    m: { 90: 89.919528, 91: 90.923806, 92: 91.926173, 93: 92.931147, 94: 93.934140 } },
+  Sr: { Z: 38, navn: "strontium",  m: { 93: 92.914024, 94: 93.915356, 95: 94.919358, 96: 95.921719, 97: 96.926376 } },
+  Zr: { Z: 40, navn: "zirconium",  m: { 95: 94.908040, 96: 95.908278, 97: 96.910964, 98: 97.912740, 99: 98.916675 } },
+  Br: { Z: 35, navn: "brom",       m: { 85: 84.915646, 86: 85.918805, 87: 86.920674, 88: 87.924083, 89: 88.926705 } },
+  Mo: { Z: 42, navn: "molybdæn",   m: { 99: 98.907707, 100: 99.907468, 101: 100.910338, 102: 101.910294, 103: 102.913092 } },
+  Se: { Z: 34, navn: "selen",      m: { 86: 85.924312, 87: 86.928689, 88: 87.931417, 89: 88.936669, 90: 89.940100 } }
+};
+// Fissionskanaler: kendt fragment a, manglende fragment b og antal frie neutroner n.
+const KANALER = [
+  { a: "Ba", A: 141, b: "Kr", B: 92,  n: 3 },
+  { a: "Xe", A: 139, b: "Sr", B: 95,  n: 2 },
+  { a: "Te", A: 137, b: "Zr", B: 97,  n: 2 },
+  { a: "La", A: 147, b: "Br", B: 87,  n: 2 },
+  { a: "Sn", A: 132, b: "Mo", B: 101, n: 3 },
+  { a: "Ce", A: 145, b: "Se", B: 88,  n: 3 }
+];
+
+function mulberry32(a){
+  return function(){
+    a |= 0; a = (a + 0x6D2B79F5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+// Alle tal i et opgavesæt udledes af opgavenummeret, så det kan genskabes.
+// Rækkefølgen af r()-kald må ikke ændres.
+function opgaveData(nr){
+  const r = mulberry32((nr * 2654435761) >>> 0);
+  r(); r();
+  const kanal = KANALER[Math.floor(r() * KANALER.length)];
+  const Eel   = Math.round((11.0 + 0.1 * Math.floor(r() * 26)) * 10) / 10;    // 11,0 - 13,5 TWh
+  const ber   = Math.round((3.5 + 0.1 * Math.floor(r() * 15)) * 10) / 10;     // 3,5 - 4,9 %
+  const vind  = Math.floor(r() * 2);    // hvor i massetabellen den rigtige isotop står
+  // ---- udledte størrelser, ingen r()-kald herfra ----
+  const ga = GRUND[kanal.a], gb = GRUND[kanal.b];
+  const A = kanal.A, B = kanal.B, n = kanal.n;
+  const Za = ga.Z, Zb = gb.Z;
+  const ma = ga.m[A], mb = gb.m[B];
+  const tabelA = [B - 1 - vind, B - vind, B + 1 - vind, B + 2 - vind];
+  const dm   = ma + mb + n * M_N - M_U235 - M_N;     // u, negativ
+  const QMeV = -dm * UC2;
+  const QJ   = QMeV * MEV_J;
+  const eta  = P_EL / P_TH;
+  const EelJ = Eel * TWH_J;
+  const Eth  = EelJ / eta;                           // J
+  const Nf   = Eth / QJ;                             // antal fissioner på et år
+  const mUkg = Nf * M_U235 * U_KG;                   // kg U-235 spaltet
+  const mBer = mUkg / (ber / 100) / 1000;            // ton beriget uran
+  const mKul = Eth / H_KUL / 1000;                   // ton stenkul
+  // Udfordring: Cs-137 dannes jævnt hen over året og henfalder samtidig.
+  // dN/dt = R - k N  med N(0) = 0  giver  N(T) = R/k * (1 - e^(-kT)).
+  const kAar  = Math.LN2 / CS_THALV;
+  const kSek  = kAar / S_PR_AAR;
+  const R     = CS_ANDEL * Nf;                       // dannede kerner pr. år
+  const NcsNaiv = R;                                 // uden henfald i løbet af året
+  const Ncs   = R / kAar * (1 - Math.exp(-kAar * 1));
+  const Acs   = kSek * Ncs;                          // Bq
+  const tCs   = Math.log(BROEKDEL) / kAar;            // år
+  return { nr, kanal, Eel, ber, vind, A, B, n, Za, Zb, ma, mb, tabelA,
+           dm, QMeV, QJ, eta, EelJ, Eth, Nf, mUkg, mBer, mKul,
+           kAar, kSek, R, NcsNaiv, Ncs, Acs, tCs };
+}
+// ================= FYSIK-END =================
+
+// ---------- formatering ----------
+const COL = { fg:"#EEEEEE", dim:"#CFCFCF", blue:"#58C4DD", yellow:"#F4D345",
+              green:"#83C167", red:"#FC6255", teal:"#5CD0B3", orange:"#F2A93B",
+              proton:"#FC6255", neutron:"#A8A8A8" };
+const SERIF = '"KaTeX_Main","Latin Modern Roman","CMU Serif",Georgia,serif';
+const MATH  = '"KaTeX_Math","KaTeX_Main",Georgia,serif';
+
+const komma = s => String(s).replace(".", ",");
+const fmt = (v, n) => komma(v.toFixed(n));
+const masseTxt = v => komma(v.toFixed(6));
+
+function sciDele(v, n){
+  if (v === 0) return { mant: "0", eks: 0 };
+  const eks = Math.floor(Math.log10(Math.abs(v)));
+  let mant = v / Math.pow(10, eks);
+  mant = Number(mant.toFixed(n - 1));
+  if (Math.abs(mant) >= 10){ mant /= 10; return { mant: komma(mant.toFixed(n - 1)), eks: eks + 1 }; }
+  return { mant: komma(mant.toFixed(n - 1)), eks };
+}
+function sciHtml(v, n){
+  const d = sciDele(v, n);
+  return `${d.mant} &middot; 10<sup>${String(d.eks).replace("-", "−")}</sup>`;
+}
+// I TeX er komma et skilletegn med luft efter. Decimalkomma skal derfor skrives {,}
+const kommaTex = s => String(s).replace(/[.,]/, "{,}");
+function sciTex(v, n){
+  const d = sciDele(v, n);
+  return `${kommaTex(d.mant)}\\cdot 10^{${d.eks}}`;
+}
+const masseTex = v => kommaTex(v.toFixed(6));
+// Kernesymbol i HTML med nukleontal over ladningstal
+function nukHtml(sym, A, Z){
+  return `<span class="nuk"><span class="iz"><span>${A}</span><span>${Z}</span></span>${sym}</span>`;
+}
+function nukTex(sym, A, Z){ return `{}^{${A}}_{${Z}}\\text{${sym}}`; }
+function reaktionHtml(D, skjul){
+  const k = D.kanal;
+  return `${nukHtml("U", 235, 92)} + ${nukHtml("n", 1, 0)} &rarr; ${nukHtml(k.a, k.A, D.Za)} + ${nukHtml(k.b, skjul ? "?" : k.B, D.Zb)} + ${D.n} &middot; ${nukHtml("n", 1, 0)}`;
+}
+
+// ---------- indlæsning af elevsvar ----------
+const SUP = { "⁰":"0","¹":"1","²":"2","³":"3","⁴":"4",
+              "⁵":"5","⁶":"6","⁷":"7","⁸":"8","⁹":"9",
+              "⁺":"+","⁻":"-" };
+function parseTal(raw){
+  if (raw == null) return NaN;
+  let s = String(raw).toLowerCase();
+  s = s.replace(/[⁰¹²³⁴-⁹⁺⁻]+/g,
+                m => "^" + [...m].map(c => SUP[c]).join(""));
+  s = s.replace(/[\s   ]/g, "");
+  s = s.replace(/−|–/g, "-");
+  s = s.replace(/[·⋅×]/g, "*");
+  s = s.replace(/\*\*/g, "^");
+  // enheder som eleven måske skriver med
+  s = s.replace(/(mev|joule|j|kg|ton|tons|t|bq|becquerel|fissioner|kerner|atomer|stk\.?|år|aar|u)$/g, "");
+  s = s.replace(/,/g, ".");
+  s = s.replace(/(\d)x(?=1?0)/g, "$1*");
+  let m;
+  if ((m = s.match(/^([+-]?(?:\d+\.?\d*|\.\d+))$/)))
+    return parseFloat(m[1]);
+  if ((m = s.match(/^([+-]?(?:\d+\.?\d*|\.\d+))e([+-]?\d+)$/)))
+    return parseFloat(m[1]) * Math.pow(10, parseInt(m[2], 10));
+  if ((m = s.match(/^(?:([+-]?(?:\d+\.?\d*|\.\d+))\*)?10\^?([+-]?\d+)$/)))
+    return (m[1] ? parseFloat(m[1]) : 1) * Math.pow(10, parseInt(m[2], 10));
+  return NaN;
+}
+const taet = (a, b, tol) => isFinite(a) && isFinite(b) && b !== 0 && Math.abs(a - b) <= tol * Math.abs(b);
+const taetAbs = (a, b, d) => isFinite(a) && isFinite(b) && Math.abs(a - b) <= d;
+
+// ---------- opgavesættet ----------
+let D = null;
+const N_FELT  = 12;                // 9 i opgave 1-6 og 3 i udfordringen
+const N_HOVED = 9;                 // felterne der tæller med i resultatet
+const N_OPG   = 7;
+const N_UDF   = N_FELT - N_HOVED;
+const OPG_FELTER = [[0], [1], [2, 3], [4, 5], [6, 7], [8], [9, 10, 11]];
+let svar = Array(N_FELT).fill(null);
+let forsoeg = Array(N_FELT).fill(0);
+let loesningSet = Array(N_OPG).fill(false);
+// Sættes i det øjeblik et svar bliver rigtigt, og ændres ikke bagefter.
+let kvalitet = Array(N_FELT).fill(null);    // "groen" | "gul" | "roed"
+const historik = new Map();
+let visMaaling = 0;
+let koerer = false;
+
+const felter = Array.from({ length: N_FELT }, (_, i) => document.getElementById("f" + (i + 1)));
+const fbEl   = Array.from({ length: N_FELT }, (_, i) => document.getElementById("fb" + (i + 1)));
+
+function facit(i){
+  return [D.B, D.dm, D.QMeV, D.QJ, D.Eth, D.Nf, D.mUkg, D.mBer, D.mKul, D.Ncs, D.Acs, D.tCs][i];
+}
+function tolerance(i){
+  if (i === 0) return 0;           // et helt tal skal ramme præcis
+  // senere led i kæden er sammensat af flere afrundede mellemresultater
+  return [0, 0.02, 0.02, 0.02, 0.02, 0.03, 0.03, 0.03, 0.02, 0.03, 0.03, 0.02][i];
+}
+function rigtig(i, v){
+  if (i === 0) return taetAbs(v, D.B, 0.001);
+  return taet(v, facit(i), tolerance(i));
+}
+const NAER_FAKTOR = 4;
+function naerhed(i, v){
+  if (i === 0) return null;
+  const f = facit(i), tol = tolerance(i);
+  const afv = Math.abs(v - f) / Math.abs(f);
+  if (!(afv > tol && afv <= NAER_FAKTOR * tol)) return null;
+  if (Math.sign(v) !== Math.sign(f)) return null;
+  const retning = Math.abs(v) > Math.abs(f) ? "højt" : "lavt";
+  const pct = Math.round(tol * 100);
+  const start = `Dit svar ligger lidt for ${retning}, men uden for de ${pct} %, der kræves. `;
+  if (i === 1) return start + "Massetilvæksten er en lille forskel mellem store tal. Brug alle seks decimaler i atommasserne, og rund først af til sidst.";
+  return start + "Det ligner en afrundingsfejl: regn videre med mindst 4 betydende cifre undervejs, og rund først af til sidst.";
+}
+
+function isoNavn(sym, A){ return `${sym}-${A}`; }
+
+// Typiske fejl, med et målrettet tip. Mest specifikke først.
+function diagnose(i, v){
+  const t = [];
+  const push = (test, tekst) => { if (!t.length && test) t.push(tekst); };
+  const k = D.kanal;
+  if (i === 0){
+    push(taetAbs(v, D.B - 1, 0.001), "Du har glemt den neutron, der rammer U-235. På venstre side er der 235 + 1 = 236 nukleoner.");
+    push(taetAbs(v, D.B + D.n - 1, 0.001), `Tjek neutronerne på højre side: der står ${D.n} frie neutroner, og hver af dem tæller som én nukleon.`);
+    push(taetAbs(v, D.B + D.n, 0.001), `Du mangler at trække de ${D.n} frie neutroner fra. De er også nukleoner.`);
+    push(taetAbs(v, D.Zb, 0.001), "Det er ladningstallet (protontallet). Her spørges om nukleontallet, altså antal protoner og neutroner tilsammen.");
+    push(taetAbs(v, D.B - D.Zb, 0.001), "Det er antal neutroner i fragmentet. Nukleontallet er protoner og neutroner tilsammen.");
+    push(taetAbs(v, 236 - k.A, 0.001) || taetAbs(v, 235 - k.A, 0.001), `Du mangler at trække de ${D.n} frie neutroner fra.`);
+    push(isFinite(v) && Math.round(v) !== v, "Nukleontallet er et antal partikler, altså et helt tal.");
+    push(v > 0 && !D.tabelA.includes(v), `Svaret skal give en isotop af ${GRUND[k.b].navn}, der er så tung, at summen af nukleoner går op. Læg nukleontallene sammen på begge sider af pilen.`);
+  }
+  if (i === 1){
+    push(taet(v, -D.dm, 0.02), "Du har fået det rigtige tal, men med forkert fortegn. Massetilvæksten er massen efter minus massen før, og massen falder ved fissionen.");
+    push(v === 0, "Med nukleontallene alene går regnskabet præcis op. Du skal bruge atommasserne fra tabellen, som ikke er hele tal.");
+    for (const a of D.tabelA){
+      if (a === D.B) continue;
+      const dmFejl = D.dm + GRUND[k.b].m[a] - D.mb;
+      push(taetAbs(v, dmFejl, 0.0015) || taetAbs(v, -dmFejl, 0.0015),
+           `Du har brugt massen af ${isoNavn(k.b, a)}. Brug den isotop, du fandt i opgave 1.`);
+    }
+    push(taetAbs(v, D.dm + M_N, 0.0015), "Du har glemt den neutron, der rammer U-235. Den skal med på venstre side.");
+    push(taetAbs(v, D.dm - D.n * M_N, 0.0015), `Du har glemt de ${D.n} frie neutroner på højre side.`);
+    push(taetAbs(v, D.dm - (D.n - 1) * M_N, 0.0015), `Der er ${D.n} frie neutroner på højre side, og de skal alle med.`);
+    push(taetAbs(v, D.dm + M_N - D.n * M_N, 0.0015), "Du har glemt neutronerne på begge sider af pilen.");
+    push(Math.abs(v) > 3, "Svaret er alt for stort. Massetilvæksten ved en fission er en lille brøkdel af én u. Tjek, at alle kerner og neutroner er med på begge sider.");
+    push(Math.abs(v) < 0.02 && v !== 0, "Svaret er for lille. Tjek, at du har brugt atommasserne med alle decimaler og ikke afrundet dem til hele tal.");
+  }
+  if (i === 2){
+    push(taet(v, -D.QMeV, 0.03), "Fortegnet er forkert. Q = −Δm · c², så en negativ massetilvækst giver en positiv Q-værdi: der frigives energi.");
+    push(taet(v, D.QJ, 0.03), "Det er Q i J. Her spørges om Q i MeV.");
+    push(taet(v, -D.dm * 9e16, 0.03) || taet(v, -D.dm * 8.98755e16, 0.03), "Du har ganget massen i u med c² i m²/s². Brug i stedet 1 u · c² = 931,5 MeV.");
+    push(taet(v, D.QMeV * 1e6, 0.03), "Det er Q i eV. Her spørges om MeV.");
+    push(taet(v, -D.dm, 0.03), "Det er massetilvæksten. Den skal ganges med 931,5 MeV/u for at give energien.");
+  }
+  if (i === 3){
+    push(taet(v, -D.QJ, 0.03), "Fortegnet er forkert. Der frigives energi, så Q er positiv.");
+    push(taet(v, D.QMeV, 0.03), "Det er Q i MeV. Gang med 1,602 · 10⁻¹³ J/MeV.");
+    push(taet(v, D.QMeV * 1.602e-19, 0.03), "Du har brugt omregningen for eV. 1 MeV = 10⁶ eV = 1,602 · 10⁻¹³ J.");
+    push(taet(v, D.QMeV / MEV_J, 0.03), "Du har divideret med 1,602 · 10⁻¹³ i stedet for at gange.");
+    push(v > 1e-6, "Svaret er alt for stort. Energien fra én enkelt fission er meget lille målt i J.");
+  }
+  if (i === 4){
+    push(taet(v, D.EelJ, 0.03), "Det er den elektriske energi. Reaktoren har frigivet mere varme, end der blev til el: divider med nyttevirkningen.");
+    push(taet(v, D.EelJ * D.eta, 0.03), "Du har ganget med nyttevirkningen i stedet for at dividere. Den termiske energi er større end den elektriske.");
+    push(taet(v, D.Eel / D.eta, 0.03), "Det er den termiske energi i TWh. Omregn til J.");
+    push(taet(v, D.Eel * 1e12 / D.eta, 0.03), "Du har omregnet til Wh, men ikke til J. 1 Wh = 3600 J.");
+    push(taet(v, D.Eel * 3.6e12 / D.eta, 0.03), "Tjek omregningen: 1 TWh = 3,6 · 10¹⁵ J.");
+    push(taet(v, P_TH * 1e6 * S_PR_AAR, 0.03), "Det er den energi, reaktoren ville frigive ved fuld effekt hele året rundt. Værket står stille en del af året, så brug årets elproduktion.");
+    push(taet(v, P_EL * 1e6 * S_PR_AAR, 0.03), "Det er den elektriske energi ved fuld effekt hele året. Brug årets elproduktion og nyttevirkningen.");
+  }
+  if (i === 5){
+    push(taet(v, D.EelJ / D.QJ, 0.04), "Du har brugt den elektriske energi. Det er den termiske energi fra a), der kommer fra fissionerne.");
+    push(taet(v, D.Eth / D.QMeV, 0.04), "Du har brugt Q i MeV. Energierne skal have samme enhed, så brug Q i J.");
+    push(taet(v, D.Eth * D.QJ, 0.04), "Du har ganget i stedet for at dividere. Antallet er den samlede energi divideret med energien fra én fission.");
+    push(taet(v, P_TH * 1e6 / D.QJ, 0.04), "Det er antal fissioner pr. sekund ved fuld effekt. Her spørges om hele året.");
+    push(taet(v, D.Eth / D.QJ / S_PR_AAR, 0.04), "Det er antal fissioner pr. sekund i gennemsnit. Her spørges om hele året.");
+    push(v > 0 && v < 1e20, "Svaret er alt for lille. Energien fra én fission er så lille, at der skal utroligt mange til.");
+  }
+  if (i === 6){
+    push(taet(v, D.Nf * M_U235, 0.04), "Det er massen i u. Gang med 1,66054 · 10⁻²⁷ kg/u.");
+    push(taet(v, D.mUkg * 1000, 0.04), "Det er massen i gram. Her spørges i kg.");
+    push(taet(v, D.mUkg / 1000, 0.04), "Det er massen i ton. Her spørges i kg.");
+    push(taet(v, D.Nf * U_KG, 0.04), "Du har regnet med massen af én nukleon. En U-235-kerne vejer ca. 235 u.");
+    push(taet(v, D.mUkg / D.Nf / D.Nf, 0.04) || taet(v, M_U235 * U_KG, 0.04), "Det er massen af én U-235-kerne. Gang med antallet af fissioner.");
+  }
+  if (i === 7){
+    push(taet(v, D.mBer * 1000, 0.04), "Det er massen i kg. Her spørges i ton.");
+    push(taet(v, D.mBer / 100, 0.04), "Berigningen skal sættes ind som decimaltal. " + fmt(D.ber, 1) + " % svarer til " + komma((D.ber / 100).toFixed(3)) + ".");
+    push(taet(v, D.mUkg * (D.ber / 100) / 1000, 0.04), "Du har ganget med berigningen i stedet for at dividere. Den berigede uran vejer mere end den U-235, den indeholder.");
+    push(taet(v, D.mUkg / 1000, 0.04), "Det er massen af U-235 i ton. U-235 er kun en lille del af uranet, så der skal mere beriget uran til.");
+    push(taet(v, D.mUkg * D.ber / 1000, 0.04), "Du har ganget med berigningen i stedet for at dividere, og den skal sættes ind som decimaltal.");
+  }
+  if (i === 8){
+    push(taet(v, D.mKul * 1000, 0.04), "Det er massen i kg. Her spørges i ton.");
+    push(taet(v, D.EelJ / H_KUL / 1000, 0.04), "Du har brugt den elektriske energi. Spørgsmålet er den samme termiske energi som reaktoren.");
+    push(taet(v, D.mKul / 1e6, 0.04) || taet(v, D.mKul * 1e6, 0.04) || taet(v, D.mKul * 1000 / 1e6, 0.04), "Tjek omregningen af brændværdien: 25 MJ/kg = 25 · 10⁶ J/kg.");
+    push(taet(v, D.mKul / 1000, 0.04), "Tjek omregningen: 1 ton = 1000 kg.");
+  }
+  if (i === 9){
+    push(taet(v, D.Nf, 0.04), "Det er antallet af fissioner. Kun 6,2 % af dem giver Cs-137.");
+    push(taet(v, D.Nf * 6.2, 0.04), "De 6,2 % skal sættes ind som decimaltal, 0,062.");
+    push(taet(v, D.Nf * 0.62, 0.04), "Tjek decimalerne: 6,2 % er 0,062.");
+    push(taet(v, D.Nf / CS_ANDEL, 0.04), "Du har divideret med 0,062 i stedet for at gange. Der er færre Cs-137-kerner end fissioner.");
+    push(taet(v, D.NcsNaiv * 0.5, 0.04), "Pænt tænkt, at noget henfalder – men en halveringstid på 30 år betyder, at der kun henfalder en lille smule på ét år. Halvdelen er alt for meget.");
+    push(taet(v, D.NcsNaiv * Math.exp(-D.kAar * 30.1), 0.04), "Du har regnet med, at der går en hel halveringstid. Kernerne har højst ligget i reaktoren i ét år.");
+  }
+  if (i === 10){
+    push(taet(v, D.kAar * D.Ncs, 0.04), "Du har brugt k i år⁻¹. Aktivitet i Bq kræver k i s⁻¹.");
+    push(taet(v, D.kSek * D.Nf, 0.04), "Du har brugt antallet af fissioner. Brug antallet af Cs-137-kerner fra a).");
+    push(taet(v, D.Ncs / CS_THALV, 0.04) || taet(v, D.Ncs / (CS_THALV * S_PR_AAR), 0.04), "Aktiviteten er A = k · N, ikke N divideret med halveringstiden. Husk ln(2).");
+    push(taet(v, D.Acs * 86400, 0.04), "Det er aktiviteten pr. døgn. Bq er pr. sekund.");
+  }
+  if (i === 11){
+    push(taet(v, Math.log(100) / D.kAar, 0.03), "Det er tiden, til aktiviteten er faldet til 1 %. Her spørges om en tusindedel, altså 0,1 %.");
+    push(taet(v, Math.log(BROEKDEL) * CS_THALV, 0.03), "Du har brugt halveringstiden i stedet for henfaldskonstanten. Husk k = ln(2)/T½.");
+    push(taet(v, Math.log(BROEKDEL) / D.kSek, 0.03), "Det er tiden i sekunder. Brug k i år⁻¹, så kommer t direkte i år.");
+    push(taet(v, 3 * CS_THALV, 0.03), "Tre halveringstider giver en ottendedel, ikke en tusindedel.");
+    push(taet(v, Math.log10(BROEKDEL) / D.kAar, 0.03), "Brug den naturlige logaritme, ln, når du løser e⁻ᵏᵗ = 1/1000.");
+    push(taet(v, BROEKDEL * CS_THALV, 0.03) || taet(v, CS_THALV * BROEKDEL / 2, 0.03), "Aktiviteten halveres for hver halveringstid. Hvor mange halveringer skal der til, før der er en tusindedel tilbage?");
+    push(v < 0, "Tiden skal være positiv. Tjek fortegnet, når du tager ln på begge sider.");
+  }
+  return t[0] || null;
+}
+
+// Venlige ekstra bemærkninger, når et svar er rigtigt
+function rigtigTillaeg(i, v){
+  if (i === 0) return ` Fragmentet er ${isoNavn(D.kanal.b, D.B)}.`;
+  if (i === 9){
+    const tNaiv = Math.abs(v - D.NcsNaiv), tEks = Math.abs(v - D.Ncs);
+    return tNaiv < tEks
+      ? " Du har set bort fra det Cs-137, der når at henfalde i løbet af året. Det er en god tilnærmelse, fordi halveringstiden er 30 år: kun ca. 1 % henfalder. Løsningen viser, hvordan man tager det med."
+      : " Du har endda taget højde for det Cs-137, der når at henfalde i løbet af året.";
+  }
+  if (i === 11) return " Det er ca. 10 halveringstider, for 2¹⁰ = 1024. Læg mærke til, at svaret er det samme, uanset hvor meget Cs-137 der er.";
+  return "";
+}
+
+function opgaveFor(i){ return OPG_FELTER.findIndex(f => f.includes(i)); }
+const KLASSE = { groen: "ok", gul: "delvis", roed: "nej" };
+const FORSOEG_KRAEVET = 3;
+
+function tjek(i){
+  const v = parseTal(felter[i].value);
+  felter[i].classList.remove("ok", "nej", "delvis");
+  fbEl[i].classList.remove("ok", "nej", "delvis");
+  if (!isFinite(v)){
+    svar[i] = null;
+    fbEl[i].className = "fb nej";
+    fbEl[i].innerHTML = "Kunne ikke læse tallet. Skriv det fx som <b>6,63e&minus;34</b> eller <b>6,63&middot;10^&minus;34</b>.";
+    opdaterStatus();
+    return;
+  }
+  forsoeg[i]++;
+  const ok = rigtig(i, v);
+  svar[i] = ok;
+  if (ok && kvalitet[i] === null){
+    kvalitet[i] = loesningSet[opgaveFor(i)] ? "roed"
+                : forsoeg[i] > FORSOEG_KRAEVET ? "gul" : "groen";
+  }
+  const kl = ok ? KLASSE[kvalitet[i]] : "nej";
+  felter[i].classList.add(kl);
+  fbEl[i].className = "fb " + kl;
+  if (ok){
+    let txt = kvalitet[i] === "groen" ? "Rigtigt."
+      : kvalitet[i] === "gul" ? `Rigtigt – det tog ${forsoeg[i]} forsøg.`
+      : "Rigtigt – men løsningen var set først.";
+    fbEl[i].innerHTML = txt + rigtigTillaeg(i, v);
+  } else {
+    const tip = diagnose(i, v);
+    const naer = tip ? null : naerhed(i, v);
+    fbEl[i].innerHTML = naer ? `Tæt på.<span class="tip">${naer}</span>`
+      : "Ikke helt." + (tip ? `<span class="tip">${tip}</span>` : "");
+  }
+  farvOpgave(opgaveFor(i));
+  if (i >= 6 && i <= 8) visGraf();
+  if (i === 11) visGraf2();
+  gemHistorik();
+  opdaterStatus();
+}
+function farvOpgave(n){
+  const sek = document.getElementById("opg" + (n + 1));
+  const felterI = OPG_FELTER[n];
+  sek.classList.remove("ok", "nej", "delvis");
+  if (felterI.some(j => svar[j] === false)) sek.classList.add("nej");
+  else if (felterI.every(j => svar[j] === true))
+    sek.classList.add(felterI.some(j => kvalitet[j] === "roed") ? "nej"
+                    : felterI.some(j => kvalitet[j] === "gul") ? "delvis" : "ok");
+}
+
+function opgaveRigtig(n){ return OPG_FELTER[n].every(i => svar[i] === true); }
+function nokForsoeg(n){ return OPG_FELTER[n].every(i => svar[i] === true || forsoeg[i] >= FORSOEG_KRAEVET); }
+function foersteUloeste(n){
+  for (let m = 0; m < n; m++) if (!opgaveRigtig(m)) return m + 1;
+  return 0;
+}
+function loesningAaben(n){ return foersteUloeste(n) === 0 && (opgaveRigtig(n) || nokForsoeg(n)); }
+function laaseTekst(n){
+  if (loesningSet[n]) return "Løsningen er set.";
+  const mangler = foersteUloeste(n);
+  if (mangler) return `Åbner, når opgave ${mangler} er rigtig.`;
+  if (opgaveRigtig(n)) return "";
+  const brugt = Math.min(...OPG_FELTER[n].filter(i => svar[i] !== true).map(i => forsoeg[i]));
+  return `Åbner efter ${FORSOEG_KRAEVET} forsøg – du har brugt ${brugt}.`;
+}
+function gemHistorik(){
+  if (D) historik.set(D.nr, { forsoeg: forsoeg.slice(), loesningSet: loesningSet.slice(), kvalitet: kvalitet.slice() });
+}
+function listeOver(tal){
+  if (tal.length === 1) return String(tal[0]);
+  return tal.slice(0, -1).join(", ") + " og " + tal[tal.length - 1];
+}
+
+function opdaterStatus(){
+  const hoved = svar.slice(0, N_HOVED), udfordring = svar.slice(N_HOVED);
+  const tjekket = svar.filter(x => x !== null).length;
+  const rigtige = hoved.filter(x => x === true).length;
+  const sete = Array.from({ length: N_OPG }, (_, n) => n + 1).filter(n => loesningSet[n - 1]);
+  const seje = kvalitet.slice(0, N_HOVED).filter(k => k === "gul").length;
+  const st = document.getElementById("statusTxt");
+  let txt = tjekket === 0 && !sete.length
+    ? "Ingen svar tjekket endnu."
+    : `${rigtige} af ${N_HOVED} rigtige.`;
+  if (seje) txt += ` ${seje === 1 ? "Et af dem tog" : seje + " af dem tog"} mere end ${FORSOEG_KRAEVET} forsøg.`;
+  // Udfordringen står uden for regnskabet og nævnes kun, når den er rørt ved
+  if (udfordring.every(x => x === true)) txt += " Udfordringen er løst.";
+  else if (udfordring.some(x => x !== null))
+    txt += ` Udfordringen: ${udfordring.filter(x => x === true).length} af ${N_UDF} rigtige.`;
+  if (sete.length) txt += ` Løsning set til opgave ${listeOver(sete)}.`;
+  st.innerHTML = txt;
+  const p = document.getElementById("prikker");
+  p.innerHTML = svar.map((s, i) =>
+    (i === N_HOVED ? `<span class="prikSkel"></span>` : "") +
+    `<span class="prik ${s === true ? KLASSE[kvalitet[i]] : s === false ? "nej" : ""}"></span>`).join("");
+  document.getElementById("visLoes").disabled = rigtige < N_HOVED;
+  for (let n = 0; n < N_OPG; n++){
+    const b = document.querySelector(`button.visOpg[data-o="${n + 1}"]`);
+    b.disabled = !loesningAaben(n);
+    document.getElementById("laas" + (n + 1)).textContent = b.disabled || loesningSet[n] ? laaseTekst(n) : "";
+  }
+}
+
+// Rydder svarene, men ikke forsøg og sete løsninger: regnskabet skal stå ved magt.
+function nulstilSvar(){
+  svar = Array(N_FELT).fill(null);
+  kvalitet = Array(N_FELT).fill(null);
+  felter.forEach(f => { f.value = ""; f.classList.remove("ok", "nej", "delvis"); });
+  fbEl.forEach(f => { f.className = "fb"; f.innerHTML = ""; });
+  for (let n = 1; n <= N_OPG; n++) document.getElementById("opg" + n).classList.remove("ok", "nej", "delvis");
+  document.getElementById("grafBoks").style.display = "none";
+  document.getElementById("grafBoks2").style.display = "none";
+  opdaterStatus();
+}
+
+// ---------- opgavesæt ----------
+function saetOpgave(nr){
+  D = opgaveData(nr);
+  document.getElementById("nrInput").value = String(nr);
+  const eTxt = fmt(D.Eel, 1) + " TWh", bTxt = fmt(D.ber, 1) + " %";
+  for (const id of ["dE", "dE2", "rE"]) document.getElementById(id).textContent = eTxt;
+  for (const id of ["dB", "dB2", "rB"]) document.getElementById(id).textContent = bTxt;
+  document.getElementById("reak2").innerHTML = reaktionHtml(D, true);
+  const k = D.kanal;
+  const raekker = [["U", 235, M_U235], [k.a, k.A, D.ma]]
+    .concat(D.tabelA.map(a => [k.b, a, GRUND[k.b].m[a]]))
+    .concat([["neutron", null, M_N]]);
+  document.getElementById("masseTab").innerHTML =
+    `<tr><td style="color:var(--dim)">Atommasser</td><td></td></tr>` +
+    raekker.map(([s, a, m]) => `<tr><td>${a === null ? "Neutron" : s + "&#8209;" + a}</td><td class="m">${masseTxt(m)} u</td></tr>`).join("");
+  document.getElementById("rNote").textContent = "Kør fissionen, eller regn videre med tallene ovenfor.";
+  if (location.hash.slice(1) !== String(nr)) history.replaceState(null, "", "#" + nr);
+  const h = historik.get(nr);
+  forsoeg = h ? h.forsoeg.slice() : Array(N_FELT).fill(0);
+  loesningSet = h ? h.loesningSet.slice() : Array(N_OPG).fill(false);
+  kvalitet = h ? h.kvalitet.slice() : Array(N_FELT).fill(null);
+  nulstilSvar();
+  visMaaling = 0; koerer = false;
+  document.getElementById("koer").textContent = "▶ Kør fissionen";
+  bygKerner();
+  tegnAlt();
+}
+function nytNummer(){
+  saetOpgave(1000 + Math.floor(Math.random() * 9000));
+}
+
+// ---------- fissionsanimation ----------
+const cvM = document.getElementById("maaling"), ctx = cvM.getContext("2d");
+const cvG = document.getElementById("graf"),    gtx = cvG.getContext("2d");
+const cvG2 = document.getElementById("graf2"),  gtx2 = cvG2.getContext("2d");
+let W = 900, Hm = 300, GW = 900, GH = 260, GW2 = 900, GH2 = 280;
+
+function layout(){
+  const dpr = window.devicePixelRatio || 1;
+  W = cvM.clientWidth || 900;
+  Hm = Math.max(260, Math.min(340, W * 0.36));
+  cvM.style.height = Hm + "px";
+  cvM.width = Math.round(W * dpr); cvM.height = Math.round(Hm * dpr);
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+  GW = cvG.clientWidth || 900;
+  GH = Math.max(220, Math.min(280, GW * 0.3));
+  cvG.style.height = GH + "px";
+  cvG.width = Math.round(GW * dpr); cvG.height = Math.round(GH * dpr);
+  gtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+  GW2 = cvG2.clientWidth || 900;
+  GH2 = Math.max(240, Math.min(320, GW2 * 0.34));
+  cvG2.style.height = GH2 + "px";
+  cvG2.width = Math.round(GW2 * dpr); cvG2.height = Math.round(GH2 * dpr);
+  gtx2.setTransform(dpr, 0, 0, dpr, 0, 0);
+  tegnAlt();
+}
+
+function rich(c, dele, x, y, align, size, farve){
+  const fontOf = p => (p[1] ? `italic ${size}px ${MATH}` : `${size}px ${SERIF}`);
+  let w = 0;
+  for (const p of dele){ c.font = fontOf(p); w += c.measureText(p[0]).width; }
+  let cx = align === "right" ? x - w : align === "center" ? x - w / 2 : x;
+  c.fillStyle = farve; c.textBaseline = "alphabetic"; c.textAlign = "left";
+  for (const p of dele){ c.font = fontOf(p); c.fillText(p[0], cx, y); cx += c.measureText(p[0]).width; }
+  return w;
+}
+
+// Kernerne tegnes som en kugle af små kugler. Antallet er langt mindre end det
+// rigtige nukleontal, men forholdet mellem protoner og neutroner er det rigtige.
+const N_U_TEGN = 64;
+let kerner = {};
+function kerneMoenster(antal, Z, A, seed){
+  const r = mulberry32(seed);
+  const pFrac = Z / A;
+  const kugler = [];
+  for (let i = 0; i < antal; i++){
+    const rr = Math.sqrt((i + 0.5) / antal);
+    const th = i * 2.399963 + r() * 0.25;
+    kugler.push({ x: rr * Math.cos(th), y: rr * Math.sin(th), proton: false });
+  }
+  // fordel protonerne tilfældigt, men med det rigtige antal
+  const nP = Math.round(antal * pFrac);
+  const idx = kugler.map((_, i) => i).sort(() => r() - 0.5);
+  for (let j = 0; j < nP; j++) kugler[idx[j]].proton = true;
+  // tegn bagfra og frem, så det ligner en kugle
+  return kugler.map(k => ({ ...k, z: r() })).sort((a, b) => a.z - b.z);
+}
+function bygKerner(){
+  if (!D) return;
+  const k = D.kanal;
+  const nA = Math.round(N_U_TEGN * k.A / 236), nB = Math.round(N_U_TEGN * k.B / 236);
+  kerner = {
+    U: kerneMoenster(N_U_TEGN - 1, 92, 235, 11),
+    U6: kerneMoenster(N_U_TEGN, 92, 236, 13),
+    a: kerneMoenster(nA, D.Za, k.A, 17),
+    b: kerneMoenster(nB, D.Zb, k.B, 19),
+    nA, nB
+  };
+}
+function tegnKerne(c, kugler, cx, cy, R, sx, sy, skala){
+  const n = kugler.length;
+  const br = R * 1.05 / Math.sqrt(n) * 1.25;
+  for (const k of kugler){
+    const x = cx + k.x * R * sx, y = cy + k.y * R * sy;
+    c.fillStyle = k.proton ? COL.proton : COL.neutron;
+    c.beginPath(); c.arc(x, y, br, 0, 2 * Math.PI); c.fill();
+    c.strokeStyle = "rgba(0,0,0,.55)"; c.lineWidth = 0.8 * skala; c.stroke();
+  }
+}
+function tegnNeutron(c, x, y, skala, alfa){
+  c.globalAlpha = alfa === undefined ? 1 : alfa;
+  c.fillStyle = COL.neutron;
+  c.beginPath(); c.arc(x, y, 5.5 * skala, 0, 2 * Math.PI); c.fill();
+  c.strokeStyle = COL.fg; c.lineWidth = 1.2; c.stroke();
+  c.globalAlpha = 1;
+}
+const VARIGHED = 8;   // sekunder for hele forløbet
+const ease = x => x < 0 ? 0 : x > 1 ? 1 : 1 - Math.pow(1 - x, 3);
+
+function tegnMaaling(){
+  const c = ctx;
+  c.clearRect(0, 0, W, Hm);
+  if (!D || !kerner.U) return;
+  const skala = Math.max(0.7, Math.min(1, W / 900));
+  const p = visMaaling * VARIGHED;           // tid i sekunder i forløbet
+  const k = D.kanal;
+  const cx = 0.30 * W, cy = Hm * 0.46;
+  const RU = Math.min(46, Hm * 0.15) * skala / Math.max(skala, 0.85);
+  const RA = RU * Math.cbrt(k.A / 236), RB = RU * Math.cbrt(k.B / 236);
+
+  // fase 1: neutronen kommer ind fra venstre
+  if (p < 1.6){
+    tegnKerne(c, kerner.U, cx, cy, RU, 1, 1, skala);
+    rich(c, [["U-235", false]], cx, cy - RU - 14 * skala, "center", 16 * skala, COL.fg);
+    const x0 = 0.03 * W, x1 = cx - RU - 4;
+    const x = x0 + (x1 - x0) * Math.min(1, p / 1.6);
+    tegnNeutron(c, x, cy, skala);
+    rich(c, [["langsom neutron", false]], x, cy + 26 * skala, "center", 14 * skala, COL.dim);
+  }
+  // fase 2: U-236 svinger og strækkes
+  else if (p < 3.4){
+    const q = p - 1.6;
+    const svingning = 0.10 * Math.sin(q * 15) * Math.min(1, q / 0.6);
+    const strakt = q > 1.2 ? (q - 1.2) / 0.6 * 0.55 : 0;
+    const sx = 1 + svingning + strakt, sy = 1 / Math.sqrt(1 + svingning + strakt);
+    tegnKerne(c, kerner.U6, cx, cy, RU, sx, sy, skala);
+    rich(c, [["U-236*", false]], cx, cy - RU * sy - 14 * skala, "center", 16 * skala, COL.yellow);
+    rich(c, [["en exciteret kerne", false]], cx, cy + RU * sy + 26 * skala, "center", 14 * skala, COL.dim);
+  }
+  // fase 3: spaltningen
+  else {
+    const q = p - 3.4;
+    const f = ease(q / 2.6);
+    // kort lysglimt i spaltningsøjeblikket
+    if (q < 0.35){
+      const g = c.createRadialGradient(cx, cy, 0, cx, cy, RU * 2.4);
+      g.addColorStop(0, `rgba(244,211,69,${0.55 * (1 - q / 0.35)})`);
+      g.addColorStop(1, "rgba(244,211,69,0)");
+      c.fillStyle = g; c.beginPath(); c.arc(cx, cy, RU * 2.4, 0, 2 * Math.PI); c.fill();
+    }
+    const ax = cx + f * 0.30 * W, ay = cy - f * Hm * 0.20;
+    const bx = cx + f * 0.30 * W, by = cy + f * Hm * 0.22;
+    tegnKerne(c, kerner.a, ax, ay, RA, 1, 1, skala);
+    tegnKerne(c, kerner.b, bx, by, RB, 1, 1, skala);
+    if (q > 0.5){
+      rich(c, [[`${k.a}-${k.A}`, false]], ax + RA + 10 * skala, ay + 5, "left", 16 * skala, COL.fg);
+      rich(c, [[`${k.b}-?`, false]], bx + RB + 10 * skala, by + 5, "left", 16 * skala, COL.fg);
+    }
+    // de frie neutroner flyver hurtigt ud i forskellige retninger
+    const retninger = D.n === 2 ? [-2.5, 0.0] : [-2.5, 2.55, 0.0];
+    retninger.forEach((th, j) => {
+      const d = ease(q / 2.0) * 0.24 * W;
+      const x = Math.max(20, Math.min(W - 20, cx + d * Math.cos(th)));
+      const y = Math.max(26, Math.min(Hm - 44, cy + d * Math.sin(th) * 0.9));
+      tegnNeutron(c, x, y, skala);
+      if (q > 0.6 && j === 0) rich(c, [["frie neutroner", false]], x, y + 24 * skala, "center", 14 * skala, COL.dim);
+    });
+  }
+
+  // afsluttende linje: reaktionen, uden det manglende nukleontal
+  if (visMaaling >= 1){
+    rich(c, [["Fissionen er sket: ", false],
+             [`U-235 + n → ${k.a}-${k.A} + ${k.b}-? + ${D.n} n`, false]],
+         W / 2, Hm - 12, "center", 15.5 * skala, COL.green);
+  }
+}
+
+// ---------- grafer ----------
+// Søjlerne viser facit, så de må først frem, når eleven selv har fundet dem.
+function visGraf(){
+  if (!(svar[6] === true && svar[7] === true && svar[8] === true)) return;
+  document.getElementById("grafBoks").style.display = "";
+  layout();
+}
+function visGraf2(){
+  if (svar[11] !== true) return;
+  document.getElementById("grafBoks2").style.display = "";
+  layout();
+}
+function tegnGraf(){
+  if (!D || document.getElementById("grafBoks").style.display === "none") return;
+  const c = gtx, mL = Math.min(170, GW * 0.3), mR = 24, mT = 14, mB = 44;
+  const pw = GW - mL - mR, ph = GH - mT - mB;
+  const LMIN = -1, LMAX = 8;                 // 10^-1 ... 10^8 ton
+  const X = v => mL + pw * (Math.log10(v) - LMIN) / (LMAX - LMIN);
+  c.clearRect(0, 0, GW, GH);
+  c.lineWidth = 1; c.strokeStyle = "#262626";
+  c.font = `13px ${SERIF}`; c.fillStyle = COL.fg; c.textAlign = "center"; c.textBaseline = "top";
+  for (let e = LMIN; e <= LMAX; e++){
+    const x = X(Math.pow(10, e));
+    c.beginPath(); c.moveTo(x, mT); c.lineTo(x, mT + ph); c.stroke();
+    if (pw > 420 || e % 2 === 0){
+      rich(c, [["10", false]], x + 1, mT + ph + 22, "right", 13, COL.fg);
+      rich(c, [[String(e).replace("-", "−"), false]], x + 2, mT + ph + 15, "left", 10, COL.fg);
+    }
+  }
+  rich(c, [["ton pr. år", false]], mL + pw, mT + ph + 40, "right", 14, COL.dim);
+  const rk = [
+    ["U-235 spaltet", D.mUkg / 1000, COL.blue],
+    ["beriget uran", D.mBer, COL.teal],
+    ["stenkul", D.mKul, COL.red]
+  ];
+  const bh = ph / rk.length * 0.55;
+  rk.forEach(([navn, v, farve], j) => {
+    const y = mT + ph * (j + 0.5) / rk.length;
+    c.fillStyle = farve;
+    c.fillRect(mL, y - bh / 2, Math.max(2, X(v) - mL), bh);
+    rich(c, [[navn, false]], mL - 10, y + 5, "right", 15, COL.fg);
+    const tekst = v >= 1e4 ? `${Math.round(v / 1e4) / 100} mio. ton`.replace(".", ",") : `${komma(v.toPrecision(3))} ton`;
+    const xt = X(v) + 8;
+    if (xt + 110 < GW) rich(c, [[tekst, false]], xt, y + 5, "left", 14, COL.fg);
+    else rich(c, [[tekst, false]], X(v) - 8, y + 5, "right", 14, "#000");
+  });
+  c.strokeStyle = COL.fg; c.lineWidth = 1.6;
+  c.beginPath(); c.moveTo(mL, mT); c.lineTo(mL, mT + ph); c.lineTo(mL + pw, mT + ph); c.stroke();
+}
+function tegnGraf2(){
+  if (!D || document.getElementById("grafBoks2").style.display === "none") return;
+  const c = gtx2, mL = 70, mR = 22, mT = 18, mB = 50;
+  const pw = GW2 - mL - mR, ph = GH2 - mT - mB;
+  const TMAX = 400, LMIN = -4;               // relativ aktivitet 10^-4 ... 1
+  const X = t => mL + pw * t / TMAX;
+  const Y = rel => mT + ph * (Math.log10(rel) / LMIN);
+  c.clearRect(0, 0, GW2, GH2);
+  c.lineWidth = 1; c.strokeStyle = "#262626";
+  for (let t = 0; t <= TMAX; t += 50){
+    c.beginPath(); c.moveTo(X(t), mT); c.lineTo(X(t), mT + ph); c.stroke();
+    if (pw > 420 || t % 100 === 0) rich(c, [[String(t), false]], X(t), mT + ph + 20, "center", 13, COL.fg);
+  }
+  for (let e = 0; e >= LMIN; e--){
+    c.beginPath(); c.moveTo(mL, Y(Math.pow(10, e))); c.lineTo(mL + pw, Y(Math.pow(10, e))); c.stroke();
+    const lab = e === 0 ? "1" : `1/${Math.pow(10, -e)}`;
+    rich(c, [[lab, false]], mL - 8, Y(Math.pow(10, e)) + 5, "right", 13, COL.fg);
+  }
+  c.strokeStyle = COL.fg; c.lineWidth = 1.6;
+  c.beginPath(); c.moveTo(mL, mT); c.lineTo(mL, mT + ph); c.lineTo(mL + pw, mT + ph); c.stroke();
+  rich(c, [["t", true], [" / år efter årets udgang", false]], mL + pw, mT + ph + 42, "right", 15, COL.fg);
+  rich(c, [["A", true], [" / ", false], ["A", true], ["₀", false]], mL + pw - 4, mT + 18, "right", 15, COL.fg);
+  c.strokeStyle = COL.blue; c.lineWidth = 2.6;
+  c.beginPath();
+  for (let i = 0; i <= 300; i++){
+    const t = TMAX * i / 300, rel = Math.exp(-D.kAar * t);
+    i ? c.lineTo(X(t), Y(rel)) : c.moveTo(X(t), Y(rel));
+  }
+  c.stroke();
+  // markering af en tusindedel
+  c.setLineDash([5, 6]); c.strokeStyle = COL.red; c.lineWidth = 1.6;
+  c.beginPath(); c.moveTo(mL, Y(1e-3)); c.lineTo(X(D.tCs), Y(1e-3)); c.lineTo(X(D.tCs), mT + ph); c.stroke();
+  c.setLineDash([]);
+  c.fillStyle = COL.red; c.beginPath(); c.arc(X(D.tCs), Y(1e-3), 5, 0, 2 * Math.PI); c.fill();
+  rich(c, [["t", true], [` ≈ ${Math.round(D.tCs / 10) * 10} år`, false]], X(D.tCs) + 10, Y(1e-3) - 10, "left", 15, COL.red);
+}
+
+function tegnAlt(){ if (D){ tegnMaaling(); tegnGraf(); tegnGraf2(); } }
+
+// ---------- løsning ----------
+function byg1(){
+  const k = D.kanal;
+  return [
+    String.raw`## 1. Det manglende fragment`,
+    String.raw`Ved en kerneproces er nukleontallet bevaret: der er lige så mange protoner og neutroner tilsammen efter processen som før. Før er der U-235 og den neutron, der rammer, altså $235 + 1 = 236$ nukleoner. Efter er der de to fragmenter og ${D.n} frie neutroner, som hver tæller som én nukleon. Kalder vi det manglende nukleontal $x$, får vi $$235 + 1 = ${k.A} + x + ${D.n}\cdot 1 \quad\Longrightarrow\quad x = 236 - ${k.A} - ${D.n} = ${D.B}.$$`,
+    String.raw`Ladningstallet skal også være bevaret. Neutronerne har ladningstallet $0$, så $$92 + 0 = ${D.Za} + ${D.Zb} + ${D.n}\cdot 0,$$ og det passer. Fissionen er altså $$${nukTex("U", 235, 92)} + {}^{1}_{0}\text{n} \rightarrow ${nukTex(k.a, k.A, D.Za)} + ${nukTex(k.b, D.B, D.Zb)} + ${D.n}\cdot {}^{1}_{0}\text{n}.$$`
+  ];
+}
+function byg2(){
+  const k = D.kanal;
+  const sumEfter = D.ma + D.mb + D.n * M_N, sumFoer = M_U235 + M_N;
+  return [
+    String.raw`## 2. Massetilvæksten`,
+    String.raw`Massetilvæksten er den samlede masse efter fissionen minus den samlede masse før: $$\Delta m = m(\text{${k.a}-${k.A}}) + m(\text{${k.b}-${D.B}}) + ${D.n}\cdot m_n - m(\text{U-235}) - m_n.$$ Vi bruger atommasser. Et U-atom har 92 elektroner, og de to fragmenters atomer har tilsammen $${D.Za} + ${D.Zb} = 92$ elektroner, så elektronmasserne går ud af regnestykket.`,
+    String.raw`Massen efter er $$${masseTex(D.ma)}\ \text{u} + ${masseTex(D.mb)}\ \text{u} + ${D.n}\cdot ${masseTex(M_N)}\ \text{u} = ${masseTex(sumEfter)}\ \text{u},$$ og massen før er $$${masseTex(M_U235)}\ \text{u} + ${masseTex(M_N)}\ \text{u} = ${masseTex(sumFoer)}\ \text{u}.$$ Dermed er $$\Delta m = ${masseTex(sumEfter)}\ \text{u} - ${masseTex(sumFoer)}\ \text{u} = ${masseTex(D.dm)}\ \text{u}.$$`,
+    String.raw`Massetilvæksten er negativ: der forsvinder masse ved fissionen, og den bliver til energi. Bemærk, at det er en lille forskel mellem to store tal. Derfor skal atommasserne bruges med alle decimaler.`
+  ];
+}
+function byg3(){
+  return [
+    String.raw`## 3. Energien fra én fission`,
+    String.raw`Q-værdien er den energi, der frigives, og den findes af massetilvæksten med Einsteins formel: $$Q = -\Delta m\cdot c^2.$$ Minustegnet sørger for, at en negativ massetilvækst giver en positiv Q-værdi. Med $1\ \text{u}\cdot c^2 = 931{,}5\ \text{MeV}$ får vi $$Q = ${masseTex(-D.dm)}\ \text{u}\cdot 931{,}5\ \frac{\text{MeV}}{\text{u}} = ${kommaTex(D.QMeV.toFixed(2))}\ \text{MeV}.$$`,
+    String.raw`Omregnet til J med $1\ \text{MeV} = 1{,}602\cdot 10^{-13}\ \text{J}$: $$Q = ${kommaTex(D.QMeV.toFixed(2))}\ \text{MeV}\cdot 1{,}602\cdot 10^{-13}\ \frac{\text{J}}{\text{MeV}} = ${sciTex(D.QJ, 4)}\ \text{J}.$$ Det er en forsvindende lille energi i hverdagens målestok, men den kommer fra én enkelt kerne.`
+  ];
+}
+function byg4(){
+  return [
+    String.raw`## 4. Fra elproduktion til fissioner`,
+    String.raw`*a)* Nyttevirkningen er den brøkdel af den termiske effekt, der bliver til el: $$\eta = \frac{P_{\text{el}}}{P_{\text{th}}} = \frac{1600\ \text{MW}}{4300\ \text{MW}} = ${kommaTex(D.eta.toFixed(4))}.$$ Den samme brøkdel gælder for energien over hele året, så $E_{\text{el}} = \eta\cdot E_{\text{th}}$. Elproduktionen omregnet til J er $$E_{\text{el}} = ${kommaTex(D.Eel.toFixed(1))}\ \text{TWh}\cdot 3{,}6\cdot 10^{15}\ \frac{\text{J}}{\text{TWh}} = ${sciTex(D.EelJ, 4)}\ \text{J},$$ og den termiske energi er $$E_{\text{th}} = \frac{E_{\text{el}}}{\eta} = \frac{${sciTex(D.EelJ, 4)}\ \text{J}}{${kommaTex(D.eta.toFixed(4))}} = ${sciTex(D.Eth, 4)}\ \text{J}.$$ Man kan også regne uden at gå over $\eta$: $E_{\text{th}} = E_{\text{el}}\cdot \frac{4300}{1600}$.`,
+    String.raw`*b)* Hver fission frigiver $Q$, så antallet af fissioner er den samlede energi divideret med energien fra én fission. Begge energier skal være i J: $$\text{antal} = \frac{E_{\text{th}}}{Q} = \frac{${sciTex(D.Eth, 4)}\ \text{J}}{${sciTex(D.QJ, 4)}\ \text{J}} = ${sciTex(D.Nf, 4)}.$$`
+  ];
+}
+function byg5(){
+  return [
+    String.raw`## 5. Brændslet`,
+    String.raw`*a)* Hver fission spalter én U-235-kerne, og et U-235-atom vejer $${masseTex(M_U235)}\ \text{u}$. Massen af den spaltede U-235 er antallet gange massen af ét atom: $$m = ${sciTex(D.Nf, 4)}\cdot ${masseTex(M_U235)}\ \text{u}\cdot 1{,}66054\cdot 10^{-27}\ \frac{\text{kg}}{\text{u}} = ${kommaTex(D.mUkg.toFixed(0))}\ \text{kg}.$$ Regner man med 235 u i stedet, bliver forskellen under en promille.`,
+    String.raw`*b)* Kun ${fmt(D.ber, 1)} % af uranet er U-235, altså brøkdelen $${kommaTex((D.ber / 100).toFixed(3))}$. Massen af beriget uran, der indeholder denne U-235, er derfor $$m_{\text{beriget}} = \frac{${kommaTex(D.mUkg.toFixed(0))}\ \text{kg}}{${kommaTex((D.ber / 100).toFixed(3))}} = ${sciTex(D.mBer * 1000, 4)}\ \text{kg} = ${kommaTex(D.mBer.toFixed(2))}\ \text{ton}.$$`
+  ];
+}
+function byg6(){
+  const forhold = D.mKul * 1000 / D.mUkg;
+  return [
+    String.raw`## 6. Hvad med kul?`,
+    String.raw`Brændværdien fortæller, hvor meget energi der frigives pr. kg kul: $E = m\cdot H$. Med $H = 25\ \text{MJ/kg} = 25\cdot 10^{6}\ \text{J/kg}$ og den termiske energi fra opgave 4 får vi $$m_{\text{kul}} = \frac{E_{\text{th}}}{H} = \frac{${sciTex(D.Eth, 4)}\ \text{J}}{25\cdot 10^{6}\ \text{J/kg}} = ${sciTex(D.mKul * 1000, 4)}\ \text{kg} = ${sciTex(D.mKul, 4)}\ \text{ton}.$$`,
+    String.raw`Det er omkring ${komma((D.mKul / 1e6).toFixed(1))} millioner ton kul om året. Sammenlignet med de ${komma(D.mUkg.toFixed(0))} kg U-235 er det en faktor $$\frac{${sciTex(D.mKul * 1000, 3)}\ \text{kg}}{${kommaTex(D.mUkg.toFixed(0))}\ \text{kg}} \approx ${sciTex(forhold, 2)}.$$ Forskellen skyldes, at en fission frigiver omkring 200 MeV, mens forbrændingen af ét kulstofatom kun frigiver nogle få eV. Det er forskellen på kernekræfter og kemiske bindinger.`
+  ];
+}
+function bygBemaerk(){
+  return [
+    String.raw`## Bemærkninger`,
+    String.raw`*Hvad bruger værket i virkeligheden?* Olkiluoto 3 skifter omkring 32 ton urandioxid ud om året, svarende til ca. 28 ton uran. Det er i samme størrelsesorden som resultatet i opgave 5 b), men modellen er forenklet på flere punkter, der trækker i hver sin retning. Noget af U-238 i brændslet indfanger neutroner og bliver til Pu-239, som også spaltes og leverer en betydelig del af energien. Til gengæld giver ikke alle neutronindfangninger i U-235 en fission, og brændslet tages ud, mens der stadig er U-235 tilbage.`,
+    String.raw`*Energien pr. fission* afhænger af, hvilke fragmenter der dannes, og ligger typisk på 170-200 MeV. Fragmenterne er desuden radioaktive og henfalder videre med betahenfald, som også afgiver energi i reaktoren. Derfor regner man i praksis med ca. 200 MeV pr. fission.`,
+    String.raw`*Kul i stedet?* Et kulkraftværk med samme elproduktion ville også have en nyttevirkning under 50 %, så sammenligningen med den termiske energi er rimelig. Hvert kg stenkul giver omkring 2,5 kg CO$_2$ ved forbrændingen.`
+  ];
+}
+function byg7(){
+  const kSek = D.kSek;
+  const Rhalv = D.NcsNaiv * Math.exp(-D.kAar * 0.5);
+  return [
+    String.raw`## 7. Affaldet`,
+    String.raw`*a)* Der dannes Cs-137 i 6,2 % af fissionerne, så i løbet af året dannes $$0{,}062\cdot ${sciTex(D.Nf, 4)} = ${sciTex(D.NcsNaiv, 4)}$$ Cs-137-kerner.`,
+    String.raw`Men noget af det henfalder, mens året går. Spørgsmålet er, om det betyder noget. Henfaldskonstanten er $$k = \frac{\ln(2)}{T_{1/2}} = \frac{\ln(2)}{30{,}1\ \text{år}} = ${kommaTex(D.kAar.toFixed(5))}\ \text{år}^{-1}.$$ Fissionerne er jævnt fordelt over året, så en Cs-137-kerne har i gennemsnit ligget et halvt år i brændslet ved årets udgang. Brøkdelen, der er tilbage, er derfor omtrent $$e^{-k\cdot 0{,}5\ \text{år}} = e^{-${kommaTex(D.kAar.toFixed(5))}\ \text{år}^{-1}\cdot 0{,}5\ \text{år}} = ${kommaTex(Math.exp(-D.kAar * 0.5).toFixed(4))},$$ altså henfalder kun ca. 1 %. Antallet ved årets udgang er $$N = ${sciTex(D.NcsNaiv, 4)}\cdot ${kommaTex(Math.exp(-D.kAar * 0.5).toFixed(4))} = ${sciTex(Rhalv, 4)}.$$ Det var altså en god tilnærmelse at se bort fra henfaldet, og begge svar godkendes.`,
+    String.raw`*Den præcise vej* bruger en differentialligning. Kalder vi antallet af dannede kerner pr. år for $R$, vokser antallet med $R$ og aftager med $k\cdot N$: $$\frac{dN}{dt} = R - k\cdot N, \qquad N(0) = 0 \quad\Longrightarrow\quad N(t) = \frac{R}{k}\cdot\left(1 - e^{-k\cdot t}\right).$$ Efter ét år giver det $N = ${sciTex(D.Ncs, 4)}$, i praksis det samme som med halvårs-argumentet.`,
+    String.raw`*b)* Aktiviteten er $A = k\cdot N$, med $k$ i $\text{s}^{-1}$: $$k = \frac{${kommaTex(D.kAar.toFixed(5))}\ \text{år}^{-1}}{3{,}1536\cdot 10^{7}\ \text{s/år}} = ${sciTex(kSek, 4)}\ \text{s}^{-1}$$ $$A = ${sciTex(kSek, 4)}\ \text{s}^{-1}\cdot ${sciTex(D.Ncs, 4)} = ${sciTex(D.Acs, 3)}\ \text{Bq}.$$ Det er et enormt tal, og det er kun én af mange radioaktive isotoper i det brugte brændsel.`,
+    String.raw`*c)* Aktiviteten aftager efter henfaldsloven $A(t) = A_0\cdot e^{-k\cdot t}$, og vi søger det $t$, hvor $A(t) = A_0/1000$: $$A_0\cdot e^{-k\cdot t} = \frac{A_0}{1000} \quad\Longrightarrow\quad e^{-k\cdot t} = \frac{1}{1000}.$$ Vi tager $\ln$ på begge sider og dividerer med $-k$: $$t = \frac{\ln(1000)}{k} = \frac{6{,}9078}{${kommaTex(D.kAar.toFixed(5))}\ \text{år}^{-1}} = ${kommaTex(D.tCs.toFixed(0))}\ \text{år}.$$`,
+    String.raw`Bemærk, at $A_0$ forkortede ud: det er lige meget, hvor meget Cs-137 der er, og svaret afhænger kun af halveringstiden. Da $2^{10} = 1024$, svarer det til omtrent 10 halveringstider. Derfor siger man ofte, at affald med Cs-137 og Sr-90 skal holdes adskilt fra omgivelserne i nogle hundrede år. I Olkiluoto bygges slutdepotet Onkalo i grundfjeldet omkring 400 m under jorden, så brugt brændsel kan ligge der langt længere end det.`
+  ];
+}
+function loesningsAfsnit(){
+  return [].concat(byg1(), byg2(), byg3(), byg4(), byg5(), byg6(), bygBemaerk(), byg7());
+}
+function bygVink(){
+  return [
+    String.raw`## Vink til opgave 7`,
+    String.raw`*a)* Antallet af Cs-137-kerner er en brøkdel af antallet af fissioner, som du fandt i opgave 4.`,
+    String.raw`Overvej, om noget af det Cs-137, der dannes, når at henfalde i løbet af året, og om det betyder noget for dit svar. Sammenlign året med halveringstiden.`,
+    String.raw`*b)* Aktiviteten følger af $A = k\cdot N$. Husk, at Bq er pr. sekund, så $k$ skal være i $\text{s}^{-1}$.`,
+    String.raw`*c)* Løs $A(t) = A_0\cdot e^{-k\cdot t}$ for det tidspunkt, hvor $A(t)/A_0 = 1/1000$. Læg mærke til, hvad du *ikke* får brug for.`
+  ];
+}
+function mdTilHtml(s){ return s.replace(/\*([^*$]+)\*/g, "<em>$1</em>"); }
+
+// ---------- TeX -> almindelig tekst, så løsningen kan sættes ind i Word ----------
+const SUP_T = { "0":"⁰","1":"¹","2":"²","3":"³","4":"⁴","5":"⁵",
+                "6":"⁶","7":"⁷","8":"⁸","9":"⁹","+":"⁺","-":"⁻",
+                "−":"⁻","(":"⁽",")":"⁾","?":"ˀ" };
+const SUB_T = { "0":"₀","1":"₁","2":"₂","3":"₃","4":"₄","5":"₅",
+                "6":"₆","7":"₇","8":"₈","9":"₉","+":"₊","-":"₋",
+                "(":"₍",")":"₎" };
+
+function texGruppe(t, i){
+  let d = 0, j = i;
+  for (; j < t.length; j++){
+    if (t[j] === "{") d++;
+    else if (t[j] === "}"){ d--; if (d === 0) break; }
+  }
+  return [t.slice(i + 1, j), j + 1];
+}
+function texPak(x){
+  return /[\s+·\/−-]/.test(x.trim()) ? "(" + x.trim() + ")" : x.trim();
+}
+function texTekst(raa){
+  const t = raa
+    .replace(/\\begin\{aligned\}|\\end\{aligned\}/g, "")
+    .replace(/\\\\\s*(\[[^\]]*\])?/g, "\n")
+    .replace(/&/g, "")
+    .replace(/\{,\}/g, ",");
+  let ud = "";
+  for (let i = 0; i < t.length; ){
+    const c = t[i];
+    if (c === "\\"){
+      const m = /^\\([a-zA-Z]+|.)/.exec(t.slice(i));
+      const cmd = m[1];
+      i += m[0].length;
+      if (/^[a-zA-Z]+$/.test(cmd)) while (t[i] === " ") i++;
+      if (cmd === "frac"){
+        let a, b;
+        [a, i] = texGruppe(t, i);
+        [b, i] = texGruppe(t, i);
+        ud += texPak(texTekst(a)) + "/" + texPak(texTekst(b));
+      } else if (cmd === "text"){
+        let a; [a, i] = texGruppe(t, i);
+        ud += a;
+      } else if (cmd === "sqrt"){
+        let a; [a, i] = texGruppe(t, i);
+        ud += "√" + texPak(texTekst(a));
+      } else if (cmd === "cdot") ud += "·";
+      else if (cmd === "pm") ud += "±";
+      else if (cmd === "delta") ud += "δ";
+      else if (cmd === "eta") ud += "η";
+      else if (cmd === "ln") ud += "ln";
+      else if (cmd === "Delta") ud += "Δ";
+      else if (cmd === "approx") ud += " ≈ ";
+      else if (cmd === "rightarrow") ud += " → ";
+      else if (cmd === "Longleftrightarrow") ud += "  ⟺  ";
+      else if (cmd === "Longrightarrow") ud += "  ⟹  ";
+      else if (cmd === "qquad") ud += "    ";
+      else if (cmd === "quad") ud += "  ";
+      else if (cmd === "%") ud += "%";
+      else if (cmd === " " || cmd === ",") ud += " ";
+      else if (cmd === "!" || cmd === "left" || cmd === "right") { /* uden virkning */ }
+      else ud += cmd;
+    } else if (c === "^" || c === "_"){
+      i++;
+      let arg;
+      if (t[i] === "{"){ [arg, i] = texGruppe(t, i); } else { arg = t[i]; i++; }
+      const inde = texTekst(arg);
+      if (c === "_" && inde === "1/2"){ ud += "½"; continue; }
+      const tab = c === "^" ? SUP_T : SUB_T;
+      ud += [...inde].every(ch => tab[ch])
+        ? [...inde].map(ch => tab[ch]).join("")
+        : (c === "^" ? "^(" : "_(") + inde + ")";
+    } else if (c === "{" ){
+      let a; [a, i] = texGruppe(t, i);
+      ud += texTekst(a);
+    } else { ud += c; i++; }
+  }
+  return ud.replace(/[ \t]{3,}/g, "  ");
+}
+function afsnitTilTekst(md){
+  if (md.startsWith("## ")) return "\n" + md.slice(3).toUpperCase();
+  return md
+    .replace(/\*([^*$]+)\*/g, "$1")
+    .replace(/\$\$([\s\S]+?)\$\$[ \t]*/g, (_, x) =>
+      "\n    " + texTekst(x).split("\n").map(r => r.trim()).join("\n    ") + "\n")
+    .replace(/\$([^$]+)\$/g, (_, x) => texTekst(x))
+    .replace(/[ \t]+\n/g, "\n");
+}
+
+const modal = document.getElementById("modal");
+// Fri formelsamling. Den er generel og indeholder ingen tal fra opgavesættet.
+function formelSamling(){
+  return [
+    String.raw`## Bevarelseslove`,
+    String.raw`I en kerneproces er både nukleontallet og ladningstallet bevaret. Summen af de øverste tal er den samme på begge sider af pilen, og det samme gælder summen af de nederste tal. En neutron skrives med nukleontal 1 og ladningstal 0: den tæller som én nukleon og har ingen ladning.`,
+    String.raw`## Massetilvækst og Q-værdi`,
+    String.raw`$$\Delta m = m_{\text{efter}} - m_{\text{før}} \qquad\qquad Q = -\Delta m\cdot c^2$$ Er $\Delta m$ negativ, er $Q$ positiv, og der frigives energi. Atommasser kan bruges i stedet for kernemasser, når der er lige mange elektroner på begge sider. Omregning: $$1\ \text{u}\cdot c^2 = 931{,}5\ \text{MeV} \qquad 1\ \text{MeV} = 1{,}602\cdot 10^{-13}\ \text{J}$$`,
+    String.raw`## Effekt, energi og nyttevirkning`,
+    String.raw`Energi er effekt gange tid, $E = P\cdot t$. Nyttevirkningen er den nyttige del af den tilførte effekt eller energi: $$\eta = \frac{P_{\text{nyttig}}}{P_{\text{tilført}}} = \frac{E_{\text{nyttig}}}{E_{\text{tilført}}}$$ $1\ \text{TWh} = 10^{12}\ \text{Wh}$ og $1\ \text{Wh} = 3600\ \text{J}$.`,
+    String.raw`## Antal processer og masse`,
+    String.raw`Kendes den samlede energi og energien fra én proces, er antallet af processer $$\text{antal} = \frac{E_{\text{samlet}}}{Q}$$ Begge energier skal have samme enhed. Massen af et antal atomer er antallet gange massen af ét atom, og $1\ \text{u} = 1{,}66054\cdot 10^{-27}\ \text{kg}$. Udgør en isotop kun en brøkdel af et stof, er massen af hele stoffet massen af isotopen divideret med brøkdelen.`,
+    String.raw`## Brændværdi`,
+    String.raw`Brændværdien $H$ er den energi, der frigives pr. kg brændsel: $E = m\cdot H$. $1\ \text{MJ} = 10^{6}\ \text{J}$.`,
+    String.raw`## Henfald og aktivitet`,
+    String.raw`$$k = \frac{\ln(2)}{T_{1/2}} \qquad A = k\cdot N \qquad A(t) = A_0\cdot e^{-k\cdot t}$$ Er $k$ i $\text{s}^{-1}$, kommer $A$ i $\text{Bq} = \text{s}^{-1}$. $1\ \text{år} = 365\cdot 24\cdot 3600\ \text{s}$. En ligning som $e^{-k\cdot t} = a$ løses ved at tage $\ln$ på begge sider eller med CAS.`
+  ];
+}
+
+function udfordringAaben(){ return loesningAaben(6); }
+function afsnitFor(n){
+  if (n === "formler") return formelSamling();
+  if (n === "vink") return bygVink();
+  // Den samlede løsning må ikke afsløre udfordringen for den, der ikke har låst den op.
+  if (n === null) return [].concat(byg1(), byg2(), byg3(), byg4(), byg5(), byg6(), bygBemaerk(),
+    udfordringAaben() ? byg7() : []);
+  return [byg1(), byg2(), byg3(), byg4(), byg5(), byg6().concat(bygBemaerk()), byg7()][n];
+}
+let visesNu = null;
+function aabnLoesning(n){
+  visesNu = n;
+  if (typeof n === "number" && !loesningSet[n]){ loesningSet[n] = true; gemHistorik(); }
+  document.getElementById("loesTitel").textContent =
+    n === "formler" ? "Relevante formler"
+    : n === "vink" ? "Vink til opgave 7"
+    : n === null ? `Løsning – opgave nr. ${D.nr}`
+    : `Løsning til opgave ${n + 1} – opgave nr. ${D.nr}`;
+  const body = document.getElementById("loesBody");
+  body.innerHTML = afsnitFor(n).map(p => p.startsWith("## ")
+    ? `<h3>${p.slice(3)}</h3>` : `<p>${mdTilHtml(p)}</p>`).join("");
+  modal.classList.add("open");
+  if (window.renderMathInElement){
+    renderMathInElement(body, {
+      delimiters: [{ left: "$$", right: "$$", display: true },
+                   { left: "$", right: "$", display: false }],
+      throwOnError: false
+    });
+  }
+  opdaterStatus();
+}
+document.querySelectorAll("button.visOpg").forEach(b =>
+  b.addEventListener("click", () => aabnLoesning(parseInt(b.dataset.o, 10) - 1)));
+document.getElementById("visLoes").addEventListener("click", () => aabnLoesning(null));
+document.getElementById("visFormler").addEventListener("click", () => aabnLoesning("formler"));
+document.getElementById("visVink").addEventListener("click", () => aabnLoesning("vink"));
+
+document.getElementById("luk").addEventListener("click", () => modal.classList.remove("open"));
+modal.addEventListener("click", e => { if (e.target === modal) modal.classList.remove("open"); });
+document.addEventListener("keydown", e => { if (e.key === "Escape") modal.classList.remove("open"); });
+function kopiTekst(){
+  const navn = "Et år i Olkiluoto 3";
+  const hoved = visesNu === "formler" ? "Relevante formler"
+    : visesNu === "vink" ? "Vink til opgave 7"
+    : visesNu === null ? `Løsning – ${navn}. Opgave nr. ${D.nr}`
+    : `Løsning til opgave ${visesNu + 1} – ${navn}. Opgave nr. ${D.nr}`;
+  const k = D.kanal;
+  const data = visesNu === "formler" || visesNu === "vink" ? ""
+    : `U-235 + n → ${k.a}-${k.A} + ${k.b}-? + ${D.n} n, elproduktion ${fmt(D.Eel, 1)} TWh, berigning ${fmt(D.ber, 1)} %\n`;
+  return hoved + "\n" + data + afsnitFor(visesNu).map(afsnitTilTekst).join("\n") + "\n";
+}
+document.getElementById("kopier").addEventListener("click", async e => {
+  const txt = kopiTekst();
+  try { await navigator.clipboard.writeText(txt); e.target.textContent = "Kopieret ✓"; }
+  catch { e.target.textContent = "Kunne ikke kopiere"; }
+  setTimeout(() => { e.target.textContent = "Kopiér tekst"; }, 1600);
+});
+
+// ---------- hændelser ----------
+document.querySelectorAll("button.tjek").forEach(b =>
+  b.addEventListener("click", () => tjek(parseInt(b.dataset.f, 10) - 1)));
+felter.forEach((f, i) => f.addEventListener("keydown", e => {
+  if (e.key === "Enter"){ e.preventDefault(); tjek(i); }
+}));
+document.getElementById("nulstil").addEventListener("click", nulstilSvar);
+document.getElementById("nytNr").addEventListener("click", nytNummer);
+document.getElementById("nrInput").addEventListener("change", e => {
+  const n = parseInt(String(e.target.value).replace(/\D/g, ""), 10);
+  if (isFinite(n) && n >= 1000 && n <= 9999) saetOpgave(n);
+  else saetOpgave(D.nr);
+});
+document.getElementById("foto").addEventListener("error", () => {
+  document.getElementById("fotoFig").style.display = "none";
+});
+
+function rulTil(el, luft){
+  const y = el.getBoundingClientRect().top + window.scrollY - (luft === undefined ? 14 : luft);
+  window.scrollTo({ top: Math.max(0, y), behavior: "smooth" });
+}
+function startScroll(){ rulTil(document.querySelector(".row"), 12); }
+function faerdigScroll(){
+  document.getElementById("rNote").textContent = "Fissionen er sket – gå videre til opgave 1.";
+  setTimeout(() => {
+    const c = cvM.getBoundingClientRect();
+    window.scrollTo({ top: Math.max(0, c.bottom + window.scrollY - 46), behavior: "smooth" });
+  }, 260);
+}
+
+const btnKoer = document.getElementById("koer");
+btnKoer.addEventListener("click", () => {
+  if (visMaaling >= 1) visMaaling = 0;
+  koerer = !koerer;
+  btnKoer.textContent = koerer ? "❮❮ Pause" : (visMaaling > 0 ? "▶ Fortsæt" : "▶ Kør fissionen");
+  if (koerer) startScroll();
+});
+document.getElementById("spring").addEventListener("click", () => {
+  visMaaling = 1; koerer = false;
+  btnKoer.textContent = "▶ Kør igen";
+  tegnAlt();
+  faerdigScroll();
+});
+
+// ---------- løkke ----------
+let sidst = null;
+function frame(ms){
+  const nu = ms / 1000;
+  if (sidst === null) sidst = nu;
+  const dt = Math.min(0.05, nu - sidst); sidst = nu;
+  if (koerer){
+    visMaaling = Math.min(1, visMaaling + dt / VARIGHED);
+    if (visMaaling >= 1){
+      koerer = false;
+      btnKoer.textContent = "▶ Kør igen";
+      faerdigScroll();
+    }
+    tegnMaaling();
+  }
+  requestAnimationFrame(frame);
+}
+
+// ---------- start ----------
+const fraHash = parseInt(location.hash.slice(1), 10);
+saetOpgave(isFinite(fraHash) && fraHash >= 1000 && fraHash <= 9999
+  ? fraHash : 1000 + Math.floor(Math.random() * 9000));
+layout();
+window.addEventListener("resize", layout);
+if (document.fonts){
+  document.fonts.load(`16px ${SERIF}`).catch(() => {});
+  document.fonts.load(`italic 16px ${MATH}`).catch(() => {});
+  document.fonts.ready.then(tegnAlt).catch(() => {});
+}
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>
