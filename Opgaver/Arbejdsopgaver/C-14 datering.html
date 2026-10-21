@@ -1021,16 +1021,21 @@ function byg5(){
   ];
 }
 function byg6(){
-  const tHoej = Math.log(D.a0Doegn / (D.aMaalt * (1 - D.dRel))) / D.kAar;
-  const tLav  = Math.log(D.a0Doegn / (D.aMaalt * (1 + D.dRel))) / D.kAar;
+  // Usikkerheden følges hele vejen som tal: tælletal ± delta giver to aktiviteter,
+  // og de to aktiviteter giver to aldre. Ingen procentregning undervejs.
+  const taelMax = D.taellinger + D.dTael, taelMin = D.taellinger - D.dTael;
+  const aMax = Math.round(taelMax / D.eta), aMin = Math.round(taelMin / D.eta);
+  const tHoej = Math.log(D.a0Doegn / aMin) / D.kAar;
+  const tLav  = Math.log(D.a0Doegn / aMax) / D.kAar;
+  const dt = (tHoej - tLav) / 2;
   return [
     `## 6. Usikkerheden på dateringen`,
-    String.raw`*a)* Henfald sker uafhængigt af hinanden og med samme sandsynlighed hele tiden. For den slags tælleforsøg er usikkerheden på et tælletal kvadratroden af tælletallet: $$\delta = \sqrt{${D.taellinger}} = ${kommaTex(D.dTael.toFixed(2))}.$$ Læg mærke til, hvad det betyder: tæller man fire gange så længe, bliver usikkerheden dobbelt så stor i antal, men kun halvt så stor i forhold til tælletallet. Det er den relative usikkerhed, der tæller.`,
-    String.raw`*b)* Den relative usikkerhed på tælletallet er $$\frac{\delta}{${D.taellinger}} = \frac{${kommaTex(D.dTael.toFixed(2))}}{${D.taellinger}} = ${kommaTex((D.dRel * 100).toFixed(2))}\ \%.$$ Aktiviteten findes ved at dividere tælletallet med udbyttet, og udbyttet er et eksakt tal. En multiplikation med en eksakt faktor ændrer ikke den relative usikkerhed, så aktiviteten $A$ har præcis samme relative usikkerhed: $$\delta A = ${kommaTex((D.dRel * 100).toFixed(2))}\ \%\ \text{af}\ ${D.aMaalt}\ \text{døgn}^{-1} = ${kommaTex((D.aMaalt * D.dRel).toFixed(0))}\ \text{døgn}^{-1}.$$`,
-    String.raw`Nu regnes alderen igennem igen, én gang med en aktivitet, der er $\delta A$ for stor, og én gang med en, der er $\delta A$ for lille. Jo mindre aktiviteten er, jo ældre bliver prøven, så den lille aktivitet giver den høje alder: $$t_{\text{høj}} = \frac{1}{k}\cdot\ln\!\left(\frac{${kommaTex(D.a0Doegn.toFixed(0))}}{${kommaTex((D.aMaalt * (1 - D.dRel)).toFixed(0))}}\right) = ${kommaTex(tHoej.toFixed(0))}\ \text{år}$$ $$t_{\text{lav}} = \frac{1}{k}\cdot\ln\!\left(\frac{${kommaTex(D.a0Doegn.toFixed(0))}}{${kommaTex((D.aMaalt * (1 + D.dRel)).toFixed(0))}}\right) = ${kommaTex(tLav.toFixed(0))}\ \text{år}$$`,
+    String.raw`*a)* Henfald sker uafhængigt af hinanden og med samme sandsynlighed hele tiden. For den slags tælleforsøg er usikkerheden på et tælletal kvadratroden af tælletallet: $$\delta = \sqrt{${D.taellinger}} = ${kommaTex(D.dTael.toFixed(2))}.$$ Tælleren kunne altså lige så godt have vist ${komma(taelMin.toFixed(2))} eller ${komma(taelMax.toFixed(2))} tællinger.`,
+    String.raw`*b)* De to tælletal giver hver sin aktivitet. Aktiviteten findes som i opgave 1 ved at dividere med udbyttet ${fmt(D.eta * 100, 2)} %, altså med ${komma(D.eta.toFixed(4))}: $$A_{\text{max}} = \frac{${kommaTex(taelMax.toFixed(2))}}{${kommaTex(D.eta.toFixed(4))}} = ${kommaTex(aMax.toFixed(0))}\ \text{døgn}^{-1}$$ $$A_{\text{min}} = \frac{${kommaTex(taelMin.toFixed(2))}}{${kommaTex(D.eta.toFixed(4))}} = ${kommaTex(aMin.toFixed(0))}\ \text{døgn}^{-1}$$`,
+    String.raw`Hver af de to aktiviteter giver en alder med formlen fra opgave 5. Jo mindre aktiviteten er, jo mere er der henfaldet, og jo ældre bliver prøven – så den lille aktivitet giver den høje alder: $$t_{\text{høj}} = \frac{1}{k}\cdot\ln\!\left(\frac{${kommaTex(D.a0Doegn.toFixed(0))}}{${kommaTex(aMin.toFixed(0))}}\right) = ${kommaTex(tHoej.toFixed(1))}\ \text{år}$$ $$t_{\text{lav}} = \frac{1}{k}\cdot\ln\!\left(\frac{${kommaTex(D.a0Doegn.toFixed(0))}}{${kommaTex(aMax.toFixed(0))}}\right) = ${kommaTex(tLav.toFixed(1))}\ \text{år}$$`,
     String.raw`De to aldre ligger tæt på hinanden, og det er netop deres forskel, vi skal bruge. Derfor skal de regnes med mange cifre: runder man dem til 3 betydende cifre, før man trækker fra, kan resultatet blive 10 % forkert. Det er en generel faldgrube, når man trækker to næsten lige store tal fra hinanden.`,
-    String.raw`Usikkerheden er den *halve* forskel mellem de to yderpunkter, for alderen ligger midt imellem dem: $$\delta t = \frac{${kommaTex(tHoej.toFixed(0))}\ \text{år} - ${kommaTex(tLav.toFixed(0))}\ \text{år}}{2} = ${kommaTex(D.dtSvar.toFixed(0))}\ \text{år}.$$ Resultatet skrives $$t = ${kommaTex(D.tSvar.toFixed(0))} \pm ${kommaTex(D.dtSvar.toFixed(0))}\ \text{år}.$$`,
-    String.raw`*Den korte vej.* Kan man differentiere, går det hurtigere. I udtrykket $t = \frac{1}{k}\ln(A_0) - \frac{1}{k}\ln(A)$ afhænger kun det sidste led af $A$, og $\ln$ differentieret giver $1/A$: $$\delta t = \frac{1}{k}\cdot\frac{\delta A}{A} = \frac{${kommaTex((D.dRel * 100).toFixed(2))}\ \%}{${sciTex(D.kAar, 5)}\ \text{år}^{-1}} = ${kommaTex(D.dtSvar.toFixed(0))}\ \text{år},$$ altså præcis det samme. Bemærk, at $A_0$ falder ud af regnestykket – det er endnu en måde at se, at kun målingen i dag bidrager.`,
+    String.raw`Alderen ligger midt mellem de to yderpunkter, så usikkerheden er den *halve* forskel: $$\delta t = \frac{${kommaTex(tHoej.toFixed(1))}\ \text{år} - ${kommaTex(tLav.toFixed(1))}\ \text{år}}{2} = ${kommaTex(dt.toFixed(0))}\ \text{år}.$$ Resultatet skrives $$t = ${kommaTex(D.tSvar.toFixed(0))} \pm ${kommaTex(D.dtSvar.toFixed(0))}\ \text{år}.$$`,
+    String.raw`*Den korte vej.* Kan man differentiere, går det hurtigere. I udtrykket $t = \frac{1}{k}\ln(A_0) - \frac{1}{k}\ln(A)$ afhænger kun det sidste led af $A$, og $\ln$ differentieret giver $1/A$. Da $A$ og tælletallet kun er hinanden gange en fast faktor, er $\delta A / A$ det samme som $\delta$ divideret med tælletallet: $$\delta t = \frac{1}{k}\cdot\frac{\delta}{${D.taellinger}} = \frac{1}{${sciTex(D.kAar, 5)}\ \text{år}^{-1}}\cdot\frac{${kommaTex(D.dTael.toFixed(2))}}{${D.taellinger}} = ${kommaTex(D.dtSvar.toFixed(0))}\ \text{år},$$ altså det samme. Bemærk, at både $A_0$ og udbyttet falder ud af regnestykket – det er endnu en måde at se, at kun tællingerne i dag bidrager.`,
     `*Hvorfor tæller man et helt døgn?* Usikkerheden går som 1 divideret med kvadratroden af tælletallet, og tælletallet er proportionalt med måletiden. Fordobler man måletiden, falder usikkerheden kun med en faktor √2. Havde man nøjedes med en time i stedet for et døgn, ville usikkerheden på alderen være knap fem gange større, altså ca. ${Math.round(D.dtSvar * Math.sqrt(24) / 10) * 10} år. Det er derfor, man er tålmodig.`,
     `*En pointe til sidst.* Forurening med nyere kulstof fra mosevandet ville typisk flytte alderen nogle få tiår. Det er mindre end de ${Math.round(D.dtSvar)} år, tællestatistikken alene giver, så med denne måletid kan man ikke se forskel på en ren og en let forurenet prøve.`
   ];
@@ -1051,8 +1056,9 @@ function loesningsAfsnit(){
 function bygVink(){
   return [
     `## Vink til opgave 6 b)`,
-    String.raw`Du kender nu usikkerheden på tælletallet. Gør den først *relativ*: hvor stor en brøkdel af tælletallet udgør den? Den brøkdel gælder også for aktiviteten $A$, fordi udbyttet er et eksakt tal, og en multiplikation med en eksakt faktor ikke ændrer en relativ usikkerhed.`,
-    String.raw`Herfra er én vej at regne alderen igennem to gange med den samme formel som i opgave 5: én gang med en aktivitet, der er $\delta A$ for stor, og én gang med en, der er $\delta A$ for lille. De to svar spænder om den rigtige alder. Overvej til sidst, om usikkerheden er hele spændet eller det halve.`,
+    String.raw`Du kender nu usikkerheden $\delta$ på tælletallet. Tælleren kunne altså lige så godt have vist $\delta$ mere eller $\delta$ mindre, end den gjorde.`,
+    String.raw`Regn de to tælletal om til hver sin aktivitet, præcis som du gjorde i opgave 1. Så har du en største og en mindste værdi af $A$.`,
+    String.raw`Hver af de to aktiviteter giver en alder med formlen fra opgave 5. De to aldre spænder om den rigtige. Overvej til sidst, om usikkerheden er hele spændet eller det halve.`,
     String.raw`Pas på afrundingen på den vej. De to aldre ligger tæt på hinanden, og du skal bruge deres *forskel*. Runder du dem til 3 betydende cifre, før du trækker fra, kan du let ramme 10 % ved siden af. Behold alle cifrene hele vejen.`,
     `Kan du differentiere, findes der en kortere vej. Den står i løsningen.`
   ];
@@ -1167,10 +1173,10 @@ function formelSamling(){
     String.raw`## Fra tællinger til aktivitet`,
     String.raw`En detektor registrerer kun en kendt brøkdel af henfaldene, *udbyttet*. Prøvens aktivitet er derfor $$A = \frac{\text{antal tællinger}}{\text{udbytte}}$$`,
     String.raw`## Usikkerhed`,
-    String.raw`Tæller man uafhængige begivenheder, er usikkerheden på tælletallet kvadratroden af tælletallet selv: $$\delta = \sqrt{\text{antal tællinger}}$$ Den *relative* usikkerhed er $\delta$ divideret med tælletallet, altså $1/\sqrt{\text{antal tællinger}}$. Jo længere man tæller, jo mindre bliver den.`,
-    String.raw`Ganges eller divideres en størrelse med et *eksakt* tal, er den relative usikkerhed uændret. Er et tal derimod *beregnet* og ikke målt, bidrager det ikke med nogen usikkerhed overhovedet.`,
-    String.raw`Usikkerheden på et resultat, der er regnet ud af en målt størrelse, kan findes på to måder. Enten regnes resultatet igennem i begge yderpunkter af den målte størrelse, og usikkerheden er den *halve* forskel mellem de to svar. Eller man differentierer udtrykket med hensyn til den målte størrelse og ganger med dens usikkerhed.`,
-    String.raw`Den første vej kræver omtanke med afrundingen: de to yderpunkter ligger tæt på hinanden, og det er deres *forskel*, man skal bruge. Trækker man to næsten lige store tal fra hinanden, forsvinder de første betydende cifre, og afrundingsfejlen fylder pludselig meget. Behold alle cifre i mellemregningerne, og rund først af til allersidst.`
+    String.raw`Tæller man uafhængige begivenheder, er usikkerheden på tælletallet kvadratroden af tælletallet selv: $$\delta = \sqrt{\text{antal tællinger}}$$ Jo længere man tæller, jo større bliver $\delta$ i antal, men jo mindre fylder den i forhold til tælletallet.`,
+    String.raw`Usikkerheden følges videre gennem en udregning ved at regne den hele vejen igennem to gange: én gang med den målte værdi *plus* dens usikkerhed og én gang med den *minus*. De to svar spænder om resultatet, og usikkerheden på det er den *halve* forskel mellem dem. Er et tal i udregningen *beregnet* og ikke målt, bidrager det ikke med nogen usikkerhed.`,
+    String.raw`Kan man differentiere, findes usikkerheden også ved at differentiere udtrykket med hensyn til den målte størrelse og gange med dens usikkerhed.`,
+    String.raw`Den første vej kræver omtanke med afrundingen: de to svar ligger tæt på hinanden, og det er deres *forskel*, man skal bruge. Trækker man to næsten lige store tal fra hinanden, forsvinder de første betydende cifre, og afrundingsfejlen fylder pludselig meget. Behold alle cifre i mellemregningerne, og rund først af til allersidst.`
   ];
 }
 
