@@ -222,14 +222,23 @@ input.nr:focus{outline:none;border-color:var(--yellow)}
 
   <section class="opg" id="opg2">
     <h3><span class="nr">2</span> &middot; Hvor mange C&#8209;14&#8209;kerner var der, da han døde?</h3>
-    <p>Så længe Lyngmosemanden levede, indgik han i kulstofkredsløbet, og brøkdelen af C&#8209;14 i hans væv var den samme som i luften. Beregn antallet af C&#8209;14&#8209;kerner <i class="sym">N</i><sub>0</sub> i prøven på det tidspunkt, hvor han døde.</p>
+    <p>Så længe Lyngmosemanden levede, indgik han i kulstofkredsløbet, og brøkdelen af C&#8209;14 i hans væv var den samme som i luften.</p>
+    <p><b>a)</b> Et kulstofatom vejer i gennemsnit 12 u. Beregn det samlede antal kulstofatomer <i class="sym">N</i><sub>C</sub> i prøven.</p>
     <div class="felt">
-      <span class="navn"><i class="sym">N</i><sub>0</sub> =</span>
+      <span class="navn"><i class="sym">N</i><sub>C</sub> =</span>
       <input id="f2" type="text" autocomplete="off" spellcheck="false">
-      <span class="enhed">kerner</span>
+      <span class="enhed">atomer</span>
       <button class="tjek" data-f="2">Tjek</button>
     </div>
     <div class="fb" id="fb2"></div>
+    <p><b>b)</b> Beregn antallet af C&#8209;14&#8209;kerner <i class="sym">N</i><sub>0</sub> i prøven på det tidspunkt, hvor han døde.</p>
+    <div class="felt">
+      <span class="navn"><i class="sym">N</i><sub>0</sub> =</span>
+      <input id="f3" type="text" autocomplete="off" spellcheck="false">
+      <span class="enhed">kerner</span>
+      <button class="tjek" data-f="3">Tjek</button>
+    </div>
+    <div class="fb" id="fb3"></div>
     <div class="loesRow">
       <button class="visOpg" data-o="2" disabled>Vis løsning til opgave 2</button>
       <span class="laas" id="laas2"></span>
@@ -241,11 +250,11 @@ input.nr:focus{outline:none;border-color:var(--yellow)}
     <p>Beregn henfaldskonstanten <i class="sym">k</i> for C&#8209;14 i enheden s<sup>&minus;1</sup>.</p>
     <div class="felt">
       <span class="navn"><i class="sym">k</i> =</span>
-      <input id="f3" type="text" autocomplete="off" spellcheck="false">
+      <input id="f4" type="text" autocomplete="off" spellcheck="false">
       <span class="enhed">s<sup>&minus;1</sup></span>
-      <button class="tjek" data-f="3">Tjek</button>
+      <button class="tjek" data-f="4">Tjek</button>
     </div>
-    <div class="fb" id="fb3"></div>
+    <div class="fb" id="fb4"></div>
     <div class="loesRow">
       <button class="visOpg" data-o="3" disabled>Vis løsning til opgave 3</button>
       <span class="laas" id="laas3"></span>
@@ -257,18 +266,18 @@ input.nr:focus{outline:none;border-color:var(--yellow)}
     <p>Beregn aktiviteten <i class="sym">A</i><sub>0</sub> af prøven på dødstidspunktet, først i enheden Bq og derefter i enheden døgn<sup>&minus;1</sup>. Det er den samme fysiske størrelse begge gange &ndash; kun tidsenheden er en anden.</p>
     <div class="felt">
       <span class="navn"><i class="sym">A</i><sub>0</sub> =</span>
-      <input id="f4" type="text" autocomplete="off" spellcheck="false">
-      <span class="enhed">Bq = s<sup>&minus;1</sup></span>
-      <button class="tjek" data-f="4">Tjek</button>
-    </div>
-    <div class="fb" id="fb4"></div>
-    <div class="felt">
-      <span class="navn"><i class="sym">A</i><sub>0</sub> =</span>
       <input id="f5" type="text" autocomplete="off" spellcheck="false">
-      <span class="enhed">døgn<sup>&minus;1</sup></span>
+      <span class="enhed">Bq = s<sup>&minus;1</sup></span>
       <button class="tjek" data-f="5">Tjek</button>
     </div>
     <div class="fb" id="fb5"></div>
+    <div class="felt">
+      <span class="navn"><i class="sym">A</i><sub>0</sub> =</span>
+      <input id="f6" type="text" autocomplete="off" spellcheck="false">
+      <span class="enhed">døgn<sup>&minus;1</sup></span>
+      <button class="tjek" data-f="6">Tjek</button>
+    </div>
+    <div class="fb" id="fb6"></div>
     <div class="loesRow">
       <button class="visOpg" data-o="4" disabled>Vis løsning til opgave 4</button>
       <span class="laas" id="laas4"></span>
@@ -280,11 +289,11 @@ input.nr:focus{outline:none;border-color:var(--yellow)}
     <p>Brug prøvens aktivitet i dag fra opgave 1 og aktiviteten på dødstidspunktet fra opgave 4. Beregn, hvor mange år der er gået, siden Lyngmosemanden døde.</p>
     <div class="felt">
       <span class="navn"><i class="sym">t</i> =</span>
-      <input id="f6" type="text" autocomplete="off" spellcheck="false">
+      <input id="f7" type="text" autocomplete="off" spellcheck="false">
       <span class="enhed">år</span>
-      <button class="tjek" data-f="6">Tjek</button>
+      <button class="tjek" data-f="7">Tjek</button>
     </div>
-    <div class="fb" id="fb6"></div>
+    <div class="fb" id="fb7"></div>
     <div class="loesRow">
       <button class="visOpg" data-o="5" disabled>Vis løsning til opgave 5</button>
       <span class="laas" id="laas5"></span>
@@ -299,20 +308,20 @@ input.nr:focus{outline:none;border-color:var(--yellow)}
     <p><b>a)</b> Bestem usikkerheden &delta; på de <b id="dT3" style="color:var(--yellow);font-weight:normal">&ndash;</b> tællinger.</p>
     <div class="felt">
       <span class="navn"><i class="sym">&delta;</i> =</span>
-      <input id="f7" type="text" autocomplete="off" spellcheck="false">
+      <input id="f8" type="text" autocomplete="off" spellcheck="false">
       <span class="enhed">tællinger</span>
-      <button class="tjek" data-f="7">Tjek</button>
+      <button class="tjek" data-f="8">Tjek</button>
     </div>
-    <div class="fb" id="fb7"></div>
+    <div class="fb" id="fb8"></div>
     <p><b>b)</b> Bestem usikkerheden <i class="sym">&delta;t</i> på den alder, du fandt i opgave 5.</p>
     <p class="note" style="margin:4px 0 0">Pas på afrundingen her: svaret er et lille tal, der kommer ud af store tal. Regn med mange cifre undervejs, og rund først af til sidst.</p>
     <div class="felt">
       <span class="navn"><i class="sym">&delta;t</i> =</span>
-      <input id="f8" type="text" autocomplete="off" spellcheck="false">
+      <input id="f9" type="text" autocomplete="off" spellcheck="false">
       <span class="enhed">år</span>
-      <button class="tjek" data-f="8">Tjek</button>
+      <button class="tjek" data-f="9">Tjek</button>
     </div>
-    <div class="fb" id="fb8"></div>
+    <div class="fb" id="fb9"></div>
     <div class="loesRow">
       <button id="visVink">Vink til b)</button>
       <button class="visOpg" data-o="6" disabled>Vis løsning til opgave 6</button>
@@ -477,8 +486,8 @@ const taet = (a, b, tol) => isFinite(a) && isFinite(b) && b !== 0 && Math.abs(a 
 
 // ---------- opgavesættet ----------
 let D = null;                      // aktuelle data
-const N_FELT = 8;                  // 6 i opgave 1-5 og 2 i udfordringen
-const N_HOVED = 6;                 // felterne der tæller med i resultatet
+const N_FELT = 9;                  // 7 i opgave 1-5 og 2 i udfordringen
+const N_HOVED = 7;                 // felterne der tæller med i resultatet
 let svar = Array(N_FELT).fill(null);        // true/false/null pr. felt
 let forsoeg = Array(N_FELT).fill(0);        // antal tjek pr. felt
 let loesningSet = Array(6).fill(false);     // pr. opgave
@@ -488,19 +497,19 @@ let kvalitet = Array(N_FELT).fill(null);    // "groen" | "gul" | "roed"
 // Regnskabet følger opgavenummeret, så man ikke kan skifte nummer frem og tilbage
 // for at slette sporet efter en åbnet løsning.
 const historik = new Map();
-const OPG_FELTER = [[0], [1], [2], [3, 4], [5], [6, 7]];
+const OPG_FELTER = [[0], [1, 2], [3], [4, 5], [6], [7, 8]];
 let visMaaling = 0;                // fremdrift 0-1 i måleanimationen
 let koerer = false;
 
-const felter = [1, 2, 3, 4, 5, 6, 7, 8].map(i => document.getElementById("f" + i));
-const fbEl   = [1, 2, 3, 4, 5, 6, 7, 8].map(i => document.getElementById("fb" + i));
+const felter = [1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => document.getElementById("f" + i));
+const fbEl   = [1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => document.getElementById("fb" + i));
 
 function facit(i){
-  return [D.aMaalt, D.n0, D.kSek, D.a0, D.a0Doegn, D.tSvar, D.dTael, D.dtSvar][i];
+  return [D.aMaalt, D.nC, D.n0, D.kSek, D.a0, D.a0Doegn, D.tSvar, D.dTael, D.dtSvar][i];
 }
 function tolerance(i){
   // alderen og dens usikkerhed er sammensat af flere afrundede mellemresultater
-  return i === 5 || i === 7 ? 0.04 : 0.02;
+  return i === 6 || i === 8 ? 0.04 : 0.02;
 }
 // Lige uden for tolerancen ligger et bånd, hvor svaret er tæt nok på til, at det
 // næsten altid skyldes afrunding undervejs og ikke en forkert metode.
@@ -512,8 +521,8 @@ function naerhed(i, v){
   const retning = v > f ? "højt" : "lavt";
   const pct = Math.round(tol * 100);
   const start = `Dit svar ligger lidt for ${retning}, men uden for de ${pct} %, der kræves. `;
-  if (i === 5) return start + "Alderen er følsom over for afrunding, fordi forholdet mellem de to aktiviteter ligger tæt på 1. Brug mindst 4 betydende cifre i <i class='sym'>A</i>, <i class='sym'>A</i><sub>0</sub> og <i class='sym'>k</i>.";
-  if (i === 7) return start + "Regner du dig frem til to aldre og trækker dem fra hinanden, trækker du to næsten lige store tal fra hinanden. Så betyder afrundingen meget: runder du de to aldre til 3 betydende cifre, kan svaret let blive 10 % forkert. Regn videre med alle cifrene og rund først af til sidst.";
+  if (i === 6) return start + "Alderen er følsom over for afrunding, fordi forholdet mellem de to aktiviteter ligger tæt på 1. Brug mindst 4 betydende cifre i <i class='sym'>A</i>, <i class='sym'>A</i><sub>0</sub> og <i class='sym'>k</i>.";
+  if (i === 8) return start + "Regner du dig frem til to aldre og trækker dem fra hinanden, trækker du to næsten lige store tal fra hinanden. Så betyder afrundingen meget: runder du de to aldre til 3 betydende cifre, kan svaret let blive 10 % forkert. Regn videre med alle cifrene og rund først af til sidst.";
   return start + "Det ligner en afrundingsfejl: regn videre med mindst 4 betydende cifre undervejs, og rund først af til sidst.";
 }
 
@@ -529,7 +538,15 @@ function diagnose(i, v){
     push(v > 0 && v < D.taellinger, "Aktiviteten kan ikke være mindre end tælletallet: røret registrerer højst ét klik pr. henfald, og det gør det langtfra.");
   }
   if (i === 1){
-    push(taet(v, D.nC, 0.03), "Det er antallet af kulstofatomer i alt. Kun brøkdelen 1,2 &middot; 10\u207b\u00b9\u00b2 af dem er C-14.");
+    push(taet(v, D.m / U_G, 0.03), "Du har divideret med massen af 1 u. Et kulstofatom vejer 12 u, altså 12 &middot; 1,66054 &middot; 10\u207b\u00b2\u2074 g = 1,99 &middot; 10\u207b\u00b2\u00b3 g.");
+    push(taet(v, D.n0, 0.03), "Det er antallet af C-14-kerner. Her spørges om <i class='sym'>alle</i> kulstofatomer i prøven.");
+    push(taet(v, D.m * M_C * U_G, 0.05) || taet(v, D.m * U_G, 0.05), "Du har ganget med massen af \u00e9t atom i stedet for at dividere. Antallet af atomer er prøvens masse divideret med massen af \u00e9t atom.");
+    push(taet(v, D.nC * M_C, 0.03), "Du har ganget med 12 i stedet for at dividere med 12.");
+    push(v > 0 && v < 1, "Svaret kan ikke v\u00e6re mindre end 1 \u2013 et gram kulstof rummer omkring 10\u00b2\u00b3 atomer. N\u00e5r man dividerer med et meget lille tal, bliver resultatet stort.");
+    push(v > 1e26, "Svaret er alt for stort. Et gram kulstof rummer omkring 10\u00b2\u00b3 atomer.");
+  }
+  if (i === 2){
+    push(taet(v, D.nC, 0.03), "Det er svaret fra a), alts\u00e5 alle kulstofatomer. Kun br\u00f8kdelen 1,2 &middot; 10\u207b\u00b9\u00b2 af dem er C-14.");
     push(taet(v, D.n0 * 12, 0.04), "Du har divideret med massen af 1 u i stedet for med massen af \u00e9t kulstofatom. Et kulstofatom vejer 12 u, alts\u00e5 12 &middot; 1,66054 &middot; 10\u207b\u00b2\u2074 g = 1,99 &middot; 10\u207b\u00b2\u00b3 g.");
     push(taet(v, D.m / U_G, 0.04), "Du har divideret med massen af 1 u i stedet for med 12 u, og du mangler at gange med br\u00f8kdelen 1,2 &middot; 10\u207b\u00b9\u00b2.");
     push(taet(v, D.m * M_C * U_G * FRAC, 0.05) || taet(v, D.m * U_G * FRAC, 0.05), "Du har ganget med massen af \u00e9t atom i stedet for at dividere. Antallet af atomer er pr\u00f8vens masse divideret med massen af \u00e9t atom.");
@@ -540,24 +557,24 @@ function diagnose(i, v){
     push(taet(v, D.n0 / 100, 0.03), "Du er en faktor 100 for lavt nede. Brøkdelen 1,2 &middot; 10\u207b\u00b9\u00b2 er ikke en procentdel.");
     push(taet(v, D.m * FRAC, 0.03), "Du mangler at dele med massen af ét kulstofatom, 12 u.");
   }
-  if (i === 2){
+  if (i === 3){
     push(taet(v, D.kAar, 0.03), "Det er <i class='sym'>k</i> i enheden år\u207b\u00b9. Del med antallet af sekunder på et år.");
     push(taet(v, T_HALV / Math.LN2, 0.03), "Du har vendt brøken om. Der gælder <i class='sym'>k</i> = ln(2)/<i class='sym'>T</i><sub>1/2</sub>.");
     push(taet(v, S_PR_AAR / Math.LN2 * T_HALV, 0.03), "Du har vendt brøken om.");
     push(taet(v, Math.LN2 / (T_HALV * 365 * 24), 0.03), "Tjek omregningen: der er 3600 sekunder på en time.");
   }
-  if (i === 3){
+  if (i === 4){
     push(taet(v, D.kAar * D.n0, 0.03), "Du har brugt <i class='sym'>k</i> i år\u207b\u00b9. Aktivitet i Bq kræver <i class='sym'>k</i> i s\u207b\u00b9.");
     push(taet(v, D.a0Doegn, 0.03), "Det er aktiviteten i enheden døgn\u207b\u00b9. Her spørges om den i Bq, altså pr. sekund.");
     push(taet(v, D.n0 / T_HALV, 0.03), "Aktiviteten er <i class='sym'>A</i> = <i class='sym'>k</i> &middot; <i class='sym'>N</i>, ikke <i class='sym'>N</i> delt med halveringstiden.");
   }
-  if (i === 4){
+  if (i === 5){
     push(taet(v, D.a0, 0.03), "Det er aktiviteten i Bq, altså pr. sekund. Gang med de 86400 sekunder, døgnet varer.");
     push(taet(v, D.a0 * 3600, 0.03), "Du har ganget med en time. Et døgn er 24 &middot; 3600 s = 86400 s.");
     push(taet(v, D.a0 * 60, 0.03), "Du har ganget med et minut.");
     push(taet(v, D.aMaalt, 0.03), "Det er prøvens aktivitet i dag. Spørgsmålet er aktiviteten på dødstidspunktet.");
   }
-  if (i === 5){
+  if (i === 6){
     push(v < 0 || taet(v, -D.tSvar, 0.06), "Du har byttet om på de to tal i logaritmen. Der skal stå ln(<i class='sym'>A</i><sub>0</sub>/<i class='sym'>A</i>), og <i class='sym'>A</i><sub>0</sub> er den største.");
     push(taet(v, D.tSvar * S_PR_AAR, 0.06), "Det er alderen i sekunder. Brug <i class='sym'>k</i> i år\u207b\u00b9, så kommer <i class='sym'>t</i> direkte i år.");
     push(taet(v, D.tSvar / S_PR_AAR, 0.06), "Enhederne passer ikke. Brug <i class='sym'>k</i> i år\u207b\u00b9, så kommer <i class='sym'>t</i> direkte i år.");
@@ -565,13 +582,13 @@ function diagnose(i, v){
     push(taet(v, D.a0Doegn / D.aMaalt, 0.05), "Forholdet mellem de to tal er ikke alderen. Isolér <i class='sym'>t</i> i <i class='sym'>A</i> = <i class='sym'>A</i><sub>0</sub> &middot; e<sup>&minus;<i class='sym'>kt</i></sup>.");
     push(v > 50000, "Svaret er alt for stort. Et moselig fra jernalderen er nogle få tusind år gammelt.");
   }
-  if (i === 6){
+  if (i === 7){
     push(taet(v, D.taellinger, 0.005), "Det er tælletallet selv. Usikkerheden er kvadratroden af det.");
     push(taet(v, D.taellinger * D.taellinger, 0.03), "Du har kvadreret i stedet for at tage kvadratroden.");
     push(taet(v, D.dRel, 0.03) || taet(v, D.dRel * 100, 0.03), "Det er den relative usikkerhed. Her spørges om usikkerheden på selve tælletallet, i antal tællinger.");
     push(taet(v, D.aMaalt, 0.02) || taet(v, Math.sqrt(D.aMaalt), 0.02), "Tag kvadratroden af tælletallet, ikke af aktiviteten. Det er tællingerne, der er den tilfældige størrelse.");
   }
-  if (i === 7){
+  if (i === 8){
     push(taet(v, D.dRel, 0.04) || taet(v, D.dRel * 100, 0.04), "Det er den relative usikkerhed på aktiviteten. Den skal omsættes til år &ndash; husk, at <i class='sym'>k</i> har enheden år⁻¹.");
     push(taet(v, D.dtSvar * Math.SQRT2, 0.03), "Pænt tænkt &ndash; men du har regnet med usikkerhed på begge aktiviteter og lagt dem sammen kvadratisk. <i class='sym'>A</i><sub>0</sub> er beregnet ud fra prøvens masse og ikke målt, så den bidrager ikke her.");
     push(taet(v, D.dtSvar * 2, 0.03), "Du er en faktor 2 for højt oppe. Enten har du talt begge aktiviteter med, eller også har du angivet hele intervallets bredde. Usikkerheden er den halve forskel mellem yderpunkterne.");
@@ -614,8 +631,8 @@ function tjek(i){
     let txt = kvalitet[i] === "groen" ? "Rigtigt."
       : kvalitet[i] === "gul" ? `Rigtigt \u2013 det tog ${forsoeg[i]} forsøg.`
       : "Rigtigt \u2013 men løsningen var set først.";
-    if (i === 5) txt += ` Lyngmosemanden døde for ca. ${Math.round(D.tSvar / 10) * 10} år siden, alts\u00e5 omkring ${doedsaar(D.tSvar)}`;
-    if (i === 7) txt += ` Dateringen er alts\u00e5 ${Math.round(D.tSvar)} \u00b1 ${Math.round(D.dtSvar)} \u00e5r.`;
+    if (i === 6) txt += ` Lyngmosemanden døde for ca. ${Math.round(D.tSvar / 10) * 10} år siden, alts\u00e5 omkring ${doedsaar(D.tSvar)}`;
+    if (i === 8) txt += ` Dateringen er alts\u00e5 ${Math.round(D.tSvar)} \u00b1 ${Math.round(D.dtSvar)} \u00e5r.`;
     fbEl[i].innerHTML = txt;
   } else {
     // En konkret diagnose er et bedre vink end "tæt på", så den kommer først
@@ -632,8 +649,8 @@ function tjek(i){
   else if (felterI.every(j => svar[j] === true))
     sek.classList.add(felterI.some(j => kvalitet[j] === "roed") ? "nej"
                     : felterI.some(j => kvalitet[j] === "gul") ? "delvis" : "ok");
-  if (i === 5) visGraf();
-  if (i === 7) tegnGraf();      // usikkerhedsbåndet kommer på, når udfordringen er løst
+  if (i === 6) visGraf();
+  if (i === 8) tegnGraf();      // usikkerhedsbåndet kommer på, når udfordringen er løst
   gemHistorik();
   opdaterStatus();
 }
@@ -955,7 +972,7 @@ function tegnGraf(){
   c.stroke();
 
   // usikkerhedsbånd, først når udfordringen er løst
-  if (svar[7] === true){
+  if (svar[8] === true){
     const tA = Math.max(0, D.tSvar - D.dtSvar), tB = Math.min(T_AKSE, D.tSvar + D.dtSvar);
     c.fillStyle = "rgba(244,211,69,0.16)";
     c.fillRect(X(tA), mT, X(tB) - X(tA), ph);
@@ -991,8 +1008,8 @@ function byg2(){
   const nC = sciTex(D.nC, 5), n0 = sciTex(D.n0, 5);
   return [
     `## 2. Antal C-14-kerner, da han døde`,
-    `Et kulstofatom vejer i gennemsnit $12\\ \\text{u}$, og $1\\ \\text{u} = 1{,}66054\\cdot 10^{-24}\\ \\text{g}$. Antallet af kulstofatomer i prøven er massen divideret med massen af ét atom: $$N_C = \\frac{m}{12\\,\\text{u}} = \\frac{${kommaTex(D.m.toFixed(1))}\\ \\text{g}}{12\\cdot 1{,}66054\\cdot 10^{-24}\\ \\text{g}} = \\frac{${kommaTex(D.m.toFixed(1))}\\ \\text{g}}{${sciTex(M_C * U_G, 5)}\\ \\text{g}} = ${nC}.$$`,
-    `Af dem er kun brøkdelen $1{,}2\\cdot 10^{-12}$ C-14. Så længe han levede, blev det indhold holdt ved lige, og det er derfor antallet på dødstidspunktet: $$N_0 = 1{,}2\\cdot 10^{-12}\\cdot ${nC} = ${n0}.$$`
+    `*a)* Et kulstofatom vejer i gennemsnit $12\\ \\text{u}$, og $1\\ \\text{u} = 1{,}66054\\cdot 10^{-24}\\ \\text{g}$. Antallet af kulstofatomer i prøven er massen divideret med massen af ét atom: $$N_C = \\frac{m}{12\\,\\text{u}} = \\frac{${kommaTex(D.m.toFixed(1))}\\ \\text{g}}{12\\cdot 1{,}66054\\cdot 10^{-24}\\ \\text{g}} = \\frac{${kommaTex(D.m.toFixed(1))}\\ \\text{g}}{${sciTex(M_C * U_G, 5)}\\ \\text{g}} = ${nC}.$$`,
+    `*b)* Af dem er kun brøkdelen $1{,}2\\cdot 10^{-12}$ C-14. Så længe han levede, blev det indhold holdt ved lige, og det er derfor antallet på dødstidspunktet: $$N_0 = 1{,}2\\cdot 10^{-12}\\cdot ${nC} = ${n0}.$$`
   ];
 }
 function byg3(){
@@ -1063,6 +1080,7 @@ function bygVink(){
     `Kan du differentiere, findes der en kortere vej. Den står i løsningen.`
   ];
 }
+
 function mdTilHtml(s){ return s.replace(/\*([^*$]+)\*/g, "<em>$1</em>"); }
 
 // ---------- TeX -> almindelig tekst, så løsningen kan sættes ind i Word ----------
